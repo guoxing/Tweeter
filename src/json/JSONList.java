@@ -1,6 +1,7 @@
 package json;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -30,21 +31,36 @@ public class JSONList extends JSONObject {
 	/* The following methods all simply add to the internal list.
 	 * 5 different types of them are needed to support only the valid JSON types
 	 */
+	public void add(String val) 	{ list.add(val); }
+	public void add(Boolean val) 	{ list.add(val); }
+	public void add(Integer val) 	{ list.add(val); }
+	public void add(Double val) 	{ list.add(val); }
+	public void add(JSONObject val) { list.add(val); }
 	
-	public void add(String val) {
-		list.add(val);
+	/**
+	 * Packs together an array of JSONabble objects into a JSONList.
+	 * @param jSONabbles Collection of objects that implement JSONabble interface
+	 * @return ordered JSONList of objects passed in
+	 */
+	public static JSONList toJSONList(JSONabble... jSONabbles) {
+		JSONList list = new JSONList();
+		for (JSONabble jSONabble : jSONabbles) {
+			list.add(jSONabble.toJSON());
+		}
+		return list;
 	}
-	public void add(Boolean val) {
-		list.add(val);
-	}
-	public void add(Integer val) {
-		list.add(val);
-	}
-	public void add(Double val) {
-		list.add(val);
-	}
-	public void add(JSONObject val) {
-		list.add(val);
+	
+	/**
+	 * Packs together a collection of JSONabble objects into a JSONList.
+	 * @param jSONabbles Collection of objects that implement JSONabble interface
+	 * @return ordered JSONList of objects passed in
+	 */
+	public static JSONList toJSONList(Collection<JSONabble> jSONabbles) {
+		JSONList list = new JSONList();
+		for (JSONabble jSONabble : jSONabbles) {
+			list.add(jSONabble.toJSON());
+		}
+		return list;
 	}
 
 	/**

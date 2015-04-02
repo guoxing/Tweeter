@@ -20,7 +20,7 @@ public class JSONMap extends JSONObject {
 	 * but due to restrictions on the value types in the implemented put methods,
 	 * will end up only being of valid JSON value types.
 	 */
-	HashMap<String, Object> map;
+	private HashMap<String, Object> map;
 	
 	/**
 	 * Initializes empty JSONMap
@@ -29,24 +29,59 @@ public class JSONMap extends JSONObject {
 		map = new HashMap<String, Object>();
 	}
 	
-	/* The following methods all simply add to the internal list.
-	 * 5 different types of them are needed to support only the valid JSON types
+	/**
+	 * @param key
+	 * @param value
+	 * @throws NullPointerException if key is null
 	 */
+	public void put(String key, String value) throws NullPointerException {
+		this.safePut(key, value);
+	}
+	/**
+	 * @param key
+	 * @param value
+	 * @throws NullPointerException if key is null
+	 */
+	public void put(String key, Double value) throws NullPointerException {
+		this.safePut(key, value);
+	}
+	/**
+	 * @param key
+	 * @param value
+	 * @throws NullPointerException if key is null
+	 */
+	public void put(String key, Integer value) throws NullPointerException {
+		this.safePut(key, value);
+	}
+	/**
+	 * @param key
+	 * @param value
+	 * @throws NullPointerException if key is null
+	 */
+	public void put(String key, JSONObject value) throws NullPointerException {
+		this.safePut(key, value);
+	}
+	/**
+	 * @param key
+	 * @param value
+	 * @throws NullPointerException if key is null
+	 */
+	public void put(String key, Boolean value) throws NullPointerException {
+		this.safePut(key, value);
+	}
 	
-	public void put(String key, String value) {
-		map.put(key, value);
-	}
-	public void put(String key, Double value) {
-		map.put(key, value);
-	}
-	public void put(String key, Integer value) {
-		map.put(key, value);
-	}
-	public void put(String key, JSONObject value) {
-		map.put(key, value);
-	}
-	public void put(String key, Boolean value) {
-		map.put(key, value);
+	/**
+	 * Private version of put that checks if key is null and throws exception if so.
+	 * @param key
+	 * @param value
+	 * @throws NullPointerException if key is null
+	 */
+	private void safePut(String key, Object value) throws NullPointerException {
+		if (key == null) {
+			throw new NullPointerException("Key for a JSONMap cannot be null");
+		} else {
+			map.put(key, value);
+		}
 	}
 
 	/**
