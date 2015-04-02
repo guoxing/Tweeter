@@ -56,5 +56,4 @@ public class JSONTests {
 	    correctResult.put("petNames", array);
         return correctResult;
 	}
-	
 }
