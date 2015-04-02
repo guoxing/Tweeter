@@ -31,7 +31,6 @@ public abstract class JSONObject {
         escapeChars.put("\"", "\\\\\"");
         escapeChars.put("\\\\", "\\\\\\\\");
         escapeChars.put("/", "\\\\/");
-        // TODO: Unicode?
     }
 
     /**

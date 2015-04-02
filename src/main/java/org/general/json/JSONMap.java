@@ -97,6 +97,11 @@ public class JSONMap extends JSONObject {
         }
     }
 
+    @Override
+    public boolean equals(Object other) {
+		return (other instanceof JSONMap && ((JSONMap)other).map.equals(this.map));
+	}
+
     /**
      * Returns a string formatted as a valid JSON associative array. Strings are
      * wrapped in double quotes and escaped. See class comments for info on
