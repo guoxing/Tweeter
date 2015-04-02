@@ -10,10 +10,10 @@ package org.general.json;
  */
 public interface JSONable {
 
-	/**
-	 * Returns a valid JSONObject
-	 * 
-	 * @return JSONObject
-	 */
-	public JSONObject toJSON();
+    /**
+     * Returns a valid JSONObject
+     * 
+     * @return JSONObject
+     */
+    public JSONObject toJSON();
 }
