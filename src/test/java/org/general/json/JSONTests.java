@@ -1,6 +1,6 @@
 package org.general.json;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -40,9 +40,21 @@ public class JSONTests {
 	
 	@Test
 	public void testJSON() {
-		JSONablePerson person = new JSONablePerson("Ma\rcel", 22, "Philippines", "Tiger", "Ginger");
-		String result = "{\"petNames\": [\"Tiger\", \"Ginger\"], \"address\": \"Philippines\", \"age\": 22, \"name\": \"Ma\\\\rcel\"}";
-		assertEquals(person.toJSON().toString(), result);
+		JSONablePerson person = new JSONablePerson("Ma\\rcel", 22, "Philippines", "Tiger", "Ginger");
+		JSONObject correctResult = createCorrectResult();
+		assertTrue(person.toJSON().equals(correctResult));
+	}
+	
+	private JSONObject createCorrectResult() {
+	    JSONMap correctResult = new JSONMap();
+	    correctResult.put("name", "Ma\\rcel");
+	    correctResult.put("age", 22);
+	    correctResult.put("address", "Philippines");
+	    JSONList array = new JSONList();
+	    array.add("Tiger");
+	    array.add("Ginger");
+	    correctResult.put("petNames", array);
+        return correctResult;
 	}
 	
 }
