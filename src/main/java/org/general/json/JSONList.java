@@ -1,4 +1,4 @@
-package json;
+package org.general.json;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,9 +42,9 @@ public class JSONList extends JSONObject {
 	 * @param jSONabbles Collection of objects that implement JSONabble interface
 	 * @return ordered JSONList of objects passed in
 	 */
-	public static JSONList toJSONList(JSONabble... jSONabbles) {
+	public static JSONList toJSONList(JSONable... jSONabbles) {
 		JSONList list = new JSONList();
-		for (JSONabble jSONabble : jSONabbles) {
+		for (JSONable jSONabble : jSONabbles) {
 			list.add(jSONabble.toJSON());
 		}
 		return list;
@@ -55,9 +55,9 @@ public class JSONList extends JSONObject {
 	 * @param jSONabbles Collection of objects that implement JSONabble interface
 	 * @return ordered JSONList of objects passed in
 	 */
-	public static JSONList toJSONList(Collection<JSONabble> jSONabbles) {
+	public static JSONList toJSONList(Collection<JSONable> jSONabbles) {
 		JSONList list = new JSONList();
-		for (JSONabble jSONabble : jSONabbles) {
+		for (JSONable jSONabble : jSONabbles) {
 			list.add(jSONabble.toJSON());
 		}
 		return list;

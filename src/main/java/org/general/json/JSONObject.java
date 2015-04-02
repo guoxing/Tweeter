@@ -1,4 +1,4 @@
-package json;
+package org.general.json;
 
 import java.util.HashMap;
 

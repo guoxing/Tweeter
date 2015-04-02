@@ -1,4 +1,4 @@
-package json;
+package org.general.json;
 
 /**
  * Interface for classes that want to be JSON-serializable. A class that implement this
@@ -7,7 +7,7 @@ package json;
  * @author marcelpuyat
  *
  */
-public interface JSONabble {
+public interface JSONable {
 	
 	/**
 	 * Returns a valid JSONObject
