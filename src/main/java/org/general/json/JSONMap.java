@@ -79,6 +79,16 @@ public class JSONMap extends JSONObject {
     public void put(String key, Boolean value) throws NullPointerException {
         this.safePut(key, value);
     }
+    
+    /**
+     * @param key
+     * @param value
+     * @throws NullPointerException
+     *             if key is null
+     */
+    public void put(String key, Long value) throws NullPointerException {
+        this.safePut(key, value);
+    }
 
     /**
      * Private version of put that checks if key is null and throws exception if
