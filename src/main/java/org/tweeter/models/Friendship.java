@@ -17,6 +17,10 @@ import org.general.json.JSONObject;
  * If a user A adds user B as their friend, then user A is user B's follower.
  * This information is used when displaying the statuses to appear on a user's
  * home timeline.
+ * 
+ * Note that because friendships are simply noted by user id's, this class
+ * is never actually instantiated. A list of long-types is sufficient in
+ * representing the list of friends/followers for a particular user.
  * @author marcelpuyat
  *
  */
