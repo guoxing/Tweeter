@@ -2,10 +2,6 @@ package org.tweeter.models;
 
 import java.util.List;
 
-import org.general.json.JSONList;
-import org.general.json.JSONMap;
-import org.general.json.JSONObject;
-
 /**
  * Model that interfaces with the data module to retrieve friend/follower
  * information as well as add/delete friends.
@@ -67,23 +63,5 @@ public class Friendship {
      */
     public static void deleteFriend(long userId, long friendId) {
         return;
-    }
-    
-    /**
-     * Returns a JSONObject of the form:
-     *  {"ids": [1, 6, 3, 9, 10]}
-     * Where the ids in the array will be those from the list of ids
-     * passed in (in order).
-     * @param ids
-     * @return
-     */
-    public static JSONObject toJSON(List<Long> ids) {
-        JSONMap returnObj = new JSONMap();
-        JSONList listOfIds = new JSONList();
-        for (Long id : ids) {
-            listOfIds.add(id);
-        }
-        returnObj.put("ids", listOfIds);
-        return returnObj;
     }
 }

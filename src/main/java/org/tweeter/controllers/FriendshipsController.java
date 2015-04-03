@@ -1,9 +1,13 @@
 package org.tweeter.controllers;
 
+import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Map;
 
-import org.general.json.JSONObject;
+import org.general.json.JSONList;
+import org.general.json.JSONMap;
+import org.tweeter.controllers.helpers.ErrorResponse;
+import org.tweeter.controllers.helpers.ParameterRetriever;
 import org.tweeter.models.Friendship;
 
 public class FriendshipsController {
@@ -12,57 +16,76 @@ public class FriendshipsController {
         Long userId = null;
         Long friendId = null;
         try {
-            userId = Long.parseLong(params.get("my_id"));
-            friendId = Long.parseLong(params.get("user_id"));
-        } catch (NumberFormatException e) {
-            // TODO: Invalid parameter response here
+            userId = ParameterRetriever.getRequiredLongParam("my_id", params);
+            friendId = ParameterRetriever.getRequiredLongParam("user_id", params);
+        } catch (InvalidParameterException e) {
+            ErrorResponse.respondWithInvalidParamError(e.getMessage());
         }
         
         Friendship.addFriend(userId, friendId);
-        // Return empty JSON object
+        returnEmptyJSONObject();
+    }
+    
+    private static void returnEmptyJSONObject() {
+        // TODO: Call response handler
     }
     
     public static void deleteFriendship(Map<String, String> params) {
         Long userId = null;
         Long friendId = null;
         try {
-            userId = Long.parseLong(params.get("my_id"));
-            friendId = Long.parseLong(params.get("user_id"));
-        } catch (NumberFormatException e) {
-            // TODO: Invalid parameter response here
+            userId = ParameterRetriever.getRequiredLongParam("my_id", params);
+            friendId = ParameterRetriever.getRequiredLongParam("user_id", params);
+        } catch (InvalidParameterException e) {
+            ErrorResponse.respondWithInvalidParamError(e.getMessage());
         }
         
         Friendship.deleteFriend(userId, friendId);
-        // Return empty JSON object
+        returnEmptyJSONObject();
     }
     
     public static void getFollowers(Map<String, String> params) {
         Long userId = null;
         try {
-            userId = Long.parseLong(params.get("user_id"));
-        } catch (NumberFormatException e) {
-            // TODO: Invalid parameter response here
+            userId = ParameterRetriever.getRequiredLongParam("user_id", params);
+        } catch (InvalidParameterException e) {
+            ErrorResponse.respondWithInvalidParamError(e.getMessage());
         }
         
         List<Long> followerIds = Friendship.getUserFollowers(userId);
         
-        JSONObject followerIdsAsJSON = Friendship.toJSON(followerIds);
-        
-        // TODO: Return followerIdsAsJSON
+        respondWithJSONIdList(followerIds);
     }
     
     public static void getFriends(Map<String, String> params) {
         Long userId = null;
         try {
-            userId = Long.parseLong(params.get("user_id"));
-        } catch (NumberFormatException e) {
-            // TODO: Invalid parameter response here
+            userId = ParameterRetriever.getRequiredLongParam("user_id", params);
+        } catch (InvalidParameterException e) {
+            ErrorResponse.respondWithInvalidParamError(e.getMessage());
         }
         
         List<Long> friendIds = Friendship.getUserFriends(userId);
         
-        JSONObject friendIdsAsJSON = Friendship.toJSON(friendIds);
+        respondWithJSONIdList(friendIds);
+    }
+    
+    /**
+     * Returns a JSONObject of the form:
+     *  {"ids": [1, 6, 3, 9, 10]}
+     * Where the ids in the array will be those from the list of ids
+     * passed in (in order).
+     * @param ids
+     * @return
+     */
+    private static void respondWithJSONIdList(List<Long> ids) {
+        JSONMap jSONresponse = new JSONMap();
+        JSONList listOfIds = new JSONList();
+        for (Long id : ids) {
+            listOfIds.add(id);
+        }
+        jSONresponse.put("ids", listOfIds);
         
-        // TODO: Return friendIdsAsJSON
+        // TODO: Interface with http response handler
     }
 }

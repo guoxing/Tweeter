@@ -1,11 +1,14 @@
 package org.tweeter.controllers;
 
+import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Map;
 
 import org.general.json.JSONList;
-import org.general.json.JSONObject;
+import org.general.json.JSONMap;
 import org.general.json.JSONable;
+import org.tweeter.controllers.helpers.ErrorResponse;
+import org.tweeter.controllers.helpers.ParameterRetriever;
 import org.tweeter.models.Status;
 
 public class StatusesController {
@@ -16,22 +19,21 @@ public class StatusesController {
         Long userId = null;
         String status = null;
         try {
-            userId = Long.parseLong(params.get("my_id"));
-            status = params.get("status");
-            if (status == null) {
-                throw new IllegalArgumentException("Must enter a status");
-            }
-        } catch (NumberFormatException e) {
-            // TODO: Invalid parameter response here
-        } catch (IllegalArgumentException e) {
-            // TODO: Must enter a status
+            userId = ParameterRetriever.getRequiredLongParam("my_id", params);
+            status = ParameterRetriever.getRequiredStringParam("status", params);
+        } catch (InvalidParameterException e) {
+            ErrorResponse.respondWithInvalidParamError(e.getMessage());
         }
         
         try {
             Status.updateStatus(userId, status);
         } catch (IllegalArgumentException e) {
-            // TODO: Tweet too long here
+            respondWithInvalidStatusError(e.getMessage());
         }
+    }
+    
+    private static void respondWithInvalidStatusError(String message) {
+     // TODO: Interface with http response handler
     }
     
     public static void getHomeTimeline(Map<String, String> params) {
@@ -39,24 +41,21 @@ public class StatusesController {
         Long count = null;
         Long maxId = null;
         try {
-            userId = Long.parseLong(params.get("my_id"));
-            count = Long.parseLong(params.get("user_id"));
-            
-            // Max count is optional, so only parse if not null
-            String maxIdAsString = params.get("max_count");
-            if (maxIdAsString != null) {
-                maxId = Long.parseLong(maxIdAsString);
+            userId = ParameterRetriever.getRequiredLongParam("my_id", params);
+            count = ParameterRetriever.getOptionalLongParam("count", params);
+            if (count == null) {
+                count = 20L;
             }
-        } catch (NumberFormatException e) {
-            // TODO: Invalid parameter response here
+            maxId = ParameterRetriever.getOptionalLongParam("max_id", params);
+        } catch (InvalidParameterException e) {
+            ErrorResponse.respondWithInvalidParamError(e.getMessage());
         }
         
         List<? extends JSONable> statuses = null;
         
         // TODO: Get appropriate statuses
         
-        JSONObject statusesAsJson = JSONList.toJSONList(statuses);
-        // TODO: Return JSON
+        respondWithJSONList(JSONList.toJSONList(statuses));
     }
     
     public static void getUserTimeline(Map<String, String> params) {
@@ -64,16 +63,14 @@ public class StatusesController {
         Long count = null;
         Long maxId = null;
         try {
-            userId = Long.parseLong(params.get("my_id"));
-            count = Long.parseLong(params.get("user_id"));
-            
-            // Max count is optional, so only parse if not null
-            String maxIdAsString = params.get("max_count");
-            if (maxIdAsString != null) {
-                maxId = Long.parseLong(maxIdAsString);
+            userId = ParameterRetriever.getRequiredLongParam("my_id", params);
+            count = ParameterRetriever.getOptionalLongParam("count", params);
+            if (count == null) {
+                count = 20L;
             }
-        } catch (NumberFormatException e) {
-            // TODO: Invalid parameter response here
+            maxId = ParameterRetriever.getOptionalLongParam("max_id", params);
+        } catch (InvalidParameterException e) {
+            ErrorResponse.respondWithInvalidParamError(e.getMessage());
         }
         
         List<? extends JSONable> statuses;
@@ -82,7 +79,13 @@ public class StatusesController {
         } else {
             statuses = Status.getUserStatuses(userId, count);
         }
-        JSONObject statusesAsJson = JSONList.toJSONList(statuses);
-        // TODO: Return JSON
+        
+        respondWithJSONList(JSONList.toJSONList(statuses));
+    }
+    
+    private static void respondWithJSONList(JSONList listOfStatuses) {
+        JSONMap tweets = new JSONMap();
+        tweets.put("tweets", listOfStatuses);
+        // TODO: Return JSON through http response module
     }
 }
