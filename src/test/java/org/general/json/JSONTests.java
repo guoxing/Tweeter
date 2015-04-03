@@ -38,21 +38,27 @@ public class JSONTests {
 
 	}
 	
+	private static final String TEST_NAME = "Ma\\rcel";
+	private static final int TEST_AGE = 22;
+	private static final String TEST_ADDRESS = "Philippines";
+	private static final String TEST_PETNAME_ONE = "Tiger";
+	private static final String TEST_PETNAME_TWO = "Ginger";
+	
 	@Test
 	public void testJSON() {
-		JSONablePerson person = new JSONablePerson("Ma\\rcel", 22, "Philippines", "Tiger", "Ginger");
+		JSONablePerson person = new JSONablePerson(TEST_NAME, TEST_AGE, TEST_ADDRESS, TEST_PETNAME_ONE, TEST_PETNAME_TWO);
 		JSONObject correctResult = createCorrectResult();
 		assertTrue(person.toJSON().equals(correctResult));
 	}
 	
 	private JSONObject createCorrectResult() {
 	    JSONMap correctResult = new JSONMap();
-	    correctResult.put("name", "Ma\\rcel");
-	    correctResult.put("age", 22);
-	    correctResult.put("address", "Philippines");
+	    correctResult.put("name", TEST_NAME);
+	    correctResult.put("age", TEST_AGE);
+	    correctResult.put("address", TEST_ADDRESS);
 	    JSONList array = new JSONList();
-	    array.add("Tiger");
-	    array.add("Ginger");
+	    array.add(TEST_PETNAME_ONE);
+	    array.add(TEST_PETNAME_TWO);
 	    correctResult.put("petNames", array);
         return correctResult;
 	}
