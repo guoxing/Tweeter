@@ -48,6 +48,10 @@ public class JSONList extends JSONObject {
     public void add(Double val) {
         list.add(val);
     }
+    
+    public void add(Long val) {
+        list.add(val);
+    }
 
     public void add(JSONObject val) {
         list.add(val);
@@ -75,7 +79,7 @@ public class JSONList extends JSONObject {
      *            Collection of objects that implement JSONabble interface
      * @return ordered JSONList of objects passed in
      */
-    public static JSONList toJSONList(Collection<JSONable> jSONabbles) {
+    public static JSONList toJSONList(Collection<? extends JSONable> jSONabbles) {
         JSONList list = new JSONList();
         for (JSONable jSONabble : jSONabbles) {
             list.add(jSONabble.toJSON());
