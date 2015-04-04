@@ -9,7 +9,6 @@ import org.general.application.ApplicationInterface.ApplicationResult;
 import org.general.json.JSONList;
 import org.general.json.JSONMap;
 import org.general.json.JSONable;
-import org.tweeter.config.Router;
 import org.tweeter.models.Status;
 
 public class StatusesController extends Controller {

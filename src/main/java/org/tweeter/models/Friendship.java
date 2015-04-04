@@ -3,6 +3,8 @@ package org.tweeter.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.general.logger.Logger;
+
 /**
  * Model that interfaces with the data module to retrieve friend/follower
  * information as well as add/delete friends.
@@ -30,6 +32,7 @@ public class Friendship {
      * @return
      */
     public static List<Long> getUserFriends(long userId) {
+        Logger.log("Getting friends of "+userId);
         return new ArrayList<Long>();
     }
     
@@ -41,6 +44,7 @@ public class Friendship {
      * @return
      */
     public static List<Long> getUserFollowers(long userId) {
+        Logger.log("Getting followers of "+userId);
         return new ArrayList<Long>();
     }
     
@@ -52,6 +56,7 @@ public class Friendship {
      * @param friendId
      */
     public static void addFriend(long userId, long friendId) {
+        Logger.log(friendId+" is now "+userId+"'s friend");
         return;
     }
     
@@ -63,6 +68,7 @@ public class Friendship {
      * @param friendId
      */
     public static void deleteFriend(long userId, long friendId) {
+        Logger.log(friendId+" is no longer "+userId+"'s friend");
         return;
     }
 }
