@@ -24,16 +24,7 @@ public interface ApplicationInterface {
             return body;
         }
     }
-    
-    /**
-     * Helper class that simply wraps together the fields from an HTTP request
-     * that are necessary to route a request to a controller's method. The
-     * httpMethod combined with the path make up what is referred to as an
-     * address. This is then used by the route method in a switch statement
-     * to take actions corresponding to the address.
-     * @author marcelpuyat
-     *
-     */
+
     public static class ApplicationAction {
         private String httpMethod;
         private String path;

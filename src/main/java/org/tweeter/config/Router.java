@@ -6,18 +6,6 @@ import org.general.application.ApplicationInterface;
 import org.tweeter.controllers.FriendshipsController;
 import org.tweeter.controllers.StatusesController;
 
-/**
- * The router is in charge of mapping an HTTP-method & path pair (along with
- * the parameters) to an appropriate controller's method, and then passing
- * the response of the method back to the HTTPHandler.
- * 
- * It implements HTTPHandler, being passed an HTTPRequest.
- * It then unwraps the HTTPRequest to put together an Action, comprised of
- * the http method, path, and the parameters. The http method and path together
- * uniquely correspond to a controller's method.
- * @author marcelpuyat
- *
- */
 public class Router implements ApplicationInterface {
     
     @Override
@@ -25,14 +13,6 @@ public class Router implements ApplicationInterface {
         return route(action);
     }
     
-    /**
-     * Routes an httpMethod path pair to a controller's method, passing along
-     * the parameters.
-     * 
-     * The httpMethod, path, and parameter are passed into the method through a
-     * helper class (Action) to abstract away all the details of an HTTPRequest.
-     * @param action Holds the address (i.e. the httpMethod path pair) and the parameters
-     */
     private static ApplicationDatagram route(ApplicationAction action) {
         Map<String, String> params = action.getParams();
         switch(action.getAddress()) {
