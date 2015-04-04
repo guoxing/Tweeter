@@ -89,12 +89,16 @@ public class HTTPRequest {
             headers.put(key, value);
             line = in.readLine();
         }
-
+        
         // process body
-        if (line == "") {
-            line = in.readLine();
-            if (line != null && method.equals(Method.POST)) {
-                addQueryParams(line);
+        if (line.isEmpty() && headers.get("Content-Length") != null) {
+            int contentLength = Integer.parseInt(headers.get("Content-Length"));
+            if (contentLength <= 0) return;
+            char[] bodyBuffer = new char[contentLength];
+            in.read(bodyBuffer, 0, contentLength);
+            String bodyAsString = URLDecoder.decode(String.copyValueOf(bodyBuffer), ENCODING);
+            if (bodyAsString != null && method.equals(Method.POST)) {
+                addQueryParams(bodyAsString);
             }
         }
     }
