@@ -1,4 +1,4 @@
-package org.tweeter.controllers;
+package org.general.application.mvc;
 
 import java.security.InvalidParameterException;
 import java.util.Map;
@@ -10,6 +10,10 @@ public abstract class Controller {
     
     public static ApplicationDatagram respondWithInvalidParamError(String message) {
         return new ApplicationDatagram(message, ApplicationResult.INVALID_PARAMETERS);
+    }
+    
+    public static ApplicationDatagram respondWithSuccess(String body) {
+        return new ApplicationDatagram(body, ApplicationResult.SUCCESS);
     }
     
     public static String getRequiredStringParam(String paramKey, Map<String, String> params)

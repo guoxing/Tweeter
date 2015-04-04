@@ -3,6 +3,7 @@ package org.tweeter.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.general.application.mvc.Model;
 import org.general.logger.Logger;
 
 /**
@@ -23,7 +24,7 @@ import org.general.logger.Logger;
  * @author marcelpuyat
  *
  */
-public class Friendship {
+public class Friendship extends Model {
     
     /**
      * Returns list of ids of friends of the given user. Will be empty

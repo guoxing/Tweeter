@@ -3,6 +3,7 @@ package org.tweeter.models;
 import java.util.Date;
 import java.util.List;
 
+import org.general.application.mvc.Model;
 import org.general.json.JSONMap;
 import org.general.json.JSONObject;
 import org.general.json.JSONable;
@@ -21,7 +22,7 @@ import org.general.json.JSONable;
  * @author marcelpuyat
  *
  */
-public class Status implements JSONable {
+public class Status extends Model implements JSONable {
     
     private static final int MAX_TWEET_LENGTH = 140;
     

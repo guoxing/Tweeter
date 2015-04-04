@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.general.application.ApplicationInterface.ApplicationDatagram;
-import org.general.application.ApplicationInterface.ApplicationResult;
+import org.general.application.mvc.Controller;
 import org.general.json.JSONList;
 import org.general.json.JSONMap;
 import org.general.json.JSONable;
@@ -30,7 +30,7 @@ public class StatusesController extends Controller {
         } catch (IllegalArgumentException e) {
             return respondWithInvalidParamError(e.getMessage());
         }
-        return new ApplicationDatagram(new JSONMap().toString(), ApplicationResult.SUCCESS);
+        return respondWithSuccess(new JSONMap().toString());
     }
     
     
@@ -57,7 +57,7 @@ public class StatusesController extends Controller {
         // TODO: Get appropriate statuses
         
         JSONMap tweetsAsJSON = respondWithJSONListOfTweets(JSONList.toJSONList(statuses));
-        return new ApplicationDatagram(tweetsAsJSON.toString(), ApplicationResult.SUCCESS);
+        return respondWithSuccess(tweetsAsJSON.toString());
     }
     
     public static ApplicationDatagram getUserTimeline(Map<String, String> params) {
@@ -83,7 +83,7 @@ public class StatusesController extends Controller {
         }
         
         JSONMap tweetsAsJSON = respondWithJSONListOfTweets(JSONList.toJSONList(statuses));
-        return new ApplicationDatagram(tweetsAsJSON.toString(), ApplicationResult.SUCCESS);
+        return respondWithSuccess(tweetsAsJSON.toString());
     }
     
     private static JSONMap respondWithJSONListOfTweets(JSONList listOfStatuses) {

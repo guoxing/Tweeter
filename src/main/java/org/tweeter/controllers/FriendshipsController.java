@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.general.application.ApplicationInterface.ApplicationDatagram;
-import org.general.application.ApplicationInterface.ApplicationResult;
+import org.general.application.mvc.Controller;
 import org.general.json.JSONList;
 import org.general.json.JSONMap;
 import org.general.json.JSONObject;
@@ -24,11 +24,7 @@ public class FriendshipsController extends Controller {
         }
         
         Friendship.addFriend(userId, friendId);
-        return new ApplicationDatagram(generateEmptyJSONObject().toString(), ApplicationResult.SUCCESS);
-    }
-    
-    private static JSONObject generateEmptyJSONObject() {
-        return new JSONMap();
+        return respondWithSuccess(new JSONMap().toString());
     }
     
     public static ApplicationDatagram deleteFriendship(Map<String, String> params) {
@@ -42,7 +38,7 @@ public class FriendshipsController extends Controller {
         }
         
         Friendship.deleteFriend(userId, friendId);
-        return new ApplicationDatagram(generateEmptyJSONObject().toString(), ApplicationResult.SUCCESS);
+        return respondWithSuccess(new JSONMap().toString());
     }
     
     public static ApplicationDatagram getFollowers(Map<String, String> params) {
@@ -55,7 +51,7 @@ public class FriendshipsController extends Controller {
         
         List<Long> followerIds = Friendship.getUserFollowers(userId);
         
-        return new ApplicationDatagram(generateJSONIdList(followerIds).toString(), ApplicationResult.SUCCESS);
+        return respondWithSuccess(generateJSONIdList(followerIds).toString());
     }
     
     public static ApplicationDatagram getFriends(Map<String, String> params) {
@@ -68,7 +64,7 @@ public class FriendshipsController extends Controller {
         
         List<Long> friendIds = Friendship.getUserFriends(userId);
         
-        return new ApplicationDatagram(generateJSONIdList(friendIds).toString(), ApplicationResult.SUCCESS);
+        return respondWithSuccess(generateJSONIdList(friendIds).toString());
     }
     
     /**
