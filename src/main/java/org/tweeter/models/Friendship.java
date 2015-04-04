@@ -1,5 +1,6 @@
 package org.tweeter.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ public class Friendship {
      * @return
      */
     public static List<Long> getUserFriends(long userId) {
-        return null;
+        return new ArrayList<Long>();
     }
     
     /**
@@ -40,7 +41,7 @@ public class Friendship {
      * @return
      */
     public static List<Long> getUserFollowers(long userId) {
-        return null;
+        return new ArrayList<Long>();
     }
     
     /**

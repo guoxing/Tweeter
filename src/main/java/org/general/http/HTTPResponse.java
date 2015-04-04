@@ -19,11 +19,19 @@ import org.general.json.JSONMap;
 public class HTTPResponse {
 
     // HTTP status code
-    public static class StatusCode {
-        public static final int OK = 200;
-        public static final int BAD_REQUEST = 400;
-        public static final int NOT_FOUND = 404;
-        public static final int SERVER_ERROR = 500;
+    public enum StatusCode {
+        OK(200),
+        BAD_REQUEST(400),
+        NOT_FOUND(404),
+        SERVER_ERROR(500);
+        
+        private int num;
+        private StatusCode(int num) {
+            this.num = num;
+        }
+        public int getNum() {
+            return this.num;
+        }
     }
 
     public static class HeaderField {
@@ -33,9 +41,9 @@ public class HTTPResponse {
         public static final String CONTENT_LENGTH = "Content-Length";
     }
 
-    private static final Map<Integer, String> StatusMessage;
+    private static final Map<StatusCode, String> StatusMessage;
     static {
-        StatusMessage = new HashMap<Integer, String>();
+        StatusMessage = new HashMap<StatusCode, String>();
         StatusMessage.put(StatusCode.OK, "OK");
         StatusMessage.put(StatusCode.BAD_REQUEST, "Bad Request");
         StatusMessage.put(StatusCode.NOT_FOUND, "Not Found");
@@ -46,7 +54,7 @@ public class HTTPResponse {
     private static final String DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss z";
 
     private PrintWriter out;
-    private int statusCode;
+    private StatusCode statusCode;
     private Map<String, String> headers;
     private String body;
     private String version;
@@ -81,7 +89,7 @@ public class HTTPResponse {
      * 
      * @return A boolean indicating whether the send is success
      */
-    public boolean sendSuccess(int code) {
+    public boolean sendSuccess(StatusCode code) {
         if (code != StatusCode.OK) {
             return false;
         }
@@ -98,7 +106,7 @@ public class HTTPResponse {
      * 
      * @return A boolean indicating whether the send is success
      */
-    public boolean sendError(int code, String message) {
+    public boolean sendError(StatusCode code, String message) {
         if (code == StatusCode.OK) {
             return false;
         }
@@ -122,7 +130,7 @@ public class HTTPResponse {
         headers.put(HeaderField.CONTENT_LENGTH, Integer.toString(body.length()));
 
         // write to stream
-        out.println(version + " " + Integer.toString(statusCode) + " "
+        out.println(version + " " + Integer.toString(statusCode.getNum()) + " "
                 + StatusMessage.get(statusCode));
         for (String key : headers.keySet()) {
             out.println(key + ": " + headers.get(key));
