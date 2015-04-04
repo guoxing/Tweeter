@@ -72,6 +72,7 @@ public class HTTPRequest {
         }
         Pattern queryP = Pattern.compile(QUERYREGEX);
         Matcher queryM = queryP.matcher(fullURI);
+        queryM.find();
         URI = URLDecoder.decode(queryM.group(1), ENCODING);
         String queryString = queryM.group(2);
         queryParams = new HashMap<String, String>();
@@ -82,10 +83,11 @@ public class HTTPRequest {
         // populate headers
         headers = new HashMap<String, String>();
         String line = in.readLine();
-        while (line != null && line != "") {
+        while (line != null && !line.isEmpty()) {
             String key = line.split(":")[0].trim();
             String value = line.split(":")[1].trim();
             headers.put(key, value);
+            line = in.readLine();
         }
 
         // process body
