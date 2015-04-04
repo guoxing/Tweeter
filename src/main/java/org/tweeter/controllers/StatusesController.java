@@ -13,7 +13,7 @@ import org.tweeter.models.Status;
 
 public class StatusesController extends Controller {
     
-    private static final int DEFAULT_TIMELINE_SIZE = 20;
+    private static final Long DEFAULT_TIMELINE_SIZE = 20L;
     
     public static ApplicationDatagram updateStatus(Map<String, String> params) {
         Long userId = null;
@@ -36,8 +36,10 @@ public class StatusesController extends Controller {
     
     
     public static ApplicationDatagram getHomeTimeline(Map<String, String> params) {
+        @SuppressWarnings("unused")
         Long userId = null;
         Long count = null;
+        @SuppressWarnings("unused")
         Long maxId = null;
         try {
             userId = getRequiredLongParam("my_id", params);
@@ -66,7 +68,7 @@ public class StatusesController extends Controller {
             userId = getRequiredLongParam("my_id", params);
             count = getOptionalLongParam("count", params);
             if (count == null) {
-                count = 20L;
+                count = DEFAULT_TIMELINE_SIZE;
             }
             maxId = getOptionalLongParam("max_id", params);
         } catch (InvalidParameterException e) {

@@ -34,6 +34,7 @@ public class HTTPRequest {
     private String method;
     private String absoluteURI;
     private String URI;
+    @SuppressWarnings("unused")
     private String version;
     private Map<String, String> queryParams;
     private Map<String, String> headers;
