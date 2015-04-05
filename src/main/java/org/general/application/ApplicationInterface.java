@@ -4,20 +4,20 @@ import java.util.Map;
 
 public interface ApplicationInterface {
     
-    public ApplicationResponse respondToAction(ApplicationRequest action);
+    public AppResponse respondToAction(AppRequest action);
     
-    public enum ApplicationResponseStatus {
+    public enum AppResponseStatus {
         SUCCESS, INVALID_PARAMETERS, INVALID_DESTINATION
     }
     
-    public static class ApplicationResponse {
-        private ApplicationResponseStatus responseStatus;
+    public static class AppResponse {
+        private AppResponseStatus responseStatus;
         private String responseBody;
-        public ApplicationResponse(String body, ApplicationResponseStatus result) {
+        public AppResponse(String body, AppResponseStatus result) {
             this.responseStatus = result;
             this.responseBody = body;
         }
-        public ApplicationResponseStatus getResult() {
+        public AppResponseStatus getResult() {
             return responseStatus;
         }
         public String getBody() {
@@ -25,11 +25,11 @@ public interface ApplicationInterface {
         }
     }
 
-    public static class ApplicationRequest {
+    public static class AppRequest {
         private String uniqueRequestAddress;
         private Map<String, String> params;
         
-        public ApplicationRequest(String uniqueRequestAddress, Map<String, String> params) {
+        public AppRequest(String uniqueRequestAddress, Map<String, String> params) {
             this.uniqueRequestAddress = uniqueRequestAddress;
             this.params = params;
         }

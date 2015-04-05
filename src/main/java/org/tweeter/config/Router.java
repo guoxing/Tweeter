@@ -9,11 +9,11 @@ import org.tweeter.controllers.StatusesController;
 public class Router implements ApplicationInterface {
     
     @Override
-    public ApplicationResponse respondToAction(ApplicationRequest request) {
+    public AppResponse respondToAction(AppRequest request) {
         return route(request);
     }
     
-    private static ApplicationResponse route(ApplicationRequest request) {
+    private static AppResponse route(AppRequest request) {
         Map<String, String> params = request.getParams();
         switch(request.getAddress()) {
             case "POST /friendships/create":
@@ -31,7 +31,7 @@ public class Router implements ApplicationInterface {
             case "GET /statuses/home_timeline.json":
                 return StatusesController.getHomeTimeline(params);
             default:
-                return new ApplicationResponse("", ApplicationResponseStatus.INVALID_DESTINATION);
+                return new AppResponse("", AppResponseStatus.INVALID_DESTINATION);
         }
     }
 }

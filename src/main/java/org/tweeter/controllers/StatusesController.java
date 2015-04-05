@@ -4,7 +4,7 @@ import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Map;
 
-import org.general.application.ApplicationInterface.ApplicationResponse;
+import org.general.application.ApplicationInterface.AppResponse;
 import org.general.application.mvc.Controller;
 import org.general.json.JSONList;
 import org.general.json.JSONMap;
@@ -14,7 +14,7 @@ public class StatusesController extends Controller {
     
     private static final Long DEFAULT_TIMELINE_SIZE = 20L;
     
-    public static ApplicationResponse updateStatus(Map<String, String> params) {
+    public static AppResponse updateStatus(Map<String, String> params) {
         Long userId = null;
         String status = null;
         try {
@@ -34,7 +34,7 @@ public class StatusesController extends Controller {
     
     
     
-    public static ApplicationResponse getHomeTimeline(Map<String, String> params) {
+    public static AppResponse getHomeTimeline(Map<String, String> params) {
         @SuppressWarnings("unused")
         Long userId = null;
         Long count = null;
@@ -58,7 +58,7 @@ public class StatusesController extends Controller {
         return generateSuccessResponse(generateJSONListOfTweets(statuses).toString());
     }
     
-    public static ApplicationResponse getUserTimeline(Map<String, String> params) {
+    public static AppResponse getUserTimeline(Map<String, String> params) {
         Long userId = null;
         Long count = null;
         Long maxId = null;

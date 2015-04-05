@@ -4,7 +4,7 @@ import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Map;
 
-import org.general.application.ApplicationInterface.ApplicationResponse;
+import org.general.application.ApplicationInterface.AppResponse;
 import org.general.application.mvc.Controller;
 import org.general.json.JSONList;
 import org.general.json.JSONMap;
@@ -13,7 +13,7 @@ import org.tweeter.models.Friendship;
 
 public class FriendshipsController extends Controller {
     
-    public static ApplicationResponse createFriendship(Map<String, String> params) {
+    public static AppResponse createFriendship(Map<String, String> params) {
         Long userId = null;
         Long friendId = null;
         try {
@@ -27,7 +27,7 @@ public class FriendshipsController extends Controller {
         return generateSuccessResponse(new JSONMap().toString());
     }
     
-    public static ApplicationResponse deleteFriendship(Map<String, String> params) {
+    public static AppResponse deleteFriendship(Map<String, String> params) {
         Long userId = null;
         Long friendId = null;
         try {
@@ -41,7 +41,7 @@ public class FriendshipsController extends Controller {
         return generateSuccessResponse(new JSONMap().toString());
     }
     
-    public static ApplicationResponse getFollowers(Map<String, String> params) {
+    public static AppResponse getFollowers(Map<String, String> params) {
         Long userId = null;
         try {
             userId = getRequiredLongParam("user_id", params);
@@ -54,7 +54,7 @@ public class FriendshipsController extends Controller {
         return generateSuccessResponse(generateJSONIdList(followerIds).toString());
     }
     
-    public static ApplicationResponse getFriends(Map<String, String> params) {
+    public static AppResponse getFriends(Map<String, String> params) {
         Long userId = null;
         try {
             userId = getRequiredLongParam("user_id", params);
