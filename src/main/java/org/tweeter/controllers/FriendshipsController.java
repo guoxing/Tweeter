@@ -4,7 +4,7 @@ import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Map;
 
-import org.general.application.ApplicationInterface.ApplicationDatagram;
+import org.general.application.ApplicationInterface.ApplicationResponse;
 import org.general.application.mvc.Controller;
 import org.general.json.JSONList;
 import org.general.json.JSONMap;
@@ -13,58 +13,58 @@ import org.tweeter.models.Friendship;
 
 public class FriendshipsController extends Controller {
     
-    public static ApplicationDatagram createFriendship(Map<String, String> params) {
+    public static ApplicationResponse createFriendship(Map<String, String> params) {
         Long userId = null;
         Long friendId = null;
         try {
             userId = getRequiredLongParam("my_id", params);
             friendId = getRequiredLongParam("user_id", params);
         } catch (InvalidParameterException e) {
-            return respondWithInvalidParamError(e.getMessage());
+            return generateInvalidParamResponse(e.getMessage());
         }
         
         Friendship.addFriend(userId, friendId);
-        return respondWithSuccess(new JSONMap().toString());
+        return generateSuccessResponse(new JSONMap().toString());
     }
     
-    public static ApplicationDatagram deleteFriendship(Map<String, String> params) {
+    public static ApplicationResponse deleteFriendship(Map<String, String> params) {
         Long userId = null;
         Long friendId = null;
         try {
             userId = getRequiredLongParam("my_id", params);
             friendId = getRequiredLongParam("user_id", params);
         } catch (InvalidParameterException e) {
-            return respondWithInvalidParamError(e.getMessage());
+            return generateInvalidParamResponse(e.getMessage());
         }
         
         Friendship.deleteFriend(userId, friendId);
-        return respondWithSuccess(new JSONMap().toString());
+        return generateSuccessResponse(new JSONMap().toString());
     }
     
-    public static ApplicationDatagram getFollowers(Map<String, String> params) {
+    public static ApplicationResponse getFollowers(Map<String, String> params) {
         Long userId = null;
         try {
             userId = getRequiredLongParam("user_id", params);
         } catch (InvalidParameterException e) {
-            return respondWithInvalidParamError(e.getMessage());
+            return generateInvalidParamResponse(e.getMessage());
         }
         
         List<Long> followerIds = Friendship.getUserFollowers(userId);
         
-        return respondWithSuccess(generateJSONIdList(followerIds).toString());
+        return generateSuccessResponse(generateJSONIdList(followerIds).toString());
     }
     
-    public static ApplicationDatagram getFriends(Map<String, String> params) {
+    public static ApplicationResponse getFriends(Map<String, String> params) {
         Long userId = null;
         try {
             userId = getRequiredLongParam("user_id", params);
         } catch (InvalidParameterException e) {
-            return respondWithInvalidParamError(e.getMessage());
+            return generateInvalidParamResponse(e.getMessage());
         }
         
         List<Long> friendIds = Friendship.getUserFriends(userId);
         
-        return respondWithSuccess(generateJSONIdList(friendIds).toString());
+        return generateSuccessResponse(generateJSONIdList(friendIds).toString());
     }
     
     /**

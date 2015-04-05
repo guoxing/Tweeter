@@ -4,38 +4,37 @@ import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Map;
 
-import org.general.application.ApplicationInterface.ApplicationDatagram;
+import org.general.application.ApplicationInterface.ApplicationResponse;
 import org.general.application.mvc.Controller;
 import org.general.json.JSONList;
 import org.general.json.JSONMap;
-import org.general.json.JSONable;
 import org.tweeter.models.Status;
 
 public class StatusesController extends Controller {
     
     private static final Long DEFAULT_TIMELINE_SIZE = 20L;
     
-    public static ApplicationDatagram updateStatus(Map<String, String> params) {
+    public static ApplicationResponse updateStatus(Map<String, String> params) {
         Long userId = null;
         String status = null;
         try {
             userId = getRequiredLongParam("my_id", params);
             status = getRequiredStringParam("status", params);
         } catch (InvalidParameterException e) {
-            return respondWithInvalidParamError(e.getMessage());
+            return generateInvalidParamResponse(e.getMessage());
         }
         
         try {
             Status.updateStatus(userId, status);
         } catch (IllegalArgumentException e) {
-            return respondWithInvalidParamError(e.getMessage());
+            return generateInvalidParamResponse(e.getMessage());
         }
-        return respondWithSuccess(new JSONMap().toString());
+        return generateSuccessResponse(new JSONMap().toString());
     }
     
     
     
-    public static ApplicationDatagram getHomeTimeline(Map<String, String> params) {
+    public static ApplicationResponse getHomeTimeline(Map<String, String> params) {
         @SuppressWarnings("unused")
         Long userId = null;
         Long count = null;
@@ -49,18 +48,17 @@ public class StatusesController extends Controller {
             }
             maxId = getOptionalLongParam("max_id", params);
         } catch (InvalidParameterException e) {
-            return respondWithInvalidParamError(e.getMessage());
+            return generateInvalidParamResponse(e.getMessage());
         }
         
-        List<? extends JSONable> statuses = null;
+        List<Status> statuses = null;
         
         // TODO: Get appropriate statuses
         
-        JSONMap tweetsAsJSON = respondWithJSONListOfTweets(JSONList.toJSONList(statuses));
-        return respondWithSuccess(tweetsAsJSON.toString());
+        return generateSuccessResponse(generateJSONListOfTweets(statuses).toString());
     }
     
-    public static ApplicationDatagram getUserTimeline(Map<String, String> params) {
+    public static ApplicationResponse getUserTimeline(Map<String, String> params) {
         Long userId = null;
         Long count = null;
         Long maxId = null;
@@ -72,23 +70,22 @@ public class StatusesController extends Controller {
             }
             maxId = getOptionalLongParam("max_id", params);
         } catch (InvalidParameterException e) {
-            respondWithInvalidParamError(e.getMessage());
+            generateInvalidParamResponse(e.getMessage());
         }
         
-        List<? extends JSONable> statuses;
+        List<Status> statuses;
         if (maxId != null) {
             statuses = Status.getUserStatuses(userId, count, maxId);
         } else {
             statuses = Status.getUserStatuses(userId, count);
         }
         
-        JSONMap tweetsAsJSON = respondWithJSONListOfTweets(JSONList.toJSONList(statuses));
-        return respondWithSuccess(tweetsAsJSON.toString());
+        return generateSuccessResponse(generateJSONListOfTweets(statuses).toString());
     }
     
-    private static JSONMap respondWithJSONListOfTweets(JSONList listOfStatuses) {
+    private static JSONMap generateJSONListOfTweets(List<Status> statuses) {
         JSONMap tweets = new JSONMap();
-        tweets.put("tweets", listOfStatuses);
+        tweets.put("tweets", JSONList.toJSONList(statuses));
         return tweets;
     }
 }

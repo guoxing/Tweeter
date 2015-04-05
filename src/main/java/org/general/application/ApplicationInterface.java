@@ -4,35 +4,33 @@ import java.util.Map;
 
 public interface ApplicationInterface {
     
-    public ApplicationDatagram respondToAction(ApplicationAction action);
+    public ApplicationResponse respondToAction(ApplicationRequest action);
     
-    public enum ApplicationResult {
-        SUCCESS, INVALID_PARAMETERS, INVALID_PATH
+    public enum ApplicationResponseStatus {
+        SUCCESS, INVALID_PARAMETERS, INVALID_DESTINATION
     }
     
-    public static class ApplicationDatagram {
-        private ApplicationResult result;
-        private String body;
-        public ApplicationDatagram(String body, ApplicationResult result) {
-            this.result = result;
-            this.body = body;
+    public static class ApplicationResponse {
+        private ApplicationResponseStatus responseStatus;
+        private String responseBody;
+        public ApplicationResponse(String body, ApplicationResponseStatus result) {
+            this.responseStatus = result;
+            this.responseBody = body;
         }
-        public ApplicationResult getResult() {
-            return result;
+        public ApplicationResponseStatus getResult() {
+            return responseStatus;
         }
         public String getBody() {
-            return body;
+            return responseBody;
         }
     }
 
-    public static class ApplicationAction {
-        private String httpMethod;
-        private String path;
+    public static class ApplicationRequest {
+        private String uniqueRequestAddress;
         private Map<String, String> params;
         
-        public ApplicationAction(String httpMethod, String path, Map<String, String> params) {
-            this.httpMethod = httpMethod;
-            this.path = path;
+        public ApplicationRequest(String uniqueRequestAddress, Map<String, String> params) {
+            this.uniqueRequestAddress = uniqueRequestAddress;
             this.params = params;
         }
         
@@ -41,7 +39,7 @@ public interface ApplicationInterface {
         }
         
         public String getAddress() {
-            return httpMethod + " " + path;
+            return uniqueRequestAddress;
         }
     }
 }

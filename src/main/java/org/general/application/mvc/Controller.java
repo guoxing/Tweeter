@@ -3,17 +3,17 @@ package org.general.application.mvc;
 import java.security.InvalidParameterException;
 import java.util.Map;
 
-import org.general.application.ApplicationInterface.ApplicationDatagram;
-import org.general.application.ApplicationInterface.ApplicationResult;
+import org.general.application.ApplicationInterface.ApplicationResponse;
+import org.general.application.ApplicationInterface.ApplicationResponseStatus;
 
 public abstract class Controller {
     
-    public static ApplicationDatagram respondWithInvalidParamError(String message) {
-        return new ApplicationDatagram(message, ApplicationResult.INVALID_PARAMETERS);
+    public static ApplicationResponse generateSuccessResponse(String body) {
+        return new ApplicationResponse(body, ApplicationResponseStatus.SUCCESS);
     }
     
-    public static ApplicationDatagram respondWithSuccess(String body) {
-        return new ApplicationDatagram(body, ApplicationResult.SUCCESS);
+    public static ApplicationResponse generateInvalidParamResponse(String message) {
+        return new ApplicationResponse(message, ApplicationResponseStatus.INVALID_PARAMETERS);
     }
     
     public static String getRequiredStringParam(String paramKey, Map<String, String> params)
