@@ -3,7 +3,6 @@ package org.general.http;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -23,7 +22,6 @@ public class HTTPRequest {
         public static final String POST = "POST";
     }
 
-    private static final String ENCODING = "UTF-8";
     // URIREGEX is used to extract the path from an absolute URI
     private static final String URIREGEX = "^https?://[^/]+(.+)";
     // QUERYREGEX is used to separate path and query string
@@ -74,7 +72,7 @@ public class HTTPRequest {
         Pattern queryP = Pattern.compile(QUERYREGEX);
         Matcher queryM = queryP.matcher(fullURI);
         queryM.find();
-        URI = URLDecoder.decode(queryM.group(1), ENCODING);
+        URI = URLDecoder.decode(queryM.group(1));
         String queryString = queryM.group(2);
         queryParams = new HashMap<String, String>();
         if (queryString != null) {
@@ -90,7 +88,7 @@ public class HTTPRequest {
             headers.put(key, value);
             line = in.readLine();
         }
-        
+
         // process body
         if (line.isEmpty() && headers.get("Content-Length") != null) {
             int contentLength = Integer.parseInt(headers.get("Content-Length"));
@@ -98,8 +96,8 @@ public class HTTPRequest {
                 return;
             char[] bodyBuffer = new char[contentLength];
             in.read(bodyBuffer, 0, contentLength);
-            String bodyAsString = URLDecoder.decode(
-                    String.copyValueOf(bodyBuffer), ENCODING);
+            String bodyAsString = URLDecoder.decode(String
+                    .copyValueOf(bodyBuffer));
             if (bodyAsString != null && method.equals(Method.POST)) {
                 addQueryParams(bodyAsString);
             }
@@ -111,8 +109,7 @@ public class HTTPRequest {
         for (String query : queries) {
             String key = query.split("=")[0];
             String value = query.split("=")[1];
-            queryParams.put(URLDecoder.decode(key, ENCODING),
-                    URLDecoder.decode(value, ENCODING));
+            queryParams.put(URLDecoder.decode(key), URLDecoder.decode(value));
         }
     }
 
