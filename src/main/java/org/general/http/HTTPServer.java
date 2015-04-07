@@ -5,7 +5,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import org.general.logger.Logger;
-import org.tweeter.config.HTTPLayer;
 
 /**
  * A generic HTTPServer that serves HTTPRequest and HTTPResponse.
@@ -24,9 +23,6 @@ public class HTTPServer {
     private HTTPHandler handler;
     private int port;
     
-    public static void main(String[] args) throws IOException {
-        new HTTPServer("Tweeter", new HTTPLayer()).start();
-    }
 
     public HTTPServer(String name, HTTPHandler handler) {
         this(DEFAULT_PORT, name, handler);
@@ -43,6 +39,7 @@ public class HTTPServer {
             Logger.log("Server " + name + " already started.");
             return;
         }
+        Logger.log("Server " + name + " started.");
         ss = new ServerSocket(port);
         while (true) {
             Socket s = ss.accept();
