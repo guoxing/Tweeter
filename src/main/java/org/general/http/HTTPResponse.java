@@ -41,7 +41,7 @@ public class HTTPResponse {
         public static final String CONTENT_LENGTH = "Content-Length";
     }
 
-    private static final Map<StatusCode, String> StatusMessage;
+    public static final Map<StatusCode, String> StatusMessage;
     static {
         StatusMessage = new HashMap<StatusCode, String>();
         StatusMessage.put(StatusCode.OK, "OK");

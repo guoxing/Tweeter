@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.general.logger.Logger;
 import org.tweeter.config.HTTPLayer;
 
 /**
@@ -38,24 +39,41 @@ public class HTTPServer {
     }
 
     public void start() throws IOException {
+        if (ss != null) {
+            Logger.log("Server " + name + " already started.");
+            return;
+        }
         ss = new ServerSocket(port);
         while (true) {
             Socket s = ss.accept();
-            HTTPRequest request;
+            HTTPRequest request = null;
             HTTPResponse response = new HTTPResponse(s.getOutputStream(), name);
+
             try {
                 request = new HTTPRequest(s.getInputStream());
-                handler.handle(request, response);
             } catch (Exception e) {
                 e.printStackTrace();
                 response.sendError(HTTPResponse.StatusCode.BAD_REQUEST,
                         "Request is malformatted");
+                s.close();
+                continue;
+            }
+            try {
+                handler.handle(request, response);
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.sendError(HTTPResponse.StatusCode.SERVER_ERROR,
+                        "Internal server error");
             }
             s.close();
         }
     }
 
     public void shutdown() throws IOException {
-        ss.close();
+        if (ss != null) {
+            Logger.log("Server " + name + " shut down.");
+            ss.close();
+            ss = null;
+        }
     }
 }
