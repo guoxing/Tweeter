@@ -1,6 +1,7 @@
 package org.tweeter.controllers;
 
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +50,8 @@ public class FriendshipsController extends Controller {
             return generateInvalidParamResponse(e.getMessage());
         }
         
-        List<Long> followerIds = FriendshipData.getUserFollowers(userId);
+        List<Long> followerIds = new ArrayList<Long>();
+        followerIds.addAll(FriendshipData.getUserFollowers(userId));
         
         return generateSuccessResponse(generateJSONIdList(followerIds).toString());
     }
@@ -62,7 +64,8 @@ public class FriendshipsController extends Controller {
             return generateInvalidParamResponse(e.getMessage());
         }
         
-        List<Long> friendIds = FriendshipData.getUserFriends(userId);
+        List<Long> friendIds = new ArrayList<Long>();
+        friendIds.addAll(FriendshipData.getUserFriends(userId));
         
         return generateSuccessResponse(generateJSONIdList(friendIds).toString());
     }

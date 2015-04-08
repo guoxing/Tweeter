@@ -1,8 +1,10 @@
 package org.tweeter.models;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.general.application.mvc.AppData;
 import org.general.logger.Logger;
@@ -27,17 +29,33 @@ import org.general.logger.Logger;
  */
 public class FriendshipData extends AppData {
     
-    public enum Action {
+    private static final String FRIENDSHIP_DATA_FILENAME = "friend_data.txt";
+    private static final int LOG_ENTRY_USER_ID_INDEX = 0;
+    private static final int LOG_ENTRY_FRIEND_ID_INDEX = 1;
+    private static final int LOG_ENTRY_ACTION_INDEX = 2;
+    private static final int NUM_FIELDS_IN_LOG_ENTRY = 3;
+    
+    private static HashMap<Long, Set<Long>> friendshipMap;
+    private static HashMap<Long, Set<Long>> followerMap;
+    
+    public enum FriendAction {
         ADD(1),
         DELETE(0);
         
         private int num;
-        private Action(int num) {
+        private FriendAction(int num) {
             this.num = num;
         }
         
-        public int getNum() {
-            return this.num;
+        public static FriendAction parseAction(String str) throws InvalidDataFormattingException {
+            switch (Integer.parseInt(str)) {
+                case 0:
+                    return FriendAction.DELETE;
+                case 1:
+                    return FriendAction.ADD;
+                default:
+                    throw new InvalidDataFormattingException("Action must be either 0 (for deletion) or 1 (for addition)");
+            }
         }
     }
     
@@ -47,9 +65,9 @@ public class FriendshipData extends AppData {
      * @param userId
      * @return
      */
-    public static List<Long> getUserFriends(long userId) {
+    public static Set<Long> getUserFriends(long userId) {
         Logger.log("Getting friends of "+userId);
-        return new ArrayList<Long>();
+        return friendshipMap.getOrDefault(userId, new HashSet<Long>());
     }
     
     /**
@@ -59,9 +77,9 @@ public class FriendshipData extends AppData {
      * @param userId
      * @return
      */
-    public static List<Long> getUserFollowers(long userId) {
+    public static Set<Long> getUserFollowers(long userId) {
         Logger.log("Getting followers of "+userId);
-        return new ArrayList<Long>();
+        return followerMap.getOrDefault(userId, new HashSet<Long>());
     }
     
     /**
@@ -75,9 +93,20 @@ public class FriendshipData extends AppData {
         Logger.log(friendId+" is now "+userId+"'s friend");
         
         List<String> addFriendLogEntry = Arrays.asList(new String[]{
-                userId.toString(), friendId.toString(), String.valueOf(Action.ADD.num)});
+                userId.toString(), friendId.toString(), String.valueOf(FriendAction.ADD.num)});
         appendToFile(FRIENDSHIP_DATA_FILENAME, addFriendLogEntry);
-        return;
+        appendToMapSet(userId, friendId, friendshipMap);
+        appendToMapSet(friendId, userId, followerMap);
+    }
+    
+    private static void appendToMapSet(Long userId, Long friendId, HashMap<Long, Set<Long>> map) {
+        if (map.get(userId) == null) {
+            Set<Long> newFriendSet = new HashSet<Long>();
+            newFriendSet.add(friendId);
+            map.put(userId, newFriendSet);
+        } else {
+            map.get(userId).add(friendId);
+        }
     }
     
     /**
@@ -87,14 +116,65 @@ public class FriendshipData extends AppData {
      * @param userId
      * @param friendId
      */
-    public static void deleteFriend(long userId, long friendId) {
+    public static void deleteFriend(Long userId, Long friendId) {
         Logger.log(friendId+" is no longer "+userId+"'s friend");
-        return;
+        
+        List<String> deleteFriendLogEntry = Arrays.asList(new String[]{
+                userId.toString(), friendId.toString(), String.valueOf(FriendAction.DELETE.num)});
+        appendToFile(FRIENDSHIP_DATA_FILENAME, deleteFriendLogEntry);
+        removeFromMapSet(userId, friendId, friendshipMap);
+        removeFromMapSet(friendId, userId, followerMap);
+    }
+    
+    private static void removeFromMapSet(Long userId, Long friendId, HashMap<Long, Set<Long>> map) {
+        Set<Long> friendSet = map.get(userId);
+        if (friendSet != null) {
+            friendSet.remove(friendId);
+        }
     }
 
     @Override
     public void recover() {
-        // TODO Auto-generated method stub
+        friendshipMap = new HashMap<Long, Set<Long>>();
+        followerMap = new HashMap<Long, Set<Long>>();
+        while (true/*replace with iteration through lines of FRIENDSHIP_DATA_FILENAME, returning false when done*/) {
+            String logEntry = /* AppData.getNextLogEntry(friendship file)*/null;
+            try {
+                replayLogEntry(logEntry);
+            } catch (InvalidDataFormattingException e) {
+                e.printStackTrace();
+                // TODO: Decide what to do on error here
+            }
+        }
+    }
+    
+    private static final String INVALID_DATA_FORMATTING_EXCEPTION_MSG = "Log entry for friendship must have 3 "
+            + "delimited values: userId (a 64-bit positive integer), friendId (a 64-bit positive integer), "
+            + "action (0 for remove, 1 for add)";
+    
+    private void replayLogEntry(String logEntry) throws InvalidDataFormattingException {
+        String[] delimitedLogEntry = logEntry.split(AppData.DELIMITER);
+        if (delimitedLogEntry.length != NUM_FIELDS_IN_LOG_ENTRY) {
+            throw new InvalidDataFormattingException(INVALID_DATA_FORMATTING_EXCEPTION_MSG);
+        }
         
+        Long userId;
+        Long friendId;
+        FriendAction action;
+        try {
+            userId = Long.parseLong(delimitedLogEntry[LOG_ENTRY_USER_ID_INDEX]);
+            friendId = Long.parseLong(delimitedLogEntry[LOG_ENTRY_FRIEND_ID_INDEX]);
+            action = FriendAction.parseAction(delimitedLogEntry[LOG_ENTRY_ACTION_INDEX]);
+        } catch (Exception e) {
+            throw new InvalidDataFormattingException(INVALID_DATA_FORMATTING_EXCEPTION_MSG);
+        }
+        
+        if (action == FriendAction.ADD) {
+            appendToMapSet(userId, friendId, friendshipMap);
+            appendToMapSet(friendId, userId, followerMap);
+        } else {
+            removeFromMapSet(userId, friendId, friendshipMap);
+            removeFromMapSet(friendId, userId, followerMap);
+        }
     }
 }
