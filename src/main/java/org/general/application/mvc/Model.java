@@ -1,5 +1,11 @@
 package org.general.application.mvc;
 
-public abstract class Model {
+import java.util.List;
 
+public abstract class Model {
+    public void appendToFile(String file, List<String> fields) {
+        
+    }
+    
+    public abstract void recover();
 }
