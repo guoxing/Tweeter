@@ -1,9 +1,10 @@
 package org.tweeter.models;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.general.application.mvc.Model;
+import org.general.application.mvc.AppData;
 import org.general.logger.Logger;
 
 /**
@@ -24,7 +25,21 @@ import org.general.logger.Logger;
  * @author marcelpuyat
  *
  */
-public class Friendship extends Model {
+public class FriendshipData extends AppData {
+    
+    public enum Action {
+        ADD(1),
+        DELETE(0);
+        
+        private int num;
+        private Action(int num) {
+            this.num = num;
+        }
+        
+        public int getNum() {
+            return this.num;
+        }
+    }
     
     /**
      * Returns list of ids of friends of the given user. Will be empty
@@ -56,8 +71,12 @@ public class Friendship extends Model {
      * @param userId
      * @param friendId
      */
-    public static void addFriend(long userId, long friendId) {
+    public static void addFriend(Long userId, Long friendId) {
         Logger.log(friendId+" is now "+userId+"'s friend");
+        
+        List<String> addFriendLogEntry = Arrays.asList(new String[]{
+                userId.toString(), friendId.toString(), String.valueOf(Action.ADD.num)});
+        appendToFile(FRIENDSHIP_DATA_FILENAME, addFriendLogEntry);
         return;
     }
     
@@ -71,5 +90,11 @@ public class Friendship extends Model {
     public static void deleteFriend(long userId, long friendId) {
         Logger.log(friendId+" is no longer "+userId+"'s friend");
         return;
+    }
+
+    @Override
+    public void recover() {
+        // TODO Auto-generated method stub
+        
     }
 }

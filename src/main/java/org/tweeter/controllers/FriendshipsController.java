@@ -9,7 +9,7 @@ import org.general.application.mvc.Controller;
 import org.general.json.JSONList;
 import org.general.json.JSONMap;
 import org.general.json.JSONObject;
-import org.tweeter.models.Friendship;
+import org.tweeter.models.FriendshipData;
 
 public class FriendshipsController extends Controller {
     
@@ -23,7 +23,7 @@ public class FriendshipsController extends Controller {
             return generateInvalidParamResponse(e.getMessage());
         }
         
-        Friendship.addFriend(userId, friendId);
+        FriendshipData.addFriend(userId, friendId);
         return generateSuccessResponse(new JSONMap().toString());
     }
     
@@ -37,7 +37,7 @@ public class FriendshipsController extends Controller {
             return generateInvalidParamResponse(e.getMessage());
         }
         
-        Friendship.deleteFriend(userId, friendId);
+        FriendshipData.deleteFriend(userId, friendId);
         return generateSuccessResponse(new JSONMap().toString());
     }
     
@@ -49,7 +49,7 @@ public class FriendshipsController extends Controller {
             return generateInvalidParamResponse(e.getMessage());
         }
         
-        List<Long> followerIds = Friendship.getUserFollowers(userId);
+        List<Long> followerIds = FriendshipData.getUserFollowers(userId);
         
         return generateSuccessResponse(generateJSONIdList(followerIds).toString());
     }
@@ -62,7 +62,7 @@ public class FriendshipsController extends Controller {
             return generateInvalidParamResponse(e.getMessage());
         }
         
-        List<Long> friendIds = Friendship.getUserFriends(userId);
+        List<Long> friendIds = FriendshipData.getUserFriends(userId);
         
         return generateSuccessResponse(generateJSONIdList(friendIds).toString());
     }

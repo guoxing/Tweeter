@@ -3,7 +3,7 @@ package org.tweeter.models;
 import java.util.Date;
 import java.util.List;
 
-import org.general.application.mvc.Model;
+import org.general.application.mvc.AppData;
 import org.general.json.JSONMap;
 import org.general.json.JSONObject;
 import org.general.json.JSONable;
@@ -22,48 +22,51 @@ import org.general.json.JSONable;
  * @author marcelpuyat
  *
  */
-public class Status extends Model implements JSONable {
+public class StatusData extends AppData {
     
     private static final int MAX_TWEET_LENGTH = 140;
     
+    public static class Status implements JSONable {
     /* Fields for an instance of a status. All of these must exist. */
-    private long statusId;
-    private long userId;
-    private String text;
-    private Date time;
-    
-    public long getStatusId() {
-        return this.statusId;
-    }
-    
-    public long userId() {
-        return this.userId;
-    }
-    
-    public String getText() {
-        return this.text;
-    }
-    
-    public Date getTime() {
-        return this.time;
-    }
-    
-    /**
-     * Private constructor. Will create a status for user with given
-     * userId and text. Takes care of assigning a statusId and time-stamping
-     * the status.
-     * @param userId
-     * @param text
-     */
-    private Status(long userId, String text) {
-        // TODO: This is just a placeholder.
-        this.statusId = 12910818; // TODO: Get nextValidStatusId from data module
+        private long statusId;
+        private long userId;
+        private String text;
+        private Date time;
+        private JSONMap json;
         
-        // TODO: Update nextValidStatusId using data module interface (which will flush new one to disk)
+        /**
+         * Private constructor. Will create a status for user with given
+         * userId and text. Takes care of assigning a statusId and time-stamping
+         * the status.
+         * @param userId
+         * @param text
+         */
+        @SuppressWarnings("deprecation")
+        private Status(long userId, String text) {
+            // TODO: This is just a placeholder.
+            this.statusId = 12910818; // TODO: Get nextValidStatusId from data module
+            
+            // TODO: Update nextValidStatusId using data module interface (which will flush new one to disk)
+            
+            this.userId = userId;
+            this.text = text;
+            this.time = new Date();
+            this.json = new JSONMap();
+            this.json.put("id", statusId);
+            this.json.put("user", userId);
+            this.json.put("text", text);
+            this.json.put("time", time.toGMTString());
+        }
         
-        this.userId = userId;
-        this.text = text;
-        this.time = new Date();
+        @Override
+        /**
+         * Returns a JSONObject of the form:
+         * {"id": 123, "user": 321, "text": "This is a status of at most 140 chars", 
+         * "time": "Sun Oct 26 20:52:35 PDT 2014"}
+         */
+        public JSONObject toJSON() {
+            return this.json;
+        }
     }
     
     /**
@@ -117,19 +120,10 @@ public class Status extends Model implements JSONable {
         return null;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
-    /**
-     * Returns a JSONObject of the form:
-     * {"id": 123, "user": 321, "text": "This is a status of at most 140 chars", 
-     * "time": "Sun Oct 26 20:52:35 PDT 2014"}
-     */
-    public JSONObject toJSON() {
-        JSONMap statusJson = new JSONMap();
-        statusJson.put("id", statusId);
-        statusJson.put("user", userId);
-        statusJson.put("text", text);
-        statusJson.put("time", time.toGMTString());
-        return statusJson;
+    public void recover() {
+        // TODO Auto-generated method stub
+        
     }
+
 }

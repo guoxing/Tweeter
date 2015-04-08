@@ -8,7 +8,8 @@ import org.general.application.ApplicationInterface.AppResponse;
 import org.general.application.mvc.Controller;
 import org.general.json.JSONList;
 import org.general.json.JSONMap;
-import org.tweeter.models.Status;
+import org.tweeter.models.StatusData;
+import org.tweeter.models.StatusData.Status;
 
 public class StatusesController extends Controller {
     
@@ -25,7 +26,7 @@ public class StatusesController extends Controller {
         }
         
         try {
-            Status.updateStatus(userId, status);
+            StatusData.updateStatus(userId, status);
         } catch (IllegalArgumentException e) {
             return generateInvalidParamResponse(e.getMessage());
         }
@@ -75,9 +76,9 @@ public class StatusesController extends Controller {
         
         List<Status> statuses;
         if (maxId != null) {
-            statuses = Status.getUserStatuses(userId, count, maxId);
+            statuses = StatusData.getUserStatuses(userId, count, maxId);
         } else {
-            statuses = Status.getUserStatuses(userId, count);
+            statuses = StatusData.getUserStatuses(userId, count);
         }
         
         return generateSuccessResponse(generateJSONListOfTweets(statuses).toString());
