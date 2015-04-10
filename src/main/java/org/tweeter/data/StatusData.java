@@ -1,4 +1,4 @@
-package org.tweeter.models;
+package org.tweeter.data;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.general.data.AppData;
+import org.general.data.InvalidDataFormattingException;
 import org.general.logger.Logger;
+import org.tweeter.models.Status;
 
 /**
  * Class to query/update status data.
@@ -37,7 +39,7 @@ public class StatusData extends AppData {
     // is in reverse order
     private Map<Long, List<Long>> ownershipCache;
 
-    public StatusData() throws IOException {
+    public StatusData() throws IOException, InvalidDataFormattingException {
         super(FILE_NAME, NUM_COLS_IN_ENTRY);
     }
 
@@ -52,9 +54,11 @@ public class StatusData extends AppData {
      * @throws IllegalArgumentException
      *             if tweet is longer than MAX_TWEET_LENGTH
      * @throws IOException
+     * @throws InvalidDataFormattingException
      */
     public void updateStatus(long userId, String text)
-            throws IllegalArgumentException, IOException {
+            throws IllegalArgumentException, IOException,
+            InvalidDataFormattingException {
         if (text.length() > MAX_TWEET_LENGTH) {
             throw new IllegalArgumentException("Tweet must be "
                     + MAX_TWEET_LENGTH + " characters (" + text + ")");
@@ -82,8 +86,10 @@ public class StatusData extends AppData {
      * @param ids
      * @return A list of statuses.
      * @throws IOException
+     * @throws InvalidDataFormattingException
      */
-    public List<Status> getStatuses(List<Long> ids) throws IOException {
+    public List<Status> getStatuses(List<Long> ids) throws IOException,
+            InvalidDataFormattingException {
         List<Status> list = new ArrayList<Status>(ids.size());
         Collections.sort(ids, Collections.reverseOrder());
         int i = 0;
@@ -190,7 +196,7 @@ public class StatusData extends AppData {
     }
 
     @Override
-    public void recover() throws IOException {
+    public void recover() throws IOException, InvalidDataFormattingException {
         statusCache = new HashMap<Long, Status>();
         ownershipCache = new HashMap<Long, List<Long>>();
         BackwardReader br = getBackwardReader();

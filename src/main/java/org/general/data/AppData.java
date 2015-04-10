@@ -16,9 +16,10 @@ import java.util.Map;
 
 /**
  * A generic data module class that stores data both persistently and in memory.
- * Think of this class as an analogy to a table in RMDB. The data module is
- * persistent on disk by storing each entry as a line of tab-separated columns.
- * Entries are delimited by newline character '\n'.
+ * By design, data can only be appended but not altered nor inserted. Think of
+ * this class as an analogy to a table in RMDB. The data module is persistent on
+ * disk by storing each entry as a line of tab-separated columns. Entries are
+ * delimited by newline character '\n'.
  * 
  * @author Guoxing Li
  *
@@ -48,7 +49,8 @@ public abstract class AppData {
     // number of columns per entry
     protected int numCols;
 
-    public AppData(String filename, int numCols) throws IOException {
+    public AppData(String filename, int numCols) throws IOException,
+            InvalidDataFormattingException {
         storage = new File(filename);
         // creates the file if not exists.
         storage.createNewFile();
@@ -56,20 +58,29 @@ public abstract class AppData {
         recover();
     }
 
-    protected void appendToFile(List<String> cols) throws IOException {
-        if (cols.size() != numCols) {
-            throw new IllegalStateException(
+    /**
+     * Append an entry to the persistent storage.
+     * 
+     * @param entry
+     *            Entry to be appended.
+     * @throws IOException
+     * @throws InvalidDataFormattingException
+     */
+    protected void appendToFile(List<String> entry) throws IOException,
+            InvalidDataFormattingException {
+        if (entry.size() != numCols) {
+            throw new InvalidDataFormattingException(
                     "Wrong number of cols written to file! Expected #cols: "
-                            + numCols + " Real #cols: " + cols.size());
+                            + numCols + " Real #cols: " + entry.size());
         }
         PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(
                 storage, true)));
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < cols.size() - 1; ++i) {
-            sb.append(DataEncoder.encode(cols.get(i)));
+        for (int i = 0; i < entry.size() - 1; ++i) {
+            sb.append(DataEncoder.encode(entry.get(i)));
             sb.append(COL_DELIMITER);
         }
-        sb.append(DataEncoder.encode(cols.get(cols.size() - 1)));
+        sb.append(DataEncoder.encode(entry.get(entry.size() - 1)));
         out.println(sb.toString());
         out.close();
     }
@@ -82,11 +93,12 @@ public abstract class AppData {
         return new BackwardReader();
     }
 
-    private List<String> breakLine(String line) {
+    private List<String> breakLine(String line)
+            throws InvalidDataFormattingException {
         List<String> res = new ArrayList<String>(numCols);
         String[] splits = line.split(String.valueOf(COL_DELIMITER));
         if (splits.length != numCols) {
-            throw new IllegalStateException(
+            throw new InvalidDataFormattingException(
                     "Malformatted storage file! Expected #cols: " + numCols
                             + " Real #cols: " + splits.length);
         }
@@ -99,11 +111,11 @@ public abstract class AppData {
     /**
      * Recover the in-memory storage from persistent storage.
      */
-    protected abstract void recover() throws IOException;
-
+    protected abstract void recover() throws IOException,
+            InvalidDataFormattingException;
 
     /**
-     * A reader that reads the consistent storage one entry at a time forward
+     * A reader that reads the persistent storage one entry at a time forward
      * (starts from the beginning).
      *
      */
@@ -118,10 +130,12 @@ public abstract class AppData {
         /**
          * Reads in an entry. Data are decoded.
          * 
-         * @return
+         * @return An entry.
          * @throws IOException
+         * @throws InvalidDataFormattingException
          */
-        public List<String> readEntry() throws IOException {
+        public List<String> readEntry() throws IOException,
+                InvalidDataFormattingException {
             String line = reader.readLine();
             return line == null ? null : breakLine(line);
         }
@@ -134,7 +148,7 @@ public abstract class AppData {
     }
 
     /**
-     * A reader that reads the consistent storage one entry at a time backward
+     * A reader that reads the persistent storage one entry at a time backward
      * (starts from the end).
      *
      */
@@ -191,7 +205,8 @@ public abstract class AppData {
             lastLineReadInBlockPos = newBlockLength;
         }
 
-        private List<String> readEntryInBlock() throws IOException {
+        private List<String> readEntryInBlock() throws IOException,
+                InvalidDataFormattingException {
             int i = lastLineReadInBlockPos - 1;
             String line = null;
             while (i >= 0) {
@@ -229,10 +244,12 @@ public abstract class AppData {
         /**
          * Reads in an entry. Data are decoded.
          * 
-         * @return
+         * @return An entry
          * @throws IOException
+         * @throws InvalidDataFormattingException
          */
-        public List<String> readEntry() throws IOException {
+        public List<String> readEntry() throws IOException,
+                InvalidDataFormattingException {
             List<String> entry = readEntryInBlock();
             while (entry == null) {
                 if (!isLastBlock) {

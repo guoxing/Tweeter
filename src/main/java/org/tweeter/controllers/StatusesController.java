@@ -8,8 +8,8 @@ import org.general.application.ApplicationInterface.AppResponse;
 import org.general.application.mvc.Controller;
 import org.general.json.JSONList;
 import org.general.json.JSONMap;
-import org.tweeter.models.StatusData;
-import org.tweeter.models.StatusData.Status;
+import org.tweeter.data.StatusData;
+import org.tweeter.data.StatusData.Status;
 
 public class StatusesController extends Controller {
     

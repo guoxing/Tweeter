@@ -10,7 +10,7 @@ import org.general.application.mvc.Controller;
 import org.general.json.JSONList;
 import org.general.json.JSONMap;
 import org.general.json.JSONObject;
-import org.tweeter.models.FriendshipData;
+import org.tweeter.data.FriendshipData;
 
 public class FriendshipsController extends Controller {
     
