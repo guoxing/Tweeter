@@ -21,6 +21,9 @@ import java.util.Map;
  * disk by storing each entry as a line of tab-separated columns. Entries are
  * delimited by newline character '\n'.
  * 
+ * Note that this class is a singleton class. Subclasses should conform to this
+ * pattern, i.e. implement a getInstance() method.
+ * 
  * @author Guoxing Li
  *
  */
@@ -49,7 +52,7 @@ public abstract class AppData {
     // number of columns per entry
     protected int numCols;
 
-    public AppData(String filename, int numCols) throws IOException,
+    protected AppData(String filename, int numCols) throws IOException,
             InvalidDataFormattingException {
         storage = new File(filename);
         // creates the file if not exists.
@@ -93,6 +96,12 @@ public abstract class AppData {
         return new BackwardReader();
     }
 
+    /**
+     * Recover the in-memory storage from persistent storage.
+     */
+    protected abstract void recover() throws IOException,
+            InvalidDataFormattingException;
+
     private List<String> breakLine(String line)
             throws InvalidDataFormattingException {
         List<String> res = new ArrayList<String>(numCols);
@@ -107,12 +116,6 @@ public abstract class AppData {
         }
         return res;
     }
-
-    /**
-     * Recover the in-memory storage from persistent storage.
-     */
-    protected abstract void recover() throws IOException,
-            InvalidDataFormattingException;
 
     /**
      * A reader that reads the persistent storage one entry at a time forward
@@ -140,6 +143,9 @@ public abstract class AppData {
             return line == null ? null : breakLine(line);
         }
 
+        /**
+         * Call this method when done reading from ForwardReader
+         */
         @Override
         public void close() throws IOException {
             reader.close();
@@ -266,6 +272,9 @@ public abstract class AppData {
             return entry;
         }
 
+        /**
+         * Call this method when done reading from BackwardReader
+         */
         @Override
         public void close() throws IOException {
             raFile.close();

@@ -12,8 +12,8 @@ import org.general.data.InvalidDataFormattingException;
 import org.general.logger.Logger;
 
 /**
- * Class that interfaces with the data module to retrieve friend/follower
- * information as well as add/delete friends.
+ * Singleton class that interfaces with the data module to retrieve
+ * friend/follower information as well as add/delete friends.
  * 
  * If a user A adds user B as their friend, then user A is user B's follower.
  * This information is used when displaying the statuses to appear on a user's
@@ -30,8 +30,8 @@ public class FriendshipData extends AppData {
     private static final int ENTRY_ACTION_INDEX = 2;
     private static final int NUM_COLS_IN_ENTRY = 3;
 
-    private static HashMap<Long, Set<Long>> followingCache;
-    private static HashMap<Long, Set<Long>> followerCache;
+    private HashMap<Long, Set<Long>> followingCache;
+    private HashMap<Long, Set<Long>> followerCache;
 
     private enum FriendAction {
         ADD(1), DELETE(0);
@@ -56,8 +56,25 @@ public class FriendshipData extends AppData {
         }
     }
 
-    public FriendshipData() throws IOException, InvalidDataFormattingException {
+    private static FriendshipData friendshipData;
+
+    private FriendshipData() throws IOException, InvalidDataFormattingException {
         super(FILE_NAME, NUM_COLS_IN_ENTRY);
+    }
+
+    /**
+     * Retrieve an (and the only) instance of FriendshipData
+     * 
+     * @return
+     * @throws IOException
+     * @throws InvalidDataFormattingException
+     */
+    public static FriendshipData getInstance() throws IOException,
+            InvalidDataFormattingException {
+        if (friendshipData == null) {
+            friendshipData = new FriendshipData();
+        }
+        return friendshipData;
     }
 
     /**
@@ -67,7 +84,7 @@ public class FriendshipData extends AppData {
      * @param userId
      * @return A set of ids or null if the specified user doens't have friends
      */
-    public static Set<Long> getUserFriends(long userId) {
+    public Set<Long> getUserFriends(long userId) {
         Logger.log("Getting friends of " + userId);
         return followingCache.get(userId);
     }
@@ -80,7 +97,7 @@ public class FriendshipData extends AppData {
      * @param userId
      * @return A set of ids or null if the specified user doesn't have followers
      */
-    public static Set<Long> getUserFollowers(long userId) {
+    public Set<Long> getUserFollowers(long userId) {
         Logger.log("Getting followers of " + userId);
         return followerCache.get(userId);
     }

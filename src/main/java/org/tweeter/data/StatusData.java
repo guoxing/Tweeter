@@ -14,7 +14,7 @@ import org.general.logger.Logger;
 import org.tweeter.models.Status;
 
 /**
- * Class to query/update status data.
+ * Singleton class to query/update status data.
  * 
  * @author Guoxing Li
  *
@@ -39,8 +39,25 @@ public class StatusData extends AppData {
     // is in reverse order
     private Map<Long, List<Long>> ownershipCache;
 
-    public StatusData() throws IOException, InvalidDataFormattingException {
+    private static StatusData statusData;
+
+    private StatusData() throws IOException, InvalidDataFormattingException {
         super(FILE_NAME, NUM_COLS_IN_ENTRY);
+    }
+
+    /**
+     * Retrieve an (and the only) instance of StatusData
+     * 
+     * @return An instance of StatusData
+     * @throws IOException
+     * @throws InvalidDataFormattingException
+     */
+    public static StatusData getInstance() throws IOException,
+            InvalidDataFormattingException {
+        if (statusData == null) {
+            statusData = new StatusData();
+        }
+        return statusData;
     }
 
     /**
