@@ -99,7 +99,7 @@ public abstract class AppData {
     /**
      * Recover the in-memory storage from persistent storage.
      */
-    protected abstract void recover();
+    protected abstract void recover() throws IOException;
 
 
     /**
