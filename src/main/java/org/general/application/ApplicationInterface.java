@@ -7,7 +7,7 @@ public interface ApplicationInterface {
     public AppResponse respondToAction(AppRequest action);
     
     public enum AppResponseStatus {
-        SUCCESS, INVALID_PARAMETERS, INVALID_DESTINATION
+        SUCCESS, INVALID_PARAMETERS, INVALID_DESTINATION, INTERNAL_ERROR
     }
     
     public static class AppResponse {

@@ -134,18 +134,18 @@ public class StatusData extends AppData {
         return list;
     }
 
-    public List<Long> getStatusIdsOnUserId(long userId, int numStatuses) {
+    public List<Long> getStatusIdsOnUserId(long userId, long numStatuses) {
         return getStatusIdsOnUserId(userId, numStatuses, currentId);
     }
 
-    public List<Long> getStatusIdsOnUserId(long userId, int numStatuses,
+    public List<Long> getStatusIdsOnUserId(long userId, long numStatuses,
             long maxId) {
         List<Long> userIds = new ArrayList<Long>();
         userIds.add(userId);
         return getStatusIdsOnUserIds(userIds, numStatuses, maxId);
     }
 
-    public List<Long> getStatusIdsOnUserIds(List<Long> userIds, int numStatuses) {
+    public List<Long> getStatusIdsOnUserIds(List<Long> userIds, long numStatuses) {
         return getStatusIdsOnUserIds(userIds, numStatuses, currentId);
     }
 
@@ -162,7 +162,7 @@ public class StatusData extends AppData {
      * @return A list of statusIds.
      */
     public List<Long> getStatusIdsOnUserIds(List<Long> userIds,
-            int numStatuses, long maxId) {
+            long numStatuses, long maxId) {
         List<Long> res = new ArrayList<Long>();
         List<Long> temp = new ArrayList<Long>();
         for (long userId : userIds) {

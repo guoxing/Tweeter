@@ -1,15 +1,20 @@
 package org.tweeter.controllers;
 
+import java.io.IOException;
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.general.application.ApplicationInterface.AppResponse;
 import org.general.application.mvc.Controller;
+import org.general.data.InvalidDataFormattingException;
 import org.general.json.JSONList;
 import org.general.json.JSONMap;
+import org.tweeter.data.FriendshipData;
 import org.tweeter.data.StatusData;
-import org.tweeter.data.StatusData.Status;
+import org.tweeter.models.Status;
 
 public class StatusesController extends Controller {
     
@@ -21,14 +26,11 @@ public class StatusesController extends Controller {
         try {
             userId = getRequiredLongParam("my_id", params);
             status = getRequiredStringParam("status", params);
-        } catch (InvalidParameterException e) {
-            return generateInvalidParamResponse(e.getMessage());
-        }
-        
-        try {
-            StatusData.updateStatus(userId, status);
+            StatusData.getInstance().updateStatus(userId, status);
         } catch (IllegalArgumentException e) {
             return generateInvalidParamResponse(e.getMessage());
+        } catch (IOException | InvalidDataFormattingException e) {
+            return generateInternalErrorResponse();
         }
         return generateSuccessResponse(new JSONMap().toString());
     }
@@ -36,11 +38,10 @@ public class StatusesController extends Controller {
     
     
     public static AppResponse getHomeTimeline(Map<String, String> params) {
-        @SuppressWarnings("unused")
         Long userId = null;
         Long count = null;
-        @SuppressWarnings("unused")
         Long maxId = null;
+        List<Status> statuses = null;
         try {
             userId = getRequiredLongParam("my_id", params);
             count = getOptionalLongParam("count", params);
@@ -48,13 +49,16 @@ public class StatusesController extends Controller {
                 count = 20L;
             }
             maxId = getOptionalLongParam("max_id", params);
+            Set<Long> timelineUserIds = FriendshipData.getInstance().getUserFriends(userId);
+            timelineUserIds.add(userId);
+            if (maxId == null) {
+                statuses = StatusData.getInstance().getStatuses(StatusData.getInstance().getStatusIdsOnUserIds(new ArrayList<Long>(timelineUserIds), count, DEFAULT_TIMELINE_SIZE));
+            }
         } catch (InvalidParameterException e) {
             return generateInvalidParamResponse(e.getMessage());
+        } catch (IOException | InvalidDataFormattingException e) {
+            return generateInternalErrorResponse();
         }
-        
-        List<Status> statuses = null;
-        
-        // TODO: Get appropriate statuses
         
         return generateSuccessResponse(generateJSONListOfTweets(statuses).toString());
     }
@@ -63,6 +67,7 @@ public class StatusesController extends Controller {
         Long userId = null;
         Long count = null;
         Long maxId = null;
+        List<Status> statuses = null;
         try {
             userId = getRequiredLongParam("my_id", params);
             count = getOptionalLongParam("count", params);
@@ -70,15 +75,15 @@ public class StatusesController extends Controller {
                 count = DEFAULT_TIMELINE_SIZE;
             }
             maxId = getOptionalLongParam("max_id", params);
+            if (maxId != null) {
+                statuses = StatusData.getInstance().getStatuses(StatusData.getInstance().getStatusIdsOnUserId(userId, count, maxId));
+            } else {
+                statuses = StatusData.getInstance().getStatuses(StatusData.getInstance().getStatusIdsOnUserId(userId, count));
+            }
         } catch (InvalidParameterException e) {
             generateInvalidParamResponse(e.getMessage());
-        }
-        
-        List<Status> statuses;
-        if (maxId != null) {
-            statuses = StatusData.getUserStatuses(userId, count, maxId);
-        } else {
-            statuses = StatusData.getUserStatuses(userId, count);
+        } catch (IOException | InvalidDataFormattingException e) {
+            return generateInternalErrorResponse();
         }
         
         return generateSuccessResponse(generateJSONListOfTweets(statuses).toString());

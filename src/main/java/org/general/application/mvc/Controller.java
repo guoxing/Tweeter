@@ -16,6 +16,10 @@ public abstract class Controller {
         return new AppResponse(message, AppResponseStatus.INVALID_PARAMETERS);
     }
     
+    public static AppResponse generateInternalErrorResponse() {
+        return new AppResponse("Internal error.", AppResponseStatus.INTERNAL_ERROR);
+    }
+    
     public static String getRequiredStringParam(String paramKey, Map<String, String> params)
             throws InvalidParameterException {
         String val = params.get(paramKey);

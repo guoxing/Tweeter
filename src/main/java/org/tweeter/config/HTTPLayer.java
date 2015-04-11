@@ -34,6 +34,9 @@ public class HTTPLayer implements HTTPHandler {
                 httpRes.sendError(HTTPResponse.StatusCode.NOT_FOUND,
                         "File not found: "+appReq.getAddress());
                 return;
+            case INTERNAL_ERROR:
+                httpRes.sendError(HTTPResponse.StatusCode.SERVER_ERROR, "Server error.");
+                return;
         }
     }
 
