@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.general.data.AppData;
 import org.general.data.InvalidDataFormattingException;
@@ -49,13 +51,15 @@ public class StatusData extends AppData {
      * Retrieve an (and the only) instance of StatusData
      * 
      * @return An instance of StatusData
-     * @throws IOException
-     * @throws InvalidDataFormattingException
      */
-    public static StatusData getInstance() throws IOException,
-            InvalidDataFormattingException {
+    public static StatusData getInstance() {
         if (statusData == null) {
-            statusData = new StatusData();
+            try {
+                statusData = new StatusData();
+            } catch (IOException | InvalidDataFormattingException e) {
+                e.printStackTrace();
+                throw new Error("Error in initializing StatusData");
+            }
         }
         return statusData;
     }
@@ -98,21 +102,22 @@ public class StatusData extends AppData {
 
     /**
      * Get a list of statuses from a list of status_ids in reverse chronological
-     * order
+     * order. ids doesn't have to be sorted.
      * 
      * @param ids
      * @return A list of statuses.
      * @throws IOException
      * @throws InvalidDataFormattingException
      */
-    public List<Status> getStatuses(List<Long> ids) throws IOException,
+    public List<Status> getStatuses(Set<Long> ids) throws IOException,
             InvalidDataFormattingException {
-        List<Status> list = new ArrayList<Status>(ids.size());
-        Collections.sort(ids, Collections.reverseOrder());
+        List<Long> idList = new ArrayList<Long>(ids);
+        List<Status> list = new ArrayList<Status>(idList.size());
+        Collections.sort(idList, Collections.reverseOrder());
         int i = 0;
         // fetch from cache if possible
-        while (i < ids.size()) {
-            long id = ids.get(i);
+        while (i < idList.size()) {
+            long id = idList.get(i);
             Status status = statusCache.get(id);
             if (status == null) {
                 break;
@@ -123,9 +128,9 @@ public class StatusData extends AppData {
         // fetch from persistent storage
         BackwardReader br = getBackwardReader();
         List<String> entry;
-        while ((entry = br.readEntry()) != null && i < ids.size()) {
+        while ((entry = br.readEntry()) != null && i < idList.size()) {
             Status status = parseEntry(entry);
-            if (status.getStatusId() == ids.get(i)) {
+            if (status.getStatusId() == idList.get(i)) {
                 list.add(status);
                 i++;
             }
@@ -140,7 +145,7 @@ public class StatusData extends AppData {
 
     public List<Long> getStatusIdsOnUserId(long userId, long numStatuses,
             long maxId) {
-        List<Long> userIds = new ArrayList<Long>();
+        Set<Long> userIds = new HashSet<Long>();
         userIds.add(userId);
         return getStatusIdsOnUserIds(userIds, numStatuses, maxId);
     }
@@ -161,11 +166,9 @@ public class StatusData extends AppData {
      *            must be no larger than this value.
      * @return A list of statusIds.
      */
-    public List<Long> getStatusIdsOnUserIds(List<Long> userIds,
-            long numStatuses, long maxId) {
-        List<Long> res = new ArrayList<Long>();
-        List<Long> temp = new ArrayList<Long>();
-        for (long userId : userIds) {
+    public Set<Long> getStatusIdsOnUserIds(Set<Long> userIds,
+            int numStatuses, long maxId) {
+        Set<Long> res = new HashSet<Long>();
             if (ownershipCache.get(userId) != null) {
                 // only care users that have tweets
                 temp.add(userId);

@@ -65,14 +65,16 @@ public class FriendshipData extends AppData {
     /**
      * Retrieve an (and the only) instance of FriendshipData
      * 
-     * @return
-     * @throws IOException
-     * @throws InvalidDataFormattingException
+     * @return An instance of FriendshipData
      */
-    public static FriendshipData getInstance() throws IOException,
-            InvalidDataFormattingException {
+    public static FriendshipData getInstance() {
         if (friendshipData == null) {
-            friendshipData = new FriendshipData();
+            try {
+                friendshipData = new FriendshipData();
+            } catch (IOException | InvalidDataFormattingException e) {
+                e.printStackTrace();
+                throw new Error("Error on initializing FriendshipData");
+            }
         }
         return friendshipData;
     }
