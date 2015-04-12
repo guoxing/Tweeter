@@ -1,7 +1,6 @@
 package org.tweeter.controllers;
 
 import java.io.IOException;
-import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,20 +15,22 @@ import org.tweeter.data.FriendshipData;
 
 public class FriendshipsController extends Controller {
     
+    private static final String PARAMS_MY_ID_KEY = "my_id";
+    private static final String PARAMS_USER_ID_KEY = "user_id";
+
     public static AppResponse createFriendship(Map<String, String> params) {
         Long userId = null;
         Long friendId = null;
         try {
-            userId = getRequiredLongParam("my_id", params);
-            friendId = getRequiredLongParam("user_id", params);
+            userId = getRequiredLongParam(PARAMS_MY_ID_KEY, params);
+            friendId = getRequiredLongParam(PARAMS_USER_ID_KEY, params);
             FriendshipData.getInstance().addFriend(userId, friendId);
-        } catch (InvalidParameterException e) {
+        } catch (IllegalArgumentException e) {
             return generateInvalidParamResponse(e.getMessage());
         } catch (IOException | InvalidDataFormattingException e) {
             return generateInternalErrorResponse();
         }
-        
-        
+
         return generateSuccessResponse(new JSONMap().toString());
     }
     
@@ -37,16 +38,15 @@ public class FriendshipsController extends Controller {
         Long userId = null;
         Long friendId = null;
         try {
-            userId = getRequiredLongParam("my_id", params);
-            friendId = getRequiredLongParam("user_id", params);
+            userId = getRequiredLongParam(PARAMS_MY_ID_KEY, params);
+            friendId = getRequiredLongParam(PARAMS_USER_ID_KEY, params);
             FriendshipData.getInstance().deleteFriend(userId, friendId);
-        } catch (InvalidParameterException e) {
+        } catch (IllegalArgumentException e) {
             return generateInvalidParamResponse(e.getMessage());
         } catch (IOException | InvalidDataFormattingException e) {
             return generateInternalErrorResponse();
         }
-        
-        
+
         return generateSuccessResponse(new JSONMap().toString());
     }
     
@@ -54,14 +54,12 @@ public class FriendshipsController extends Controller {
         Long userId = null;
         List<Long> followerIds = new ArrayList<Long>();
         try {
-            userId = getRequiredLongParam("user_id", params);
+            userId = getRequiredLongParam(PARAMS_USER_ID_KEY, params);
             followerIds.addAll(FriendshipData.getInstance().getUserFollowers(userId));
-        } catch (InvalidParameterException e) {
+        } catch (IllegalArgumentException e) {
             return generateInvalidParamResponse(e.getMessage());
-        } catch (IOException | InvalidDataFormattingException e) {
-            return generateInternalErrorResponse();
         }
-        
+
         return generateSuccessResponse(generateJSONIdList(followerIds).toString());
     }
     
@@ -69,14 +67,12 @@ public class FriendshipsController extends Controller {
         Long userId = null;
         List<Long> friendIds = new ArrayList<Long>();
         try {
-            userId = getRequiredLongParam("user_id", params);
+            userId = getRequiredLongParam(PARAMS_USER_ID_KEY, params);
             friendIds.addAll(FriendshipData.getInstance().getUserFriends(userId));
-        } catch (InvalidParameterException e) {
+        } catch (IllegalArgumentException e) {
             return generateInvalidParamResponse(e.getMessage());
-        } catch (IOException | InvalidDataFormattingException e) {
-            return generateInternalErrorResponse();
         }
-        
+
         return generateSuccessResponse(generateJSONIdList(friendIds).toString());
     }
     
@@ -95,7 +91,7 @@ public class FriendshipsController extends Controller {
             listOfIds.add(id);
         }
         jSONresponse.put("ids", listOfIds);
-        
+
         return jSONresponse;
     }
 }

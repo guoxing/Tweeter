@@ -67,12 +67,10 @@ public abstract class AppData {
      * @param entry
      *            Entry to be appended.
      * @throws IOException
-     * @throws InvalidDataFormattingException
      */
-    protected void appendToFile(List<String> entry) throws IOException,
-            InvalidDataFormattingException {
+    protected void appendToFile(List<String> entry) throws IOException {
         if (entry.size() != numCols) {
-            throw new InvalidDataFormattingException(
+            throw new IllegalArgumentException(
                     "Wrong number of cols written to file! Expected #cols: "
                             + numCols + " Real #cols: " + entry.size());
         }

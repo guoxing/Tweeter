@@ -101,8 +101,8 @@ public class StatusData extends AppData {
     }
 
     /**
-     * Get a list of statuses from a list of status_ids in reverse chronological
-     * order. ids doesn't have to be sorted.
+     * Get a list of statuses from a set of status_ids in reverse chronological
+     * order. Ids don't have to be sorted.
      * 
      * @param ids
      * @return A list of statuses.
@@ -139,23 +139,23 @@ public class StatusData extends AppData {
         return list;
     }
 
-    public List<Long> getStatusIdsOnUserId(long userId, long numStatuses) {
+    public Set<Long> getStatusIdsOnUserId(long userId, long numStatuses) {
         return getStatusIdsOnUserId(userId, numStatuses, currentId);
     }
 
-    public List<Long> getStatusIdsOnUserId(long userId, long numStatuses,
+    public Set<Long> getStatusIdsOnUserId(long userId, long numStatuses,
             long maxId) {
         Set<Long> userIds = new HashSet<Long>();
         userIds.add(userId);
         return getStatusIdsOnUserIds(userIds, numStatuses, maxId);
     }
 
-    public List<Long> getStatusIdsOnUserIds(List<Long> userIds, long numStatuses) {
+    public Set<Long> getStatusIdsOnUserIds(Set<Long> userIds, long numStatuses) {
         return getStatusIdsOnUserIds(userIds, numStatuses, currentId);
     }
 
     /**
-     * Get a list of most recent status Ids whose owner is in the userIds list.
+     * Get a set of most recent status Ids whose owner is in the userIds list.
      * 
      * @param userIds
      *            A list of userIds.
@@ -164,11 +164,13 @@ public class StatusData extends AppData {
      * @param maxId
      *            Specifies the maximum id. All the ids in the returned list
      *            must be no larger than this value.
-     * @return A list of statusIds.
+     * @return A set of statusIds.
      */
-    public Set<Long> getStatusIdsOnUserIds(Set<Long> userIds,
-            int numStatuses, long maxId) {
+    public Set<Long> getStatusIdsOnUserIds(Set<Long> userIds, long numStatuses,
+            long maxId) {
         Set<Long> res = new HashSet<Long>();
+        Set<Long> temp = new HashSet<Long>();
+        for (long userId : userIds) {
             if (ownershipCache.get(userId) != null) {
                 // only care users that have tweets
                 temp.add(userId);

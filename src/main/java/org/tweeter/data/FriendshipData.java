@@ -84,11 +84,13 @@ public class FriendshipData extends AppData {
      * empty if the user has no friends.
      * 
      * @param userId
-     * @return A set of ids or null if the specified user doens't have friends
+     * @return A set of ids
      */
     public Set<Long> getUserFriends(long userId) {
         Logger.log("Getting friends of " + userId);
-        return followingCache.get(userId);
+        Set<Long> res = followingCache.get(userId);
+        res = res == null ? new HashSet<Long>() : res;
+        return res;
     }
 
     /**
@@ -97,11 +99,13 @@ public class FriendshipData extends AppData {
      * followers.
      * 
      * @param userId
-     * @return A set of ids or null if the specified user doesn't have followers
+     * @return A set of ids
      */
     public Set<Long> getUserFollowers(long userId) {
         Logger.log("Getting followers of " + userId);
-        return followerCache.get(userId);
+        Set<Long> res = followerCache.get(userId);
+        res = res == null ? new HashSet<Long>() : res;
+        return res;
     }
 
     /**
