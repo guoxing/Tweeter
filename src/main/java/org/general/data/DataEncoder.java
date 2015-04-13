@@ -18,7 +18,7 @@ class DataEncoder {
      */
     static String encode(String in) {
         for (Entry<String, String> entry : AppData.ENCODE_MAP.entrySet()) {
-            in = in.replace(entry.getKey(), entry.getValue());
+            in = in.replaceAll(entry.getKey(), entry.getValue());
         }
         return in;
     }

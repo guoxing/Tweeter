@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,17 +31,17 @@ public abstract class AppData {
 
     static final Map<String, String> ENCODE_MAP;
     static {
-        ENCODE_MAP = new HashMap<String, String>();
+        ENCODE_MAP = new LinkedHashMap<String, String>();
+        ENCODE_MAP.put("\\", "\\\\");
         ENCODE_MAP.put("\t", "\\t");
         ENCODE_MAP.put("\n", "\\n");
-        ENCODE_MAP.put("\\", "\\\\");
     }
     static final Map<String, String> DECODE_MAP;
     static {
-        DECODE_MAP = new HashMap<String, String>();
+        DECODE_MAP = new LinkedHashMap<String, String>();
+        DECODE_MAP.put("\\\\", "\\");
         DECODE_MAP.put("\\t", "\t");
         DECODE_MAP.put("\\n", "\n");
-        DECODE_MAP.put("\\\\", "\\");
     }
 
     protected static final char COL_DELIMITER = '\t';

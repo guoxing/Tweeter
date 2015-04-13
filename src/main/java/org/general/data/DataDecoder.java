@@ -18,7 +18,7 @@ class DataDecoder {
      */
     static String decode(String in) {
         for (Entry<String, String> entry : AppData.DECODE_MAP.entrySet()) {
-            in = in.replace(entry.getKey(), entry.getValue());
+            in = in.replaceAll(entry.getKey(), entry.getValue());
         }
         return in;
     }
