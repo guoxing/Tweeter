@@ -95,6 +95,10 @@ public class StatusData extends AppData {
             }
         }
         statusCache.put(currentId, status);
+        if (ownershipCache.get(userId) == null) {
+            ownershipCache.put(userId, new ArrayList<Long>());
+        }
+        ownershipCache.get(userId).add(status.getStatusId());
 
         // write to disk
         appendToFile(status.toEntry());
@@ -155,15 +159,15 @@ public class StatusData extends AppData {
     }
 
     /**
-     * Get a set of most recent status Ids whose owner is in the userIds list.
+     * Get a set of most recent status Ids whose owner is in the userIds set.
      * 
      * @param userIds
-     *            A list of userIds.
+     *            A set of userIds.
      * @param numStatuses
-     *            Specifies the maximum size of the returned list.
+     *            Specifies the maximum size of the returned set.
      * @param maxId
-     *            Specifies the maximum id. All the ids in the returned list
-     *            must be no larger than this value.
+     *            Specifies the maximum id. All the ids in the returned set must
+     *            be no larger than this value.
      * @return A set of statusIds.
      */
     public Set<Long> getStatusIdsOnUserIds(Set<Long> userIds, long numStatuses,
