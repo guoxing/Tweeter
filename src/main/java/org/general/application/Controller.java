@@ -1,4 +1,4 @@
-package org.general.application.mvc;
+package org.general.application;
 
 import java.util.Map;
 

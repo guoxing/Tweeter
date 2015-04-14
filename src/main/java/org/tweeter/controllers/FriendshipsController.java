@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.general.application.ApplicationInterface.AppResponse;
-import org.general.application.mvc.Controller;
+import org.general.application.Controller;
 import org.general.data.InvalidDataFormattingException;
 import org.general.json.JSONList;
 import org.general.json.JSONMap;
