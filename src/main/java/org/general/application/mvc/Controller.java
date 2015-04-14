@@ -51,7 +51,8 @@ public abstract class Controller {
 
     public static Long getOptionalLongParam(String paramKey,
             Map<String, String> params) throws IllegalArgumentException {
-        Long val = null;
+    	if (params.get(paramKey) == null) return null;
+    	Long val = null;
         try {
             val = Long.parseLong(params.get(paramKey));
         } catch (NumberFormatException e) {

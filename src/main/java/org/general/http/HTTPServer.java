@@ -12,7 +12,7 @@ import org.general.logger.Logger;
  * @author Guoxing Li
  *
  */
-public class HTTPServer {
+public abstract class HTTPServer {
 
     // server name
     public String name;
@@ -20,18 +20,16 @@ public class HTTPServer {
     private static int DEFAULT_PORT = 8080;
 
     private ServerSocket ss;
-    private HTTPHandler handler;
     private int port;
     
 
-    public HTTPServer(String name, HTTPHandler handler) {
-        this(DEFAULT_PORT, name, handler);
+    protected HTTPServer(String name) {
+        this(DEFAULT_PORT, name);
     }
 
-    public HTTPServer(int port, String name, HTTPHandler handler) {
+    protected HTTPServer(int port, String name) {
         this.port = port;
         this.name = name;
-        this.handler = handler;
     }
 
     public void start() throws IOException {
@@ -56,7 +54,7 @@ public class HTTPServer {
                 continue;
             }
             try {
-                handler.handle(request, response);
+                handle(request, response);
             } catch (Exception e) {
                 e.printStackTrace();
                 response.sendError(HTTPResponse.StatusCode.SERVER_ERROR,
@@ -65,6 +63,8 @@ public class HTTPServer {
             s.close();
         }
     }
+    
+    protected abstract void handle(HTTPRequest req, HTTPResponse res);
 
     public void shutdown() throws IOException {
         if (ss != null) {

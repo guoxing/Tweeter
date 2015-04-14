@@ -1,26 +1,51 @@
 package org.tweeter.config;
 
+import java.io.IOException;
+
 import org.general.application.ApplicationInterface.AppRequest;
 import org.general.application.ApplicationInterface.AppResponse;
 import org.general.application.ApplicationInterface.AppResponseStatus;
-import org.general.http.HTTPHandler;
+import org.general.data.InvalidDataFormattingException;
 import org.general.http.HTTPRequest;
 import org.general.http.HTTPResponse;
+import org.general.http.HTTPServer;
+import org.tweeter.data.FriendshipData;
+import org.tweeter.data.StatusData;
 
-public class HTTPLayer implements HTTPHandler {
+public class TweeterServer extends HTTPServer {
     
-    private Router router;
+	private TweeterServer(String name) {
+		super(name);
+	}
+    private TweeterServer(int port, String name) {
+		super(port, name);
+	}
+
+	private static Router router;
     
-    public HTTPLayer() {
-        this.router = new Router();
+    private static HTTPServer server;
+
+    public static void main(String[] args) throws IOException,
+            InvalidDataFormattingException {
+        server = new TweeterServer("Tweeter/1.0");
+        router = new Router();
+        
+        // spin up data modules
+        FriendshipData.getInstance();
+        StatusData.getInstance();
+        try {
+            server.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+            server.shutdown();
+        }
     }
     
-    @Override
-    public void handle(HTTPRequest httpReq, HTTPResponse httpRes) {
+    protected void handle(HTTPRequest httpReq, HTTPResponse httpRes) {
         AppRequest appReq = new AppRequest(httpReq.getMethod() + " " + httpReq.getURI(), httpReq.getQueryParams());
         AppResponse appRes = router.respondToAction(appReq);
         String body = appRes.getBody();
-        AppResponseStatus result = appRes.getResult();
+        AppResponseStatus result = appRes.getResponseStatus();
         httpRes.setBody(body);
         
         switch (result) {
@@ -39,5 +64,5 @@ public class HTTPLayer implements HTTPHandler {
                 return;
         }
     }
-
+    
 }

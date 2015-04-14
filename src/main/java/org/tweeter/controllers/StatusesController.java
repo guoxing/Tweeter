@@ -95,6 +95,7 @@ public class StatusesController extends Controller {
         } catch (IllegalArgumentException e) {
             return generateInvalidParamResponse(e.getMessage());
         } catch (IOException | InvalidDataFormattingException e) {
+        	e.printStackTrace();
             return generateInternalErrorResponse();
         }
 

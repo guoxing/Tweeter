@@ -13,11 +13,11 @@ public interface ApplicationInterface {
     public static class AppResponse {
         private AppResponseStatus responseStatus;
         private String responseBody;
-        public AppResponse(String body, AppResponseStatus result) {
-            this.responseStatus = result;
+        public AppResponse(String body, AppResponseStatus responseStatus) {
+            this.responseStatus = responseStatus;
             this.responseBody = body;
         }
-        public AppResponseStatus getResult() {
+        public AppResponseStatus getResponseStatus() {
             return responseStatus;
         }
         public String getBody() {
@@ -26,11 +26,11 @@ public interface ApplicationInterface {
     }
 
     public static class AppRequest {
-        private String uniqueRequestAddress;
+        private String requestAddress;
         private Map<String, String> params;
         
-        public AppRequest(String uniqueRequestAddress, Map<String, String> params) {
-            this.uniqueRequestAddress = uniqueRequestAddress;
+        public AppRequest(String requestAddress, Map<String, String> params) {
+            this.requestAddress = requestAddress;
             this.params = params;
         }
         
@@ -39,7 +39,7 @@ public interface ApplicationInterface {
         }
         
         public String getAddress() {
-            return uniqueRequestAddress;
+            return requestAddress;
         }
     }
 }
