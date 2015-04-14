@@ -5,21 +5,63 @@ import java.util.Map;
 import org.general.application.ApplicationInterface.AppResponse;
 import org.general.application.ApplicationInterface.AppResponseStatus;
 
+/**
+ * Abstract class that is the base controller for application logic.
+ * 
+ * Provides methods for subclasses to generate AppResponses and
+ * retrieve required and/or optional parameters.
+ * @author marcelpuyat
+ *
+ */
 public abstract class Controller {
-
-    public static AppResponse generateSuccessResponse(String body) {
+	
+	/**
+	 * Returns an AppResponse with the response status set to success
+	 * and the body being the parameter passed in. Body must not be
+	 * null.
+	 * @param body String that must not be null.
+	 * @throws NullPointerException Thrown if body is null
+	 * @return AppResponse object with success status and body passed in
+	 */
+    public static AppResponse generateSuccessResponse(String body) throws NullPointerException {
+    	if (body == null) throw new NullPointerException("AppResponse body must not be null");
         return new AppResponse(body, AppResponseStatus.SUCCESS);
     }
 
+    /**
+	 * Returns an AppResponse with the response status set to INVALID_PARAMETER
+	 * and the body being the message parameter passed in. Message must not be
+	 * null.
+	 * @param message String that must not be null.
+	 * @throws NullPointerException Thrown if message is null
+	 * @return AppResponse object with invalid parameter status and body set to the message passed in
+	 */
     public static AppResponse generateInvalidParamResponse(String message) {
+    	if (message == null) throw new NullPointerException("AppResponse message must not be null");
         return new AppResponse(message, AppResponseStatus.INVALID_PARAMETERS);
     }
 
+    /**
+	 * Returns an AppResponse with the response status set to INTERNAL_ERROR
+	 * and the body being "Internal error."
+	 * 
+	 * @return AppResponse object with internal error status and "Internal error" body
+	 */
     public static AppResponse generateInternalErrorResponse() {
         return new AppResponse("Internal error.",
                 AppResponseStatus.INTERNAL_ERROR);
     }
 
+    /**
+     * Retrieves a string value associated with a passed in string key 
+     * from params map. Use this when the controller action requires
+     * the parameter associated with this key to exist.
+     * 
+     * @param paramKey Required string parameter
+     * @param params Parameters map
+     * @return Long value associated with key passed in
+     * @throws IllegalArgumentException Thrown if map does not contain given key
+     */
     public static String getRequiredStringParam(String paramKey,
             Map<String, String> params) throws IllegalArgumentException {
         String val = params.get(paramKey);
@@ -30,6 +72,17 @@ public abstract class Controller {
         return val;
     }
 
+    /**
+     * Retrieves a long value associated with a passed in string key 
+     * from params map. Use this when the controller action requires
+     * the parameter associated with this key to exist.
+     * 
+     * @param paramKey Required string parameter
+     * @param params Parameters map
+     * @return String value associated with key passed in
+     * @throws IllegalArgumentException Thrown if map does not contain given key 
+     * or if map contains given key but value cannot be parsed into a long
+     */
     public static Long getRequiredLongParam(String paramKey,
             Map<String, String> params) throws IllegalArgumentException {
 
@@ -49,9 +102,21 @@ public abstract class Controller {
         return val;
     }
 
+    /**
+     * Retrieves a long value associated with a passed in string key 
+     * from params map. Use this when the controller action does not require
+     * the parameter associated with this key to exist (it is merely optional).
+     * 
+     * @param paramKey Optional string parameter
+     * @param params Parameters map
+     * @return String value associated with key passed in, or null if params does not contain this parameter.
+     * @throws IllegalArgumentException Thrown if map contains given key but value
+     * cannot be parsed into a long
+     */
     public static Long getOptionalLongParam(String paramKey,
             Map<String, String> params) throws IllegalArgumentException {
     	if (params.get(paramKey) == null) return null;
+    	
     	Long val = null;
         try {
             val = Long.parseLong(params.get(paramKey));
