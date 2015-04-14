@@ -17,6 +17,7 @@ import org.tweeter.models.Status;
 public class StatusesController extends Controller {
 
     private static final Long DEFAULT_TIMELINE_SIZE = 20L;
+    private static final Long DEFAULT_MAX_ID = Long.MAX_VALUE;
     private static final String PARAMS_MY_ID_KEY = "my_id";
     private static final String PARAMS_STATUS_KEY = "status";
     private static final String PARAMS_COUNT_KEY = "count";
@@ -26,8 +27,8 @@ public class StatusesController extends Controller {
         Long userId = null;
         String status = null;
         try {
-            userId = getRequiredLongParam(PARAMS_MY_ID_KEY, params);
-            status = getRequiredStringParam(PARAMS_STATUS_KEY, params);
+            userId = getRequiredLong(PARAMS_MY_ID_KEY, params);
+            status = getRequiredString(PARAMS_STATUS_KEY, params);
             StatusData.getInstance().updateStatus(userId, status);
         } catch (IllegalArgumentException e) {
             return generateInvalidParamResponse(e.getMessage());
@@ -43,12 +44,9 @@ public class StatusesController extends Controller {
         Long maxId = null;
         List<Status> statuses = null;
         try {
-            userId = getRequiredLongParam(PARAMS_MY_ID_KEY, params);
-            count = getOptionalLongParam(PARAMS_COUNT_KEY, params);
-            if (count == null) {
-                count = DEFAULT_TIMELINE_SIZE;
-            }
-            maxId = getOptionalLongParam(PARAMS_MAX_ID_KEY, params);
+            userId = getRequiredLong(PARAMS_MY_ID_KEY, params);
+            count = getOptionalLongOrDefault(PARAMS_COUNT_KEY, params, DEFAULT_TIMELINE_SIZE);
+            maxId = getOptionalLongOrDefault(PARAMS_MAX_ID_KEY, params, DEFAULT_MAX_ID);
             Set<Long> timelineUserIds = FriendshipData.getInstance()
                     .getUserFriends(userId);
             timelineUserIds.add(userId);
@@ -77,12 +75,9 @@ public class StatusesController extends Controller {
         Long maxId = null;
         List<Status> statuses = null;
         try {
-            userId = getRequiredLongParam(PARAMS_MY_ID_KEY, params);
-            count = getOptionalLongParam(PARAMS_COUNT_KEY, params);
-            if (count == null) {
-                count = DEFAULT_TIMELINE_SIZE;
-            }
-            maxId = getOptionalLongParam(PARAMS_MAX_ID_KEY, params);
+            userId = getRequiredLong(PARAMS_MY_ID_KEY, params);
+            count = getOptionalLongOrDefault(PARAMS_COUNT_KEY, params, DEFAULT_TIMELINE_SIZE);
+            maxId = getOptionalLongOrDefault(PARAMS_MAX_ID_KEY, params, DEFAULT_MAX_ID);
             Set<Long> statusIds;
             if (maxId == null) {
                 statusIds = StatusData.getInstance().getStatusIdsOnUserId(

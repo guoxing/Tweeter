@@ -62,7 +62,7 @@ public abstract class Controller {
      * @return Long value associated with key passed in
      * @throws IllegalArgumentException Thrown if map does not contain given key
      */
-    public static String getRequiredStringParam(String paramKey,
+    public static String getRequiredString(String paramKey,
             Map<String, String> params) throws IllegalArgumentException {
         String val = params.get(paramKey);
         if (val == null) {
@@ -83,7 +83,7 @@ public abstract class Controller {
      * @throws IllegalArgumentException Thrown if map does not contain given key 
      * or if map contains given key but value cannot be parsed into a long
      */
-    public static Long getRequiredLongParam(String paramKey,
+    public static Long getRequiredLong(String paramKey,
             Map<String, String> params) throws IllegalArgumentException {
 
         if (params.get(paramKey) == null) {
@@ -109,13 +109,15 @@ public abstract class Controller {
      * 
      * @param paramKey Optional string parameter
      * @param params Parameters map
-     * @return String value associated with key passed in, or null if params does not contain this parameter.
+     * @param defaultValue Default value to be returned if params does not contain value
+     * @return String value associated with key passed in, or defaultValue if params does not contain this parameter.
      * @throws IllegalArgumentException Thrown if map contains given key but value
      * cannot be parsed into a long
      */
-    public static Long getOptionalLongParam(String paramKey,
-            Map<String, String> params) throws IllegalArgumentException {
-    	if (params.get(paramKey) == null) return null;
+    public static Long getOptionalLongOrDefault(String paramKey,
+            Map<String, String> params,
+            Long defaultValue) throws IllegalArgumentException {
+    	if (params.get(paramKey) == null) return defaultValue;
     	
     	Long val = null;
         try {

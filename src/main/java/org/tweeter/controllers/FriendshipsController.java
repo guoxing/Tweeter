@@ -22,8 +22,8 @@ public class FriendshipsController extends Controller {
         Long userId = null;
         Long friendId = null;
         try {
-            userId = getRequiredLongParam(PARAMS_MY_ID_KEY, params);
-            friendId = getRequiredLongParam(PARAMS_USER_ID_KEY, params);
+            userId = getRequiredLong(PARAMS_MY_ID_KEY, params);
+            friendId = getRequiredLong(PARAMS_USER_ID_KEY, params);
             FriendshipData.getInstance().addFriend(userId, friendId);
         } catch (IllegalArgumentException e) {
             return generateInvalidParamResponse(e.getMessage());
@@ -38,8 +38,8 @@ public class FriendshipsController extends Controller {
         Long userId = null;
         Long friendId = null;
         try {
-            userId = getRequiredLongParam(PARAMS_MY_ID_KEY, params);
-            friendId = getRequiredLongParam(PARAMS_USER_ID_KEY, params);
+            userId = getRequiredLong(PARAMS_MY_ID_KEY, params);
+            friendId = getRequiredLong(PARAMS_USER_ID_KEY, params);
             FriendshipData.getInstance().deleteFriend(userId, friendId);
         } catch (IllegalArgumentException e) {
             return generateInvalidParamResponse(e.getMessage());
@@ -54,7 +54,7 @@ public class FriendshipsController extends Controller {
         Long userId = null;
         List<Long> followerIds = new ArrayList<Long>();
         try {
-            userId = getRequiredLongParam(PARAMS_USER_ID_KEY, params);
+            userId = getRequiredLong(PARAMS_USER_ID_KEY, params);
             followerIds.addAll(FriendshipData.getInstance().getUserFollowers(userId));
         } catch (IllegalArgumentException e) {
             return generateInvalidParamResponse(e.getMessage());
@@ -67,7 +67,7 @@ public class FriendshipsController extends Controller {
         Long userId = null;
         List<Long> friendIds = new ArrayList<Long>();
         try {
-            userId = getRequiredLongParam(PARAMS_USER_ID_KEY, params);
+            userId = getRequiredLong(PARAMS_USER_ID_KEY, params);
             friendIds.addAll(FriendshipData.getInstance().getUserFriends(userId));
         } catch (IllegalArgumentException e) {
             return generateInvalidParamResponse(e.getMessage());
