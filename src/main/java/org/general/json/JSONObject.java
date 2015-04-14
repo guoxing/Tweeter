@@ -7,17 +7,19 @@ import java.util.HashMap;
  * this class permits one only to retrieve (not modify) the JSON representation
  * of an instance using its toString method.
  * 
- * Classes that subclass off of this must provide an implementation
- * for a toString method that returns a string that adheres to valid
- * JSON formatting.
- * 
  * See http://json.org/ for more details on JSON formatting.
  * 
  * @author marcelpuyat
  *
  */
 public abstract class JSONObject {
+	/**
+	 * Classes that subclass off of this must provide an implementation
+	 * for a toString method that returns a string that adheres to valid
+	 * JSON formatting.
+	 */
     
+	
     /**
      * Mapping from JSON characters that should be escaped to their appropriate
      * replacements. Static initializer sets up the hashmap for use in the
