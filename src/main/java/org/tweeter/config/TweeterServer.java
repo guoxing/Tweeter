@@ -2,9 +2,10 @@ package org.tweeter.config;
 
 import java.io.IOException;
 
+import org.general.application.ApplicationInterface;
 import org.general.application.ApplicationInterface.AppRequest;
 import org.general.application.ApplicationInterface.AppResponse;
-import org.general.application.ApplicationInterface.AppResponseStatus;
+import org.general.application.ApplicationInterface.AppResponse.AppResponseStatus;
 import org.general.data.InvalidDataFormattingException;
 import org.general.http.HTTPRequest;
 import org.general.http.HTTPResponse;
@@ -21,14 +22,14 @@ public class TweeterServer extends HTTPServer {
 		super(port, name);
 	}
 
-	private static Router router;
+	private static ApplicationInterface appInterface;
     
     private static HTTPServer server;
 
     public static void main(String[] args) throws IOException,
             InvalidDataFormattingException {
         server = new TweeterServer("Tweeter/1.0");
-        router = new Router();
+        appInterface = new Router();
         
         // spin up data modules
         FriendshipData.getInstance();
@@ -42,8 +43,9 @@ public class TweeterServer extends HTTPServer {
     }
     
     protected void handle(HTTPRequest httpReq, HTTPResponse httpRes) {
-        AppRequest appReq = new AppRequest(httpReq.getMethod() + " " + httpReq.getURI(), httpReq.getQueryParams());
-        AppResponse appRes = router.respondToAction(appReq);
+        AppRequest appReq = new AppRequest(httpReq.getMethod() + 
+        		" " + httpReq.getURI(), httpReq.getQueryParams());
+        AppResponse appRes = appInterface.respondToAppReq(appReq);
         String body = appRes.getBody();
         AppResponseStatus result = appRes.getResponseStatus();
         httpRes.setBody(body);

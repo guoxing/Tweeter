@@ -3,7 +3,7 @@ package org.general.application;
 import java.util.Map;
 
 import org.general.application.ApplicationInterface.AppResponse;
-import org.general.application.ApplicationInterface.AppResponseStatus;
+import org.general.application.ApplicationInterface.AppResponse.AppResponseStatus;
 
 /**
  * Abstract class that is the base controller for application logic.
