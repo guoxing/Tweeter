@@ -13,11 +13,36 @@ import org.general.json.JSONMap;
 import org.general.json.JSONObject;
 import org.tweeter.data.FriendshipData;
 
+/**
+ * In charge of API endpoints regarding friendships between users.
+ * @author marcelpuyat
+ *
+ */
 public class FriendshipsController extends Controller {
     
+	/**
+	 * Key for my_id parameter
+	 */
     private static final String PARAMS_MY_ID_KEY = "my_id";
+    
+    /**
+     * Key for user_id parameter
+     */
     private static final String PARAMS_USER_ID_KEY = "user_id";
 
+    /**
+     * Creates a friendship from the long value in params associated with "my_id"
+     * to the long value in params associated with "user_id".
+     * 
+     * Will return an empty JSON object on success, or a message with an 
+     * error (and a corresponding response status) otherwise.
+     * 
+     * If the friendship already exists, will still 
+     * respond with empty JSON object and success.
+     * 
+     * @param params Map that should contain values for PARAMS_MY_ID_KEY and PARAMS_USER_ID_KEY. Should not be null.
+     * @return Response that will have a body with an empty JSON object on success, or a message with an error.
+     */
     public static AppResponse createFriendship(Map<String, String> params) {
         Long userId = null;
         Long friendId = null;
@@ -34,6 +59,19 @@ public class FriendshipsController extends Controller {
         return generateSuccessResponse(new JSONMap().toString());
     }
     
+    /**
+     * Deletes a friendship from the long value in params associated with "my_id"
+     * to the long value in params associated with "user_id".
+     * 
+     * Will return an empty JSON object on success, or a message with an 
+     * error (and a corresponding response status) otherwise.
+     * 
+     * If the friendship did not exist, will still 
+     * respond with empty JSON object and success.
+     * 
+     * @param params Map that should contain values for PARAMS_MY_ID_KEY and PARAMS_USER_ID_KEY. Should not be null. 
+     * @return Response that will have a body with an empty JSON object on success, or a message with an error.
+     */
     public static AppResponse deleteFriendship(Map<String, String> params) {
         Long userId = null;
         Long friendId = null;
@@ -50,6 +88,21 @@ public class FriendshipsController extends Controller {
         return generateSuccessResponse(new JSONMap().toString());
     }
     
+    /**
+     * Returns an AppResponse with a body containing the followers of a given
+     * user.
+     * 
+     * On success, body of the response contains a JSONObject of the form:
+     * 		{ids: [1, 2, 3, etc...]}
+     * Returns {ids: []} if user has no followers.
+     * 
+     * Params must contain a long value associated with PARAMS_USER_ID_KEY, or
+     * response will contain error message and have an invalid parameter status.
+     * 
+     * @param params Map that should contain value for PARAMS_USER_ID_KEY. Should not be null.
+     * @return Response that will have a body with a JSON object formatted
+     * as mentioned above on success, or a message with an error.
+     */
     public static AppResponse getFollowers(Map<String, String> params) {
         Long userId = null;
         List<Long> followerIds = new ArrayList<Long>();
@@ -63,6 +116,21 @@ public class FriendshipsController extends Controller {
         return generateSuccessResponse(generateJSONIdList(followerIds).toString());
     }
     
+    /**
+     * Returns an AppResponse with a body containing the friends of a given
+     * user.
+     * 
+     * On success, body of the response contains a JSONObject of the form:
+     * 		{ids: [1, 2, 3, etc...]}
+     * Returns {ids: []} if user has no friends.
+     * 
+     * Params must contain a long value associated with PARAMS_USER_ID_KEY, or
+     * response will contain error message and have an invalid parameter status.
+     * 
+     * @param params Map that should contain value for PARAMS_USER_ID_KEY. Should not be null.
+     * @return Response that will have a body with a JSON object formatted
+     * as mentioned above on success, or a message with an error.
+     */
     public static AppResponse getFriends(Map<String, String> params) {
         Long userId = null;
         List<Long> friendIds = new ArrayList<Long>();

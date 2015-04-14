@@ -14,6 +14,11 @@ import org.tweeter.data.FriendshipData;
 import org.tweeter.data.StatusData;
 import org.tweeter.models.Status;
 
+/**
+ * In charge of API endpoints regarding users' statuses
+ * @author marcelpuyat
+ *
+ */
 public class StatusesController extends Controller {
 
     private static final Long DEFAULT_TIMELINE_SIZE = 20L;
