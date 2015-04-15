@@ -21,13 +21,54 @@ import org.tweeter.models.Status;
  */
 public class StatusesController extends Controller {
 
+	/**
+	 * If timeline size parameter is not given when retrieving
+	 * a timeline, will retrieve this many statuses.
+	 */
     private static final Long DEFAULT_TIMELINE_SIZE = 20L;
+    
+    /**
+     * If max id parameter is not given, will not put a bound
+     * on max id of statuses to retrieve (besides bound on
+     * Long type).
+     */
     private static final Long DEFAULT_MAX_ID = Long.MAX_VALUE;
+    
+    /**
+     * Parameter that holds the id of the user to perform
+     * a given action on
+     */
     private static final String PARAMS_MY_ID_KEY = "my_id";
+    
+    /**
+     * Parameter that holds a new status body
+     */
     private static final String PARAMS_STATUS_KEY = "status";
+    
+    /**
+     * Parameter that indicate the max number of statuses
+     * to retrieve
+     */
     private static final String PARAMS_COUNT_KEY = "count";
+    
+    /**
+     * Parameter that indicates what the maximum id of any
+     * retrieved status should be
+     */
     private static final String PARAMS_MAX_ID_KEY = "max_id";
 
+    /**
+     * Updates the status of a user.
+     * 
+     * Parameters must include a user_id (which must be parsable into a long)
+     * and a status.
+     * 
+     * Will return an empty JSON object as a result on success, or a message
+     * with an error (and a corresponding response status) on failure.
+     * @param params Parameters that must include the keys "user_id" and "status"
+     * @return App Response with a body with an empty JSON object on success, or a message
+     * indicating an error on failure.
+     */
     public static AppResponse updateStatus(Map<String, String> params) {
         Long userId = null;
         String status = null;
@@ -70,7 +111,7 @@ public class StatusesController extends Controller {
             return generateInternalErrorResponse();
         }
 
-        return generateSuccessResponse(generateJSONListOfTweets(statuses)
+        return generateSuccessResponse(generateJSONOfTweets(statuses)
                 .toString());
     }
 
@@ -99,11 +140,24 @@ public class StatusesController extends Controller {
             return generateInternalErrorResponse();
         }
 
-        return generateSuccessResponse(generateJSONListOfTweets(statuses)
+        return generateSuccessResponse(generateJSONOfTweets(statuses)
                 .toString());
     }
 
-    private static JSONMap generateJSONListOfTweets(List<Status> statuses) {
+    /**
+     * Generates JSON List of statuses given a list of statuses (that should not be null).
+     * Will be of the form:
+     * {"tweets": [
+	      {"id": 20115, "user": 84, "time": "Mon Oct 27 18:02:57 PDT 2014",
+	       "text": "On my way home"},
+	      {"id": 18442, "user": 84, "time": "Sun Oct 26 20:52:35 PDT 2014",
+	       "text": "Just saw a flying saucer!"}
+	    ]}
+	 * In the same order as given in the list.
+     * @param statuses List of statuses
+     * @return JSON object of tweets formatted as described above
+     */
+    private static JSONMap generateJSONOfTweets(List<Status> statuses) {
         JSONMap tweets = new JSONMap();
         tweets.put("tweets", JSONList.toJSONList(statuses));
         return tweets;
