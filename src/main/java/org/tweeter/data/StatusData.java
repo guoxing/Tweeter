@@ -29,7 +29,6 @@ public class StatusData extends AppData {
     private static final int ENTRY_TEXT_IDX = 2;
     private static final int ENTRY_TIME_IDX = 3;
 
-    private static final int MAX_TWEET_LENGTH = 140;
     private static final String FILE_NAME = "status.db";
     private static final int STATUS_CACHE_SIZE = 1_000;
 
@@ -80,11 +79,6 @@ public class StatusData extends AppData {
     public void updateStatus(long userId, String text)
             throws IllegalArgumentException, IOException,
             InvalidDataFormattingException {
-        if (text.length() > MAX_TWEET_LENGTH) {
-            throw new IllegalArgumentException("Tweet must be "
-                    + MAX_TWEET_LENGTH + " characters (" + text + ")");
-        }
-
         currentId++;
         Status status = new Status(currentId, userId, text, new Date());
         // evict older status in cache if cache is full
@@ -101,7 +95,16 @@ public class StatusData extends AppData {
         ownershipCache.get(userId).add(status.getStatusId());
 
         // write to disk
-        appendToFile(status.toEntry());
+        appendToFile(toEntry(status));
+    }
+    
+    private static List<String> toEntry(Status status) {
+    	List<String> entry = new ArrayList<String>();
+        entry.add(String.valueOf(status.getStatusId()));
+        entry.add(String.valueOf(status.getUserId()));
+        entry.add(status.getText());
+        entry.add(status.getTime());
+        return entry;
     }
 
     /**
