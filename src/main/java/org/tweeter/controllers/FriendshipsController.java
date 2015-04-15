@@ -54,6 +54,7 @@ public class FriendshipsController extends Controller {
             friendId = getRequiredLong(PARAMS_USER_ID_KEY, params);
             FriendshipData.getInstance().addFriend(userId, friendId);
         } catch (IllegalArgumentException e) {
+        	e.printStackTrace();
             return generateInvalidParamResponse(e.getMessage());
         } catch (IOException | InvalidDataFormattingException e) {
         	e.printStackTrace();
@@ -86,6 +87,7 @@ public class FriendshipsController extends Controller {
             friendId = getRequiredLong(PARAMS_USER_ID_KEY, params);
             FriendshipData.getInstance().deleteFriend(userId, friendId);
         } catch (IllegalArgumentException e) {
+        	e.printStackTrace();
             return generateInvalidParamResponse(e.getMessage());
         } catch (IOException | InvalidDataFormattingException e) {
         	e.printStackTrace();
@@ -118,6 +120,7 @@ public class FriendshipsController extends Controller {
             userId = getRequiredLong(PARAMS_USER_ID_KEY, params);
             followerIds.addAll(FriendshipData.getInstance().getUserFollowers(userId));
         } catch (IllegalArgumentException e) {
+        	e.printStackTrace();
             return generateInvalidParamResponse(e.getMessage());
         }
 
@@ -147,6 +150,7 @@ public class FriendshipsController extends Controller {
             userId = getRequiredLong(PARAMS_USER_ID_KEY, params);
             friendIds.addAll(FriendshipData.getInstance().getUserFriends(userId));
         } catch (IllegalArgumentException e) {
+        	e.printStackTrace();
             return generateInvalidParamResponse(e.getMessage());
         }
 

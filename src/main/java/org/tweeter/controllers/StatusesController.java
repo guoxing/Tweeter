@@ -79,6 +79,7 @@ public class StatusesController extends Controller {
             status = getRequiredString(PARAMS_STATUS_KEY, params);
             StatusData.getInstance().updateStatus(userId, status);
         } catch (IllegalArgumentException e) {
+        	e.printStackTrace();
             return generateInvalidParamResponse(e.getMessage());
         } catch (IOException | InvalidDataFormattingException e) {
         	e.printStackTrace();
@@ -122,6 +123,7 @@ public class StatusesController extends Controller {
                         homeTimelineUserIds, count, maxId);
             statuses = StatusData.getInstance().getStatuses(statusIds);
         } catch (IllegalArgumentException e) {
+        	e.printStackTrace();
             return generateInvalidParamResponse(e.getMessage());
         } catch (IOException | InvalidDataFormattingException e) {
         	e.printStackTrace();
@@ -162,6 +164,7 @@ public class StatusesController extends Controller {
                         userId, count, maxId);
             statuses = StatusData.getInstance().getStatuses(statusIds);
         } catch (IllegalArgumentException e) {
+        	e.printStackTrace();
             return generateInvalidParamResponse(e.getMessage());
         } catch (IOException | InvalidDataFormattingException e) {
         	e.printStackTrace();
