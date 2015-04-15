@@ -5,7 +5,7 @@ import java.util.Date;
 
 import org.general.json.JSONMap;
 import org.general.json.JSONObject;
-import org.general.json.JSONable;
+import org.general.json.JSONSerializable;
 
 /**
  * Represents a status.
@@ -13,7 +13,7 @@ import org.general.json.JSONable;
  * @author Guoxing Li
  *
  */
-public class Status implements JSONable {
+public class Status implements JSONSerializable {
 
 	/**
 	 * Date format wherein: <br>

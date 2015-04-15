@@ -10,14 +10,14 @@ package org.general.json;
  * @author marcelpuyat
  *
  */
-public interface JSONable {
+public interface JSONSerializable {
 
     /**
      * Returns a valid JSONObject that represents instance of the class
-     * that adheres to the JSONable interface.
+     * that adheres to the JSONSerializable interface.
      * 
      * @return JSONObject JSON representing the instance of the class
-     * that adheres to the JSONable interface
+     * that adheres to the JSONSerializable interface
      */
     public JSONObject toJSON();
 }

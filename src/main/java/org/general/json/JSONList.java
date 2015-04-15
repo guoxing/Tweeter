@@ -80,29 +80,29 @@ public class JSONList extends JSONObject {
     }
 
     /**
-     * Packs together varargs of JSONabble objects into a JSONList.
+     * Packs together varargs of JSONSerializable objects into a JSONList.
      * 
-     * @param jSONabbles Varargs of objects that implement JSONabble interface
+     * @param jSONSerializables Varargs of objects that implement JSONSerializable interface
      * @return JSONList of objects passed in, ordered in the same order passed in
      */
-    public static JSONList toJSONList(JSONable... jSONabbles) {
+    public static JSONList toJSONList(JSONSerializable... jSONSerializables) {
         JSONList list = new JSONList();
-        for (JSONable jSONabble : jSONabbles) {
-            list.add(jSONabble.toJSON());
+        for (JSONSerializable jsonSerializables : jSONSerializables) {
+            list.add(jsonSerializables.toJSON());
         }
         return list;
     }
 
     /**
-     * Packs together a collection of JSONabble objects into a JSONList.
+     * Packs together a collection of JSON-serializable objects into a JSONList.
      * 
-     * @param jSONabbles Collection of objects that implement JSONabble interface
+     * @param jSONSerializables Collection of objects that implement JSONSerializable interface
      * @return JSONList of objects passed in, ordered in the same order passed in
      */
-    public static JSONList toJSONList(Collection<? extends JSONable> jSONabbles) {
+    public static JSONList toJSONList(Collection<? extends JSONSerializable> jSONSerializables) {
         JSONList list = new JSONList();
-        for (JSONable jSONabble : jSONabbles) {
-            list.add(jSONabble.toJSON());
+        for (JSONSerializable jSONSerializable : jSONSerializables) {
+            list.add(jSONSerializable.toJSON());
         }
         return list;
     }

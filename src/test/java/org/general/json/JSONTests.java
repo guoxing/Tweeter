@@ -6,14 +6,14 @@ import org.junit.Test;
 
 public class JSONTests {
 	
-	private class JSONablePerson implements JSONable {
+	private class JSONSerializablePerson implements JSONSerializable {
 		
 		private String name;
 		private int age;
 		private String address;
 		private String[] petNames;
 		
-		public JSONablePerson(String name, int age, String address, String... petNames) {
+		public JSONSerializablePerson(String name, int age, String address, String... petNames) {
 			this.age = age;
 			this.name = name;
 			this.address = address;
@@ -46,7 +46,7 @@ public class JSONTests {
 	
 	@Test
 	public void testJSON() {
-		JSONablePerson person = new JSONablePerson(TEST_NAME, TEST_AGE, TEST_ADDRESS, TEST_PETNAME_ONE, TEST_PETNAME_TWO);
+		JSONSerializablePerson person = new JSONSerializablePerson(TEST_NAME, TEST_AGE, TEST_ADDRESS, TEST_PETNAME_ONE, TEST_PETNAME_TWO);
 		JSONObject correctResult = createCorrectResult();
 		assertTrue(person.toJSON().equals(correctResult));
 	}
