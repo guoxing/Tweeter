@@ -81,6 +81,7 @@ public class StatusesController extends Controller {
         } catch (IllegalArgumentException e) {
             return generateInvalidParamResponse(e.getMessage());
         } catch (IOException | InvalidDataFormattingException e) {
+        	e.printStackTrace();
             return generateInternalErrorResponse();
         }
         return generateSuccessResponse(new JSONMap().toString());
@@ -123,6 +124,7 @@ public class StatusesController extends Controller {
         } catch (IllegalArgumentException e) {
             return generateInvalidParamResponse(e.getMessage());
         } catch (IOException | InvalidDataFormattingException e) {
+        	e.printStackTrace();
             return generateInternalErrorResponse();
         }
 

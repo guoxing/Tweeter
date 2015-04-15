@@ -56,6 +56,7 @@ public class FriendshipsController extends Controller {
         } catch (IllegalArgumentException e) {
             return generateInvalidParamResponse(e.getMessage());
         } catch (IOException | InvalidDataFormattingException e) {
+        	e.printStackTrace();
             return generateInternalErrorResponse();
         }
 
@@ -87,6 +88,7 @@ public class FriendshipsController extends Controller {
         } catch (IllegalArgumentException e) {
             return generateInvalidParamResponse(e.getMessage());
         } catch (IOException | InvalidDataFormattingException e) {
+        	e.printStackTrace();
             return generateInternalErrorResponse();
         }
 
