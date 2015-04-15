@@ -124,4 +124,13 @@ public class JSONMap extends JSONObject {
         }
         return jsonString + "}";
     }
+    
+    @Override
+    /**
+     * Equals another object if they are both JSONList types and
+     * internal lists equal each other.
+     */
+    public boolean equals(Object other) {
+    	return (other instanceof JSONMap && ((JSONMap)other).map.equals(this.map));
+    }
 }

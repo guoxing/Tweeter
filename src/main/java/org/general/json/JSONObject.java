@@ -85,4 +85,9 @@ public abstract class JSONObject {
         }
         return str;
     }
+    
+    /**
+     * Subclasses must implement equals method.
+     */
+    public abstract boolean equals(Object other);
 }
