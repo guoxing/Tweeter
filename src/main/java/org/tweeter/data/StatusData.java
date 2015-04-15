@@ -30,6 +30,7 @@ public class StatusData extends AppData {
     private static final int ENTRY_TIME_IDX = 3;
 
     private static final int MAX_TWEET_LENGTH = 140;
+    private static String PATH = "";
     private static final String FILE_NAME = "status.db";
     private static final int STATUS_CACHE_SIZE = 1_000;
 

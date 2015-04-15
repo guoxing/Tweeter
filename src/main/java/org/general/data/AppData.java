@@ -46,15 +46,20 @@ public abstract class AppData {
 
     protected static final char COL_DELIMITER = '\t';
     protected static final char ROW_DELIMITER = '\n';
+    protected static String pathToWorkspace = "";
 
     protected File storage;
 
     // number of columns per entry
     protected int numCols;
+    
+    public static void setPathToWorkspace(String path) {
+    	pathToWorkspace = path;
+    }
 
     protected AppData(String filename, int numCols) throws IOException,
             InvalidDataFormattingException {
-        storage = new File(filename);
+        storage = new File(pathToWorkspace + "/" + filename);
         // creates the file if not exists.
         storage.createNewFile();
         this.numCols = numCols;
