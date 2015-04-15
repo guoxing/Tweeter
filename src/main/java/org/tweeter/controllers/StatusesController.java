@@ -1,6 +1,5 @@
 package org.tweeter.controllers;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -79,10 +78,9 @@ public class StatusesController extends Controller {
             status = getRequiredString(PARAMS_STATUS_KEY, params);
             StatusData.getInstance().updateStatus(userId, status);
         } catch (IllegalArgumentException e) {
-        	e.printStackTrace();
             return generateInvalidParamResponse(e.getMessage());
         } catch (InternalError e) {
-            return generateInternalErrorResponse();
+            return generateInternalErrorResponse(e.getMessage());
         }
         return generateSuccessResponse(new JSONMap().toString());
     }
@@ -122,10 +120,9 @@ public class StatusesController extends Controller {
                         homeTimelineUserIds, count, maxId);
             statuses = StatusData.getInstance().getStatuses(statusIds);
         } catch (IllegalArgumentException e) {
-        	e.printStackTrace();
             return generateInvalidParamResponse(e.getMessage());
         } catch (InternalError e) {
-            return generateInternalErrorResponse();
+            return generateInternalErrorResponse(e.getMessage());
         }
 
         return generateSuccessResponse(generateJSONOfTweets(statuses)
@@ -162,10 +159,9 @@ public class StatusesController extends Controller {
                         userId, count, maxId);
             statuses = StatusData.getInstance().getStatuses(statusIds);
         } catch (IllegalArgumentException e) {
-        	e.printStackTrace();
             return generateInvalidParamResponse(e.getMessage());
         } catch (InternalError e) {
-            return generateInternalErrorResponse();
+            return generateInternalErrorResponse(e.getMessage());
         }
 
         return generateSuccessResponse(generateJSONOfTweets(statuses)

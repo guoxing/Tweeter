@@ -56,7 +56,7 @@ public class FriendshipsController extends Controller {
         	e.printStackTrace();
             return generateInvalidParamResponse(e.getMessage());
         } catch (InternalError e) {
-            return generateInternalErrorResponse();
+            return generateInternalErrorResponse(e.getMessage());
         }
 
         return generateSuccessResponse(new JSONMap().toString());
@@ -87,7 +87,7 @@ public class FriendshipsController extends Controller {
         } catch (IllegalArgumentException e) {
             return generateInvalidParamResponse(e.getMessage());
         } catch (InternalError e) {
-            return generateInternalErrorResponse();
+            return generateInternalErrorResponse(e.getMessage());
         }
 
         return generateSuccessResponse(new JSONMap().toString());
@@ -118,7 +118,7 @@ public class FriendshipsController extends Controller {
         } catch (IllegalArgumentException e) {
             return generateInvalidParamResponse(e.getMessage());
         } catch (InternalError e) {
-        	return generateInternalErrorResponse();
+        	return generateInternalErrorResponse(e.getMessage());
         }
 
         return generateSuccessResponse(generateJSONIdList(followerIds).toString());
@@ -149,7 +149,7 @@ public class FriendshipsController extends Controller {
         } catch (IllegalArgumentException e) {
             return generateInvalidParamResponse(e.getMessage());
         } catch (InternalError e) {
-        	return generateInternalErrorResponse();
+        	return generateInternalErrorResponse(e.getMessage());
         }
 
         return generateSuccessResponse(generateJSONIdList(friendIds).toString());

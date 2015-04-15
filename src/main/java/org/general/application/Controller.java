@@ -43,12 +43,12 @@ public abstract class Controller {
 
     /**
 	 * Returns an AppResponse with the response status set to INTERNAL_ERROR
-	 * and the body being "Internal error."
+	 * and the body being message passed in.
 	 * 
-	 * @return AppResponse object with internal error status and "Internal error" body
+	 * @return AppResponse object with internal error status and body of message passed in
 	 */
-    public static AppResponse generateInternalErrorResponse() {
-        return new AppResponse("Internal error.",
+    public static AppResponse generateInternalErrorResponse(String message) {
+        return new AppResponse(message,
                 AppResponseStatus.INTERNAL_ERROR);
     }
 
