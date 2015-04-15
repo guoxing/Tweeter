@@ -84,6 +84,22 @@ public class StatusesController extends Controller {
         return generateSuccessResponse(new JSONMap().toString());
     }
 
+    /**
+     * Returns the home timeline (in json) of a given user. The home timeline includes
+     * statuses of all the user's friends and the user's own statuses.
+     * 
+     * See generateJSONOfTweets method for format of JSON object returned.
+     * 
+     * Parameters must include a user_id to indicate whose user home timeline
+     * should be returned, and may optionally include a count to indicate the max number
+     * of tweets to get and a max_id to indicate the max id of any status
+     * to be retrieved.
+     * 
+     * @param params Parameters that must include the key "user_id" and may
+     * include "count" and "max_id"
+     * @return AppResponse with a body of a format as specified in generateJSONOfTweets on success,
+     * or an error message with an appropriate response status on failure.
+     */
     public static AppResponse getHomeTimeline(Map<String, String> params) {
         Long userId = null;
         Long count = null;
@@ -93,17 +109,13 @@ public class StatusesController extends Controller {
             userId = getRequiredLong(PARAMS_MY_ID_KEY, params);
             count = getOptionalLongOrDefault(PARAMS_COUNT_KEY, params, DEFAULT_TIMELINE_SIZE);
             maxId = getOptionalLongOrDefault(PARAMS_MAX_ID_KEY, params, DEFAULT_MAX_ID);
-            Set<Long> timelineUserIds = FriendshipData.getInstance()
+            
+            Set<Long> homeTimelineUserIds = FriendshipData.getInstance()
                     .getUserFriends(userId);
-            timelineUserIds.add(userId);
-            Set<Long> statusIds;
-            if (maxId == null) {
-                statusIds = StatusData.getInstance().getStatusIdsOnUserIds(
-                        timelineUserIds, count);
-            } else {
-                statusIds = StatusData.getInstance().getStatusIdsOnUserIds(
-                        timelineUserIds, count, maxId);
-            }
+            homeTimelineUserIds.add(userId);
+            
+            Set<Long> statusIds = StatusData.getInstance().getStatusIdsOnUserIds(
+                        homeTimelineUserIds, count, maxId);
             statuses = StatusData.getInstance().getStatuses(statusIds);
         } catch (IllegalArgumentException e) {
             return generateInvalidParamResponse(e.getMessage());
@@ -115,6 +127,22 @@ public class StatusesController extends Controller {
                 .toString());
     }
 
+    /**
+     * Returns the user timeline (in json) of a given user. The user timeline includes
+     * all the statuses of the user.
+     * 
+     * See generateJSONOfTweets method for format of JSON object returned.
+     * 
+     * Parameters must include a user_id to indicate whose user timeline
+     * should be returned, and may optionally include a count to indicate the max number
+     * of tweets to get and a max_id to indicate the max id of any status
+     * to be retrieved.
+     * 
+     * @param params Parameters that must include the key "user_id" and may
+     * include "count" and "max_id"
+     * @return AppResponse with a body of a format as specified in generateJSONOfTweets on success,
+     * or an error message with an appropriate response status on failure.
+     */
     public static AppResponse getUserTimeline(Map<String, String> params) {
         Long userId = null;
         Long count = null;
@@ -124,14 +152,8 @@ public class StatusesController extends Controller {
             userId = getRequiredLong(PARAMS_MY_ID_KEY, params);
             count = getOptionalLongOrDefault(PARAMS_COUNT_KEY, params, DEFAULT_TIMELINE_SIZE);
             maxId = getOptionalLongOrDefault(PARAMS_MAX_ID_KEY, params, DEFAULT_MAX_ID);
-            Set<Long> statusIds;
-            if (maxId == null) {
-                statusIds = StatusData.getInstance().getStatusIdsOnUserId(
-                        userId, count);
-            } else {
-                statusIds = StatusData.getInstance().getStatusIdsOnUserId(
+            Set<Long> statusIds = StatusData.getInstance().getStatusIdsOnUserId(
                         userId, count, maxId);
-            }
             statuses = StatusData.getInstance().getStatuses(statusIds);
         } catch (IllegalArgumentException e) {
             return generateInvalidParamResponse(e.getMessage());

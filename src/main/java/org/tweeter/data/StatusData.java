@@ -172,6 +172,7 @@ public class StatusData extends AppData {
      */
     public Set<Long> getStatusIdsOnUserIds(Set<Long> userIds, long numStatuses,
             long maxId) {
+    	maxId = Math.min(currentId, maxId);
         Set<Long> res = new HashSet<Long>();
         Set<Long> temp = new HashSet<Long>();
         for (long userId : userIds) {
