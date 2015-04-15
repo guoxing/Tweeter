@@ -14,6 +14,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.general.application.InternalError;
+import org.general.logger.Logger;
+
 /**
  * A generic data module class that stores data both persistently and in memory.
  * By design, data can only be appended but not altered nor inserted. Think of
@@ -57,11 +60,15 @@ public abstract class AppData {
     	pathToWorkspace = path;
     }
 
-    protected AppData(String filename, int numCols) throws IOException,
-            InvalidDataFormattingException {
+    protected AppData(String filename, int numCols) throws InternalError {
         storage = new File(pathToWorkspace + filename);
         // creates the file if not exists.
-        storage.createNewFile();
+        try {
+			storage.createNewFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new InternalError();
+		}
         this.numCols = numCols;
         recover();
     }
@@ -73,14 +80,21 @@ public abstract class AppData {
      *            Entry to be appended.
      * @throws IOException
      */
-    protected void appendToFile(List<String> entry) throws IOException, IllegalArgumentException {
+    protected void appendToFile(List<String> entry) throws InternalError {
         if (entry.size() != numCols) {
-            throw new IllegalArgumentException(
-                    "Wrong number of cols written to file! Expected #cols: "
-                            + numCols + " Real #cols: " + entry.size());
+        	Logger.log("Wrong number of cols written to file! Expected #cols: "
+                    + numCols + " Real #cols: " + entry.size());
+            throw new InternalError();
         }
-        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(
-                storage, true)));
+        
+        PrintWriter out;
+		try {
+			out = new PrintWriter(new BufferedWriter(new FileWriter(
+			        storage, true)));
+		} catch (IOException e) {
+			throw new InternalError();
+		}
+		
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < entry.size() - 1; ++i) {
             sb.append(DataEncoder.encode(entry.get(i)));
@@ -102,17 +116,16 @@ public abstract class AppData {
     /**
      * Recover the in-memory storage from persistent storage.
      */
-    protected abstract void recover() throws IOException,
-            InvalidDataFormattingException;
+    protected abstract void recover() throws InternalError;
 
     private List<String> breakLine(String line)
-            throws InvalidDataFormattingException {
+            throws InternalError {
         List<String> res = new ArrayList<String>(numCols);
         String[] splits = line.split(String.valueOf(COL_DELIMITER));
         if (splits.length != numCols) {
-            throw new InvalidDataFormattingException(
-                    "Malformatted storage file! Expected #cols: " + numCols
+        	Logger.log("Malformatted storage file! Expected #cols: " + numCols
                             + " Real #cols: " + splits.length);
+            throw new InternalError();
         }
         for (String col : splits) {
             res.add(DataDecoder.decode(col));
@@ -140,9 +153,14 @@ public abstract class AppData {
          * @throws IOException
          * @throws InvalidDataFormattingException
          */
-        public List<String> readEntry() throws IOException,
-                InvalidDataFormattingException {
-            String line = reader.readLine();
+        public List<String> readEntry() throws InternalError {
+            String line;
+			try {
+				line = reader.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new InternalError();
+			}
             return line == null ? null : breakLine(line);
         }
 
@@ -214,8 +232,7 @@ public abstract class AppData {
             lastLineReadInBlockPos = newBlockLength;
         }
 
-        private List<String> readEntryInBlock() throws IOException,
-                InvalidDataFormattingException {
+        private List<String> readEntryInBlock() throws InternalError {
             int i = lastLineReadInBlockPos - 1;
             String line = null;
             while (i >= 0) {
@@ -257,14 +274,18 @@ public abstract class AppData {
          * @throws IOException
          * @throws InvalidDataFormattingException
          */
-        public List<String> readEntry() throws IOException,
-                InvalidDataFormattingException {
+        public List<String> readEntry() throws InternalError {
             List<String> entry = readEntryInBlock();
             while (entry == null) {
                 if (!isLastBlock) {
                     // keep reading in new blocks until we find a new line
                     // character
-                    readNewBlock(leftOver);
+                    try {
+						readNewBlock(leftOver);
+					} catch (IOException e) {
+						e.printStackTrace();
+						throw new InternalError();
+					}
                     entry = readEntryInBlock();
                 } else {
                     // if it's the last block, and entry is null, it means we

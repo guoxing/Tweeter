@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.general.data.AppData;
-import org.general.data.InvalidDataFormattingException;
 import org.general.logger.Logger;
+import org.general.application.InternalError;
 
 /**
  * Singleton class that interfaces with the data module to retrieve
@@ -43,22 +43,22 @@ public class FriendshipData extends AppData {
         }
 
         public static FriendAction parseAction(String str)
-                throws InvalidDataFormattingException {
+                throws InternalError {
             switch (Integer.parseInt(str)) {
             case 0:
                 return FriendAction.DELETE;
             case 1:
                 return FriendAction.ADD;
             default:
-                throw new InvalidDataFormattingException(
-                        "Action must be either 0 (for deletion) or 1 (for addition)");
+            	Logger.log("Action must be either 0 (for deletion) or 1 (for addition)");
+                throw new InternalError();
             }
         }
     }
 
     private static FriendshipData friendshipData;
 
-    private FriendshipData() throws IOException, InvalidDataFormattingException {
+    private FriendshipData() throws InternalError {
         super(FILE_NAME, NUM_COLS_IN_ENTRY);
     }
 
@@ -67,14 +67,9 @@ public class FriendshipData extends AppData {
      * 
      * @return An instance of FriendshipData
      */
-    public static FriendshipData getInstance() {
+    public static FriendshipData getInstance() throws InternalError {
         if (friendshipData == null) {
-            try {
-                friendshipData = new FriendshipData();
-            } catch (IOException | InvalidDataFormattingException e) {
-                e.printStackTrace();
-                throw new Error("Error on initializing FriendshipData");
-            }
+        	friendshipData = new FriendshipData();
         }
         return friendshipData;
     }
@@ -118,8 +113,7 @@ public class FriendshipData extends AppData {
      * @throws InvalidDataFormattingException
      * @throws IOException
      */
-    public void addFriend(Long userId, Long friendId) throws IOException,
-            InvalidDataFormattingException {
+    public void addFriend(Long userId, Long friendId) throws InternalError {
         Logger.log(friendId + " is now " + userId + "'s friend");
 
         List<String> addFriendEntry = Arrays.asList(new String[] {
@@ -139,8 +133,7 @@ public class FriendshipData extends AppData {
      * @throws InvalidDataFormattingException
      * @throws IOException
      */
-    public void deleteFriend(Long userId, Long friendId) throws IOException,
-            InvalidDataFormattingException {
+    public void deleteFriend(Long userId, Long friendId) throws InternalError {
         Logger.log(friendId + " is no longer " + userId + "'s friend");
 
         List<String> deleteFriendEntry = Arrays.asList(new String[] {
@@ -151,10 +144,16 @@ public class FriendshipData extends AppData {
     }
 
     @Override
-    public void recover() throws IOException, InvalidDataFormattingException {
+    public void recover() throws InternalError {
         followingCache = new HashMap<Long, Set<Long>>();
         followerCache = new HashMap<Long, Set<Long>>();
-        ForwardReader fr = getForwardReader();
+        ForwardReader fr;
+		try {
+			fr = getForwardReader();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new InternalError();
+		}
         List<String> entry;
         while ((entry = fr.readEntry()) != null) {
             replayEntry(entry);
@@ -166,7 +165,7 @@ public class FriendshipData extends AppData {
             + "action (0 for remove, 1 for add)";
 
     private void replayEntry(List<String> entry)
-            throws InvalidDataFormattingException {
+            throws InternalError {
         Long userId;
         Long friendId;
         FriendAction action;
@@ -174,8 +173,8 @@ public class FriendshipData extends AppData {
             userId = Long.parseLong(entry.get(ENTRY_USER_ID_INDEX));
             friendId = Long.parseLong(entry.get(ENTRY_FRIEND_ID_INDEX));
         } catch (Exception e) {
-            throw new InvalidDataFormattingException(
-                    INVALID_DATA_FORMATTING_EXCEPTION_MSG);
+        	Logger.log(INVALID_DATA_FORMATTING_EXCEPTION_MSG);
+            throw new InternalError();
         }
         action = FriendAction.parseAction(entry.get(ENTRY_ACTION_INDEX));
 

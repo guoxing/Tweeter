@@ -1,17 +1,16 @@
 package org.tweeter.controllers;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.general.application.ApplicationInterface.AppResponse;
 import org.general.application.Controller;
-import org.general.data.InvalidDataFormattingException;
 import org.general.json.JSONList;
 import org.general.json.JSONMap;
 import org.general.json.JSONObject;
 import org.general.logger.Logger;
+import org.general.application.InternalError;
 import org.tweeter.data.FriendshipData;
 
 /**
@@ -56,8 +55,7 @@ public class FriendshipsController extends Controller {
         } catch (IllegalArgumentException e) {
         	e.printStackTrace();
             return generateInvalidParamResponse(e.getMessage());
-        } catch (IOException | InvalidDataFormattingException e) {
-        	e.printStackTrace();
+        } catch (InternalError e) {
             return generateInternalErrorResponse();
         }
 
@@ -87,10 +85,8 @@ public class FriendshipsController extends Controller {
             friendId = getRequiredLong(PARAMS_USER_ID_KEY, params);
             FriendshipData.getInstance().deleteFriend(userId, friendId);
         } catch (IllegalArgumentException e) {
-        	e.printStackTrace();
             return generateInvalidParamResponse(e.getMessage());
-        } catch (IOException | InvalidDataFormattingException e) {
-        	e.printStackTrace();
+        } catch (InternalError e) {
             return generateInternalErrorResponse();
         }
 
@@ -120,8 +116,9 @@ public class FriendshipsController extends Controller {
             userId = getRequiredLong(PARAMS_USER_ID_KEY, params);
             followerIds.addAll(FriendshipData.getInstance().getUserFollowers(userId));
         } catch (IllegalArgumentException e) {
-        	e.printStackTrace();
             return generateInvalidParamResponse(e.getMessage());
+        } catch (InternalError e) {
+        	return generateInternalErrorResponse();
         }
 
         return generateSuccessResponse(generateJSONIdList(followerIds).toString());
@@ -150,8 +147,9 @@ public class FriendshipsController extends Controller {
             userId = getRequiredLong(PARAMS_USER_ID_KEY, params);
             friendIds.addAll(FriendshipData.getInstance().getUserFriends(userId));
         } catch (IllegalArgumentException e) {
-        	e.printStackTrace();
             return generateInvalidParamResponse(e.getMessage());
+        } catch (InternalError e) {
+        	return generateInternalErrorResponse();
         }
 
         return generateSuccessResponse(generateJSONIdList(friendIds).toString());

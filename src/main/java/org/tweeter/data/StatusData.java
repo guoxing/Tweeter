@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.general.data.AppData;
-import org.general.data.InvalidDataFormattingException;
 import org.general.logger.Logger;
+import org.general.application.InternalError;
 import org.tweeter.models.Status;
 
 /**
@@ -42,7 +42,7 @@ public class StatusData extends AppData {
 
     private static StatusData statusData;
 
-    private StatusData() throws IOException, InvalidDataFormattingException {
+    private StatusData() throws InternalError {
         super(FILE_NAME, NUM_COLS_IN_ENTRY);
     }
 
@@ -50,15 +50,11 @@ public class StatusData extends AppData {
      * Retrieve an (and the only) instance of StatusData
      * 
      * @return An instance of StatusData
+     * @throws InternalError 
      */
-    public static StatusData getInstance() {
+    public static StatusData getInstance() throws InternalError {
         if (statusData == null) {
-            try {
-                statusData = new StatusData();
-            } catch (IOException | InvalidDataFormattingException e) {
-                e.printStackTrace();
-                throw new Error("Error in initializing StatusData");
-            }
+        	statusData = new StatusData();
         }
         return statusData;
     }
@@ -77,8 +73,7 @@ public class StatusData extends AppData {
      * @throws InvalidDataFormattingException
      */
     public void updateStatus(long userId, String text)
-            throws IllegalArgumentException, IOException,
-            InvalidDataFormattingException {
+            throws InternalError, IllegalArgumentException {
         currentId++;
         Status status = new Status(currentId, userId, text, new Date());
         // evict older status in cache if cache is full
@@ -116,8 +111,7 @@ public class StatusData extends AppData {
      * @throws IOException
      * @throws InvalidDataFormattingException
      */
-    public List<Status> getStatuses(Set<Long> ids) throws IOException,
-            InvalidDataFormattingException {
+    public List<Status> getStatuses(Set<Long> ids) throws InternalError {
         List<Long> idList = new ArrayList<Long>(ids);
         List<Status> list = new ArrayList<Status>(idList.size());
         Collections.sort(idList, Collections.reverseOrder());
@@ -133,7 +127,14 @@ public class StatusData extends AppData {
             i++;
         }
         // fetch from persistent storage
-        BackwardReader br = getBackwardReader();
+        BackwardReader br;
+		try {
+			br = getBackwardReader();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new InternalError();
+		}
+		
         List<String> entry;
         while ((entry = br.readEntry()) != null && i < idList.size()) {
             Status status = parseEntry(entry);
@@ -142,7 +143,16 @@ public class StatusData extends AppData {
                 i++;
             }
         }
-        br.close();
+        
+        try {
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			/* Note we do not throw internal error... simply
+			 * let this error go on silently because it was just
+			 * a failed close. */
+		}
+        
         return list;
     }
 
@@ -226,10 +236,16 @@ public class StatusData extends AppData {
     }
 
     @Override
-    public void recover() throws IOException, InvalidDataFormattingException {
+    public void recover() throws InternalError {
         statusCache = new HashMap<Long, Status>();
         ownershipCache = new HashMap<Long, List<Long>>();
-        BackwardReader br = getBackwardReader();
+        BackwardReader br;
+		try {
+			br = getBackwardReader();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new InternalError();
+		}
         List<String> entry;
         while ((entry = br.readEntry()) != null) {
             Status status = parseEntry(entry);
@@ -245,7 +261,14 @@ public class StatusData extends AppData {
             }
             ids.add(status.getStatusId());
         }
-        br.close();
+        try {
+			br.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			/* Note we do not throw internal error... simply
+			 * let this error go on silently because it was just
+			 * a failed close. */
+		}
     }
 
     private Status parseEntry(List<String> entry) {

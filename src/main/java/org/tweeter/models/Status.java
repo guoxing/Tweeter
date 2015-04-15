@@ -16,13 +16,13 @@ import org.general.json.JSONable;
 public class Status implements JSONable {
 
 	/**
-	 * Date format wherein:
-	 * 	First token is 3 letters of the day of the week
-	 * 	Second token is 3 letters of the month
-	 *  Third token is the date (using 2 characters)
-	 *  Fourth token is: 2 digits of the hours:2 digits of the minutes:2 digits of the seconds
-	 *  Fifth token is the time zone
-	 *  Sixth token is 4 digits of the year
+	 * Date format wherein: <br>
+	 * 	1st token is 3 letters of the day of the week <br>
+	 * 	2nd token is 3 letters of the month <br>
+	 *  3rd token is the date (using 2 characters) <br>
+	 *  4th token is 2 digits of the hours:2 digits of the minutes:2 digits of the seconds <br>
+	 *  5th token is the time zone <br>
+	 *  6th token is 4 digits of the year
 	 */
     private static final String DATE_FORMAT = "EEE MMM dd HH:mm:ss z yyyy";
 

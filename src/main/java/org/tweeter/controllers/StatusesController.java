@@ -7,7 +7,7 @@ import java.util.Set;
 
 import org.general.application.ApplicationInterface.AppResponse;
 import org.general.application.Controller;
-import org.general.data.InvalidDataFormattingException;
+import org.general.application.InternalError;
 import org.general.json.JSONList;
 import org.general.json.JSONMap;
 import org.general.logger.Logger;
@@ -81,8 +81,7 @@ public class StatusesController extends Controller {
         } catch (IllegalArgumentException e) {
         	e.printStackTrace();
             return generateInvalidParamResponse(e.getMessage());
-        } catch (IOException | InvalidDataFormattingException e) {
-        	e.printStackTrace();
+        } catch (InternalError e) {
             return generateInternalErrorResponse();
         }
         return generateSuccessResponse(new JSONMap().toString());
@@ -125,8 +124,7 @@ public class StatusesController extends Controller {
         } catch (IllegalArgumentException e) {
         	e.printStackTrace();
             return generateInvalidParamResponse(e.getMessage());
-        } catch (IOException | InvalidDataFormattingException e) {
-        	e.printStackTrace();
+        } catch (InternalError e) {
             return generateInternalErrorResponse();
         }
 
@@ -166,8 +164,7 @@ public class StatusesController extends Controller {
         } catch (IllegalArgumentException e) {
         	e.printStackTrace();
             return generateInvalidParamResponse(e.getMessage());
-        } catch (IOException | InvalidDataFormattingException e) {
-        	e.printStackTrace();
+        } catch (InternalError e) {
             return generateInternalErrorResponse();
         }
 

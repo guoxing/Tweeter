@@ -8,6 +8,7 @@ import org.general.application.ApplicationInterface;
 import org.general.application.ApplicationInterface.AppRequest;
 import org.general.application.ApplicationInterface.AppResponse;
 import org.general.application.ApplicationInterface.AppResponse.AppResponseStatus;
+import org.general.application.InternalError;
 import org.general.data.AppData;
 import org.general.http.HTTPRequest;
 import org.general.http.HTTPResponse;
@@ -57,12 +58,14 @@ public class TweeterServer extends HTTPServer {
     	
         appInterface = new Router();
         
-        // spin up data modules
-        FriendshipData.getInstance();
-        StatusData.getInstance();
+        
         try {
+        	// spin up data modules
+            FriendshipData.getInstance();
+            StatusData.getInstance();
+            
             server.start();
-        } catch (IOException e) {
+        } catch (IOException | InternalError e) {
             e.printStackTrace();
             server.shutdown();
         }
