@@ -10,6 +10,7 @@ import org.general.application.Controller;
 import org.general.data.InvalidDataFormattingException;
 import org.general.json.JSONList;
 import org.general.json.JSONMap;
+import org.general.logger.Logger;
 import org.tweeter.data.FriendshipData;
 import org.tweeter.data.StatusData;
 import org.tweeter.models.Status;
@@ -70,6 +71,7 @@ public class StatusesController extends Controller {
      * indicating an error on failure.
      */
     public static AppResponse updateStatus(Map<String, String> params) {
+    	Logger.log("Updating status of " + params.get(PARAMS_MY_ID_KEY));
         Long userId = null;
         String status = null;
         try {
@@ -101,6 +103,7 @@ public class StatusesController extends Controller {
      * or an error message with an appropriate response status on failure.
      */
     public static AppResponse getHomeTimeline(Map<String, String> params) {
+    	Logger.log("Returning JSON of home timeline of " + params.get(PARAMS_MY_ID_KEY));
         Long userId = null;
         Long count = null;
         Long maxId = null;
@@ -144,6 +147,7 @@ public class StatusesController extends Controller {
      * or an error message with an appropriate response status on failure.
      */
     public static AppResponse getUserTimeline(Map<String, String> params) {
+    	Logger.log("Returning JSON of user timeline of " + params.get(PARAMS_MY_ID_KEY));
         Long userId = null;
         Long count = null;
         Long maxId = null;

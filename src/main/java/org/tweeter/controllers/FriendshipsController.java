@@ -11,6 +11,7 @@ import org.general.data.InvalidDataFormattingException;
 import org.general.json.JSONList;
 import org.general.json.JSONMap;
 import org.general.json.JSONObject;
+import org.general.logger.Logger;
 import org.tweeter.data.FriendshipData;
 
 /**
@@ -44,6 +45,8 @@ public class FriendshipsController extends Controller {
      * @return Response that will have a body with an empty JSON object on success, or a message with an error.
      */
     public static AppResponse createFriendship(Map<String, String> params) {
+    	Logger.log("Creating friendship between " + 
+    			params.get(PARAMS_MY_ID_KEY) + " and " + params.get(PARAMS_USER_ID_KEY));
         Long userId = null;
         Long friendId = null;
         try {
@@ -73,6 +76,8 @@ public class FriendshipsController extends Controller {
      * @return Response that will have a body with an empty JSON object on success, or a message with an error.
      */
     public static AppResponse deleteFriendship(Map<String, String> params) {
+    	Logger.log("Deleting friendship between " + 
+    			params.get(PARAMS_MY_ID_KEY) + " and " + params.get(PARAMS_USER_ID_KEY));
         Long userId = null;
         Long friendId = null;
         try {
@@ -104,6 +109,7 @@ public class FriendshipsController extends Controller {
      * as mentioned above on success, or a message with an error.
      */
     public static AppResponse getFollowers(Map<String, String> params) {
+    	Logger.log("Getting followers JSON of " + params.get(PARAMS_USER_ID_KEY));
         Long userId = null;
         List<Long> followerIds = new ArrayList<Long>();
         try {
@@ -132,6 +138,7 @@ public class FriendshipsController extends Controller {
      * as mentioned above on success, or a message with an error.
      */
     public static AppResponse getFriends(Map<String, String> params) {
+    	Logger.log("Getting friends JSON of " + params.get(PARAMS_USER_ID_KEY));
         Long userId = null;
         List<Long> friendIds = new ArrayList<Long>();
         try {
