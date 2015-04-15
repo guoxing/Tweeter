@@ -24,7 +24,6 @@ import org.general.logger.Logger;
  */
 public class FriendshipData extends AppData {
 
-	private static String PATH = "";
     private static final String FILE_NAME = "friend.db";
     private static final int ENTRY_USER_ID_INDEX = 0;
     private static final int ENTRY_FRIEND_ID_INDEX = 1;

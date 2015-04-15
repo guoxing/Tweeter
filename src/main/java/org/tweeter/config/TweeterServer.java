@@ -9,7 +9,6 @@ import org.general.application.ApplicationInterface.AppRequest;
 import org.general.application.ApplicationInterface.AppResponse;
 import org.general.application.ApplicationInterface.AppResponse.AppResponseStatus;
 import org.general.data.AppData;
-import org.general.data.InvalidDataFormattingException;
 import org.general.http.HTTPRequest;
 import org.general.http.HTTPResponse;
 import org.general.http.HTTPServer;
