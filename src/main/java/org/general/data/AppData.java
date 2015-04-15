@@ -59,7 +59,7 @@ public abstract class AppData {
 
     protected AppData(String filename, int numCols) throws IOException,
             InvalidDataFormattingException {
-        storage = new File(pathToWorkspace + "/" + filename);
+        storage = new File(pathToWorkspace + filename);
         // creates the file if not exists.
         storage.createNewFile();
         this.numCols = numCols;

@@ -75,7 +75,7 @@ public class TweeterServer extends HTTPServer {
     			argOptions.put(PORT_OPTION, args[i+1]);
     		}
     		if (args[i].equals(WORKSPACE_OPTION) && i+1 < args.length) {
-    			argOptions.put(WORKSPACE_OPTION, args[i+1]);
+    			argOptions.put(WORKSPACE_OPTION, args[i+1] + "/"); // End workspace path with a slash
     		}
     		if (args[i].equals(HELP_OPTION)) {
     			argOptions.put(HELP_OPTION, "");
