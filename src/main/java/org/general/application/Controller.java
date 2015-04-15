@@ -43,11 +43,13 @@ public abstract class Controller {
 
     /**
 	 * Returns an AppResponse with the response status set to INTERNAL_ERROR
-	 * and the body being message passed in.
-	 * 
+	 * and the body being message passed in. Message must not be null.
+	 * @param message String that must not be null.
+	 * @throws NullPointerException Thrown if message is null
 	 * @return AppResponse object with internal error status and body of message passed in
 	 */
     public static AppResponse generateInternalErrorResponse(String message) {
+    	if (message == null) throw new NullPointerException("AppResponse message must not be null");
         return new AppResponse(message,
                 AppResponseStatus.INTERNAL_ERROR);
     }
