@@ -52,7 +52,8 @@ public class HTTPRequestTests {
     @Test
     public void testMalformattedReq() {
         try {
-            HTTPRequest req = generateRequest(HTTPRequest.Method.POST
+            @SuppressWarnings("unused")
+			HTTPRequest req = generateRequest(HTTPRequest.Method.POST
                     + "/path  " + DEFAULT_VERSION + "\n", "name=Guoxing Li");
         } catch (Exception e) {
             e.printStackTrace();
