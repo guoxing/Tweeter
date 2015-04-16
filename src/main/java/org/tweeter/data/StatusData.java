@@ -13,7 +13,7 @@ import java.util.Set;
 import org.general.data.AppData;
 import org.general.logger.Logger;
 import org.general.application.InternalError;
-import org.tweeter.models.Status;
+import org.tweeter.entities.Status;
 
 /**
  * Singleton class to query/update status data.

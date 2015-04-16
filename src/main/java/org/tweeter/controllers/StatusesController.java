@@ -12,7 +12,7 @@ import org.general.json.JSONMap;
 import org.general.logger.Logger;
 import org.tweeter.data.FriendshipData;
 import org.tweeter.data.StatusData;
-import org.tweeter.models.Status;
+import org.tweeter.entities.Status;
 
 /**
  * In charge of API endpoints regarding users' statuses

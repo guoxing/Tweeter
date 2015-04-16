@@ -1,4 +1,4 @@
-package org.tweeter.models;
+package org.tweeter.entities;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
