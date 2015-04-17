@@ -231,7 +231,8 @@ public class StatusData extends AppData {
             }
             List<Long> ids = ownershipCache.get(status.getUserId());
             if (ids == null) {
-                ownershipCache.put(status.getUserId(), new ArrayList<Long>());
+                ids = new ArrayList<Long>();
+                ownershipCache.put(status.getUserId(), ids);
             }
             ids.add(status.getStatusId());
         }
