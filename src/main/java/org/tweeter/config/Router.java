@@ -70,6 +70,7 @@ public class Router {
      * @return body response
      */
     static void route(HTTPRequest req, HTTPResponse res) {
+        System.out.println(req.getMethod() + " " + req.getURI());
         switch(req.getMethod() + " " + req.getURI()) {
             case CREATE_FRIENDSHIP_ADDRESS:
                 FriendshipsController.createFriendship(req.getQueryParams(), res);
@@ -94,7 +95,7 @@ public class Router {
                 return;
             default:
                 Controller.respondWithJSONError(StatusCode.NOT_FOUND, 
-                        FILE_NOT_FOUND_MESSAGE + req.getAbsoluteURI(), res);
+                        FILE_NOT_FOUND_MESSAGE + req.getURI(), res);
         }
     }
 }

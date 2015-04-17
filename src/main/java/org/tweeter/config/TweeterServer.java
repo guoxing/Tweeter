@@ -11,7 +11,6 @@ import org.general.data.AppData;
 import org.general.http.HTTPRequest;
 import org.general.http.HTTPResponse;
 import org.general.http.HTTPResponse.HeaderField;
-import org.general.http.HTTPResponse.StatusCode;
 import org.general.http.HTTPServer;
 
 public class TweeterServer extends HTTPServer {
