@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.general.data.AppData;
+import org.general.data.InvalidDataFormattingException;
 import org.general.logger.Logger;
-import org.general.application.InternalError;
 import org.tweeter.entities.Status;
 
 /**
@@ -42,7 +42,7 @@ public class StatusData extends AppData {
 
     private static StatusData statusData;
 
-    private StatusData() throws InternalError {
+    private StatusData() throws IOException, InvalidDataFormattingException {
         super(FILE_NAME, NUM_COLS_IN_ENTRY);
     }
 
@@ -50,11 +50,15 @@ public class StatusData extends AppData {
      * Retrieve an (and the only) instance of StatusData
      * 
      * @return An instance of StatusData
-     * @throws InternalError 
      */
-    public static StatusData getInstance() throws InternalError {
+    public static StatusData getInstance() {
         if (statusData == null) {
-        	statusData = new StatusData();
+            try {
+                statusData = new StatusData();
+            } catch (IOException | InvalidDataFormattingException e) {
+                e.printStackTrace();
+                throw new Error("Error in initializing StatusData");
+            }
         }
         return statusData;
     }
@@ -67,13 +71,11 @@ public class StatusData extends AppData {
      *            user id of user that is updating their status
      * @param text
      *            status text
-     * @throws IllegalArgumentException
-     *             if tweet is longer than MAX_TWEET_LENGTH
      * @throws IOException
      * @throws InvalidDataFormattingException
      */
-    public void updateStatus(long userId, String text)
-            throws InternalError, IllegalArgumentException {
+    public void updateStatus(long userId, String text) throws IOException,
+            InvalidDataFormattingException {
         currentId++;
         Status status = new Status(currentId, userId, text, new Date());
         // evict older status in cache if cache is full
@@ -92,15 +94,6 @@ public class StatusData extends AppData {
         // write to disk
         appendToFile(toEntry(status));
     }
-    
-    private static List<String> toEntry(Status status) {
-    	List<String> entry = new ArrayList<String>();
-        entry.add(String.valueOf(status.getStatusId()));
-        entry.add(String.valueOf(status.getUserId()));
-        entry.add(status.getText());
-        entry.add(status.getTime());
-        return entry;
-    }
 
     /**
      * Get a list of statuses from a set of status_ids in reverse chronological
@@ -111,7 +104,8 @@ public class StatusData extends AppData {
      * @throws IOException
      * @throws InvalidDataFormattingException
      */
-    public List<Status> getStatuses(Set<Long> ids) throws InternalError {
+    public List<Status> getStatuses(Set<Long> ids)
+            throws InvalidDataFormattingException, IOException {
         List<Long> idList = new ArrayList<Long>(ids);
         List<Status> list = new ArrayList<Status>(idList.size());
         Collections.sort(idList, Collections.reverseOrder());
@@ -127,14 +121,8 @@ public class StatusData extends AppData {
             i++;
         }
         // fetch from persistent storage
-        BackwardReader br;
-		try {
-			br = getBackwardReader();
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new InternalError();
-		}
-		
+        BackwardReader br = getBackwardReader();
+
         List<String> entry;
         while ((entry = br.readEntry()) != null && i < idList.size()) {
             Status status = parseEntry(entry);
@@ -143,16 +131,8 @@ public class StatusData extends AppData {
                 i++;
             }
         }
-        
-        try {
-			br.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			/* Note we do not throw internal error... simply
-			 * let this error go on silently because it was just
-			 * a failed close. */
-		}
-        
+        br.close();
+
         return list;
     }
 
@@ -185,7 +165,7 @@ public class StatusData extends AppData {
      */
     public Set<Long> getStatusIdsOnUserIds(Set<Long> userIds, long numStatuses,
             long maxId) {
-    	maxId = Math.min(currentId, maxId);
+        maxId = Math.min(currentId, maxId);
         Set<Long> res = new HashSet<Long>();
         Set<Long> temp = new HashSet<Long>();
         for (long userId : userIds) {
@@ -236,16 +216,10 @@ public class StatusData extends AppData {
     }
 
     @Override
-    public void recover() throws InternalError {
+    public void recover() throws InvalidDataFormattingException, IOException {
         statusCache = new HashMap<Long, Status>();
         ownershipCache = new HashMap<Long, List<Long>>();
-        BackwardReader br;
-		try {
-			br = getBackwardReader();
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new InternalError();
-		}
+        BackwardReader br = getBackwardReader();
         List<String> entry;
         while ((entry = br.readEntry()) != null) {
             Status status = parseEntry(entry);
@@ -261,17 +235,19 @@ public class StatusData extends AppData {
             }
             ids.add(status.getStatusId());
         }
-        try {
-			br.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			/* Note we do not throw internal error... simply
-			 * let this error go on silently because it was just
-			 * a failed close. */
-		}
+        br.close();
     }
 
-    private Status parseEntry(List<String> entry) {
+    private static List<String> toEntry(Status status) {
+        List<String> entry = new ArrayList<String>();
+        entry.add(String.valueOf(status.getStatusId()));
+        entry.add(String.valueOf(status.getUserId()));
+        entry.add(status.getText());
+        entry.add(status.getTime());
+        return entry;
+    }
+
+    private static Status parseEntry(List<String> entry) {
         long statusId = Long.parseLong(entry.get(ENTRY_STATUS_ID_IDX));
         long userId = Long.parseLong(entry.get(ENTRY_USER_ID_IDX));
         String text = entry.get(ENTRY_TEXT_IDX);
