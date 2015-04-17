@@ -47,7 +47,7 @@ public abstract class JSONObject {
     public abstract String toString();
     
     protected static final String ILLEGAL_JSON_VALUE_TYPE_MESSAGE = 
-            "JSON value must be int, double, long, boolean, string or other jsonobject";
+            "JSON value must be a Number, String, Boolean, or JSONObject";
 
     /**
      * Returns string form of object that adheres to JSON format.
@@ -87,11 +87,9 @@ public abstract class JSONObject {
      *          True if val is a valid json value type, false otherwise
      */
     public static boolean isValidJSONValueType(Object val) {
-        return (val instanceof Integer
-             || val instanceof Double
-             || val instanceof Long
-             || val instanceof Boolean
+        return (val instanceof Number
              || val instanceof String
+             || val instanceof Boolean
              || val instanceof JSONObject);
     }
 
