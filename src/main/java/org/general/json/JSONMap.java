@@ -33,24 +33,71 @@ public class JSONMap extends JSONObject {
     }
 
     /**
-     * Associates key with value in JSONMap.
-     * 
-     * Key must not be null, and value must be a valid JSON value type.
-     * 
-     * @param key 
-     *              Key that must not be null.
-     * @param value 
-     *              Value that must be a valid JSON value type
-     * @throws NullPointerException 
-     *              Thrown if key is null
-     * @throws IllegalArgumentException
-     *              Thrown if value is not a valid JSON value type
+     * @param key Key that is a string. Cannot be null. Can be empty.
+     * @param value Value that is a string. Can be null or empty.
+     * @throws NullPointerException Thrown if key is null
      */
-    public void put(String key, Object value) {
+    public void put(String key, String value) throws NullPointerException {
+        this.genericPut(key, value);
+    }
+
+    /**
+     * @param key Key that is a string. Cannot be null. Can be empty.
+     * @param value Value that is a double. Can be null.
+     * @throws NullPointerException Thrown if key is null
+     */
+    public void put(String key, Double value) throws NullPointerException {
+        this.genericPut(key, value);
+    }
+    
+    /**
+     * @param key Key that is a string. Cannot be null. Can be empty.
+     * @param value Value that is a long. Can be null.
+     * @throws NullPointerException Thrown if key is null
+     */
+    public void put(String key, Long value) throws NullPointerException {
+        this.genericPut(key, value);
+    }
+
+    /**
+     * @param key Key that is a string. Cannot be null. Can be empty.
+     * @param value Value that is an integer. Can be null.
+     * @throws NullPointerException Thrown if key is null
+     */
+    public void put(String key, Integer value) throws NullPointerException {
+        this.genericPut(key, value);
+    }
+
+    /**
+     * @param key Key that is a string. Cannot be null. Can be empty.
+     * @param value Value that is a JSONObject. Can be null or empty.
+     * @throws NullPointerException Thrown if key is null
+     */
+    public void put(String key, JSONObject value) throws NullPointerException {
+        this.genericPut(key, value);
+    }
+
+    /**
+     * @param key Key that is a string. Cannot be null. Can be empty.
+     * @param value  Value that is an boolean. Can be null.
+     * @throws NullPointerException Thrown if key is null
+     */
+    public void put(String key, Boolean value) throws NullPointerException {
+        this.genericPut(key, value);
+    }
+
+    /**
+     * Private version of put that checks if key is null and throws exception if
+     * so. If not, will put key-value entry into map.
+     * 
+     * @param key Key that must not be null.
+     * @param value Value that is limited to valid JSON value types through the
+     * exposed public put methods.
+     * @throws NullPointerException Thrown if key is null
+     */
+    private void genericPut(String key, Object value) throws NullPointerException {
         if (key == null) {
             throw new NullPointerException("Key for a JSONMap cannot be null");
-        } else if (!isValidJSONValueType(value)) {
-            throw new IllegalArgumentException(ILLEGAL_JSON_VALUE_TYPE_MESSAGE);
         } else {
             map.put(key, value);
         }
@@ -58,6 +105,7 @@ public class JSONMap extends JSONObject {
 
     /**
      * Returns a string formatted as a valid JSON associative array.
+     * See http://json.org/ for more details on JSON formatting.
      */
     public String toString() {
         String jsonString = "{";

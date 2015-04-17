@@ -32,18 +32,65 @@ public class JSONList extends JSONObject {
     }
 
     /**
-     * Adds an object to the JSONList.  Must be a valid JSON value type.
-     * @param val 
-     *              Object to be added to list. Must be a valid
-     *              JSON value type.
-     * @throws IllegalArgumentException
-     *              Thrown if val is not a valid JSON value type
+     * Adds a string to the JSONList. Can be null or empty.
+     * @param val String to be added to list. Can be null or empty.
      */
-    public void add(Object val) {
-        if (!isValidJSONValueType(val)) {
-            throw new IllegalArgumentException(ILLEGAL_JSON_VALUE_TYPE_MESSAGE);
-        }
+    public void add(String val) {
         list.add(val);
+    }
+
+    /**
+     * Adds a boolean to the JSONList. Can be null.
+     * @param val Boolean to be added to list. Can be null.
+     */
+    public void add(Boolean val) {
+        list.add(val);
+    }
+
+    /**
+     * Adds an integer to the JSONList. Can be null.
+     * @param val Integer to be added to list. Can be null.
+     */
+    public void add(Integer val) {
+        list.add(val);
+    }
+
+    /**
+     * Adds a double to the JSONList. Can be null.
+     * @param val Double to be added to list. Can be null.
+     */
+    public void add(Double val) {
+        list.add(val);
+    }
+    
+    /**
+     * Adds a long to the JSONList. Can be null.
+     * @param val Long to be added to list. Can be null.
+     */
+    public void add(Long val) {
+        list.add(val);
+    }
+
+    /**
+     * Adds a JSONObject to the JSONList. Can be null or empty.
+     * @param val JSONObject to be added to list. Can be null or empty.
+     */
+    public void add(JSONObject val) {
+        list.add(val);
+    }
+
+    /**
+     * Packs together varargs of JSONSerializable objects into a JSONList.
+     * 
+     * @param jSONSerializables Varargs of objects that implement JSONSerializable interface
+     * @return JSONList of objects passed in, ordered in the same order passed in
+     */
+    public static JSONList toJSONList(JSONSerializable... jSONSerializables) {
+        JSONList list = new JSONList();
+        for (JSONSerializable jsonSerializables : jSONSerializables) {
+            list.add(jsonSerializables.toJSON());
+        }
+        return list;
     }
 
     /**
@@ -62,6 +109,7 @@ public class JSONList extends JSONObject {
 
     /**
      * Returns a string formatted as a valid JSON array.
+     * See http://json.org/ for more details on JSON formatting.
      */
     public String toString() {
         String jsonString = "[";
@@ -85,8 +133,7 @@ public class JSONList extends JSONObject {
      * internal lists equal each other.
      */
     public boolean equals(Object other) {
-    	return (other instanceof JSONList && 
-    	        ((JSONList)other).list.equals(this.list));
+    	return (other instanceof JSONList && ((JSONList)other).list.equals(this.list));
     }
 
 }

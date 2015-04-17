@@ -12,15 +12,12 @@ public class JSONTests {
 		private int age;
 		private String address;
 		private String[] petNames;
-		private boolean isMale;
 		
-		public JSONSerializablePerson(String name, int age, String address, 
-		        Boolean isMale, String... petNames) {
+		public JSONSerializablePerson(String name, int age, String address, String... petNames) {
 			this.age = age;
 			this.name = name;
 			this.address = address;
 			this.petNames = petNames;
-			this.isMale = isMale;
 		}
 		
 		@Override
@@ -29,7 +26,6 @@ public class JSONTests {
 			jsonMap.put("name", name);
 			jsonMap.put("age", age);
 			jsonMap.put("address", address);
-			jsonMap.put("isMale", isMale);
 			
 			JSONList petNamesList = new JSONList();
 			for (String petName : petNames) {
@@ -47,12 +43,10 @@ public class JSONTests {
 	private static final String TEST_ADDRESS = "Philippines";
 	private static final String TEST_PETNAME_ONE = "Tiger";
 	private static final String TEST_PETNAME_TWO = "Ginger";
-	private static final Boolean TEST_IS_MALE = true;
 	
 	@Test
 	public void testJSON() {
-		JSONSerializablePerson person = new JSONSerializablePerson(TEST_NAME, TEST_AGE, TEST_ADDRESS, 
-		        TEST_IS_MALE, TEST_PETNAME_ONE, TEST_PETNAME_TWO);
+		JSONSerializablePerson person = new JSONSerializablePerson(TEST_NAME, TEST_AGE, TEST_ADDRESS, TEST_PETNAME_ONE, TEST_PETNAME_TWO);
 		JSONObject correctResult = createCorrectResult();
 		assertTrue(person.toJSON().equals(correctResult));
 	}
@@ -62,7 +56,6 @@ public class JSONTests {
 	    correctResult.put("name", TEST_NAME);
 	    correctResult.put("age", TEST_AGE);
 	    correctResult.put("address", TEST_ADDRESS);
-	    correctResult.put("isMale", TEST_IS_MALE);
 	    JSONList array = new JSONList();
 	    array.add(TEST_PETNAME_ONE);
 	    array.add(TEST_PETNAME_TWO);
