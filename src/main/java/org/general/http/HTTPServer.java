@@ -48,7 +48,7 @@ public abstract class HTTPServer {
                 request = new HTTPRequest(s.getInputStream());
             } catch (Exception e) {
                 e.printStackTrace();
-                response.sendError(HTTPResponse.StatusCode.BAD_REQUEST,
+                response.send(HTTPResponse.StatusCode.BAD_REQUEST,
                         "Request is malformatted");
                 s.close();
                 continue;
@@ -57,7 +57,7 @@ public abstract class HTTPServer {
                 handle(request, response);
             } catch (Exception e) {
                 e.printStackTrace();
-                response.sendError(HTTPResponse.StatusCode.SERVER_ERROR,
+                response.send(HTTPResponse.StatusCode.SERVER_ERROR,
                         "Internal server error");
             }
             s.close();

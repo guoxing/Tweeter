@@ -4,9 +4,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.general.application.ApplicationInterface.AppResponse;
 import org.general.application.Controller;
 import org.general.application.InternalError;
+import org.general.http.HTTPResponse;
+import org.general.http.HTTPResponse.StatusCode;
 import org.general.json.JSONList;
 import org.general.json.JSONMap;
 import org.general.logger.Logger;
@@ -15,7 +16,17 @@ import org.tweeter.data.StatusData;
 import org.tweeter.entities.Status;
 
 /**
- * In charge of API endpoints regarding users' statuses
+ * In charge of API endpoints regarding users' statuses.
+ * 
+ * On failure of any of this classes methods, will respond with
+ * JSON formatted as such:
+ * 
+ * {"error": "Error message here"}
+ * 
+ * With an HTTP Status code of StatusCode.BAD_REQUEST if the parameters
+ * passed in are malformed, or StatusCode.SERVER_ERROR if an internal
+ * error occurs.
+ * 
  * @author marcelpuyat
  *
  */
@@ -63,13 +74,12 @@ public class StatusesController extends Controller {
      * Parameters must include a user_id (which must be parsable into a long)
      * and a status.
      * 
-     * Will return an empty JSON object as a result on success, or a message
-     * with an error (and a corresponding response status) on failure.
+     * Will respond with an empty JSON object as a result on success.
+     * 
      * @param params Parameters that must include the keys "user_id" and "status"
-     * @return App Response with a body with an empty JSON object on success, or a message
-     * indicating an error on failure.
+     * @param res HTTP Response
      */
-    public static AppResponse updateStatus(Map<String, String> params) {
+    public static void updateStatus(Map<String, String> params, HTTPResponse res) {
     	Logger.log("Updating status of " + params.get(PARAMS_MY_ID_KEY));
         Long userId = null;
         String status = null;
@@ -78,15 +88,17 @@ public class StatusesController extends Controller {
             status = getRequiredString(PARAMS_STATUS_KEY, params);
             StatusData.getInstance().updateStatus(userId, status);
         } catch (IllegalArgumentException e) {
-            return generateInvalidParamResponse(e.getMessage());
+            respondWithJSONError(StatusCode.BAD_REQUEST, e.getMessage(), res);
+            return;
         } catch (InternalError e) {
-            return generateInternalErrorResponse(e.getMessage());
+            respondWithJSONError(StatusCode.SERVER_ERROR, e.getMessage(), res);
+            return;
         }
-        return generateSuccessResponse(new JSONMap().toString());
+        res.send(StatusCode.OK, new JSONMap().toString());
     }
 
     /**
-     * Returns the home timeline (in json) of a given user. The home timeline includes
+     * Responds with the home timeline (in json) of a given user. The home timeline includes
      * statuses of all the user's friends and the user's own statuses.
      * 
      * See generateJSONOfTweets method for format of JSON object returned.
@@ -98,10 +110,9 @@ public class StatusesController extends Controller {
      * 
      * @param params Parameters that must include the key "user_id" and may
      * include "count" and "max_id"
-     * @return AppResponse with a body of a format as specified in generateJSONOfTweets on success,
-     * or an error message with an appropriate response status on failure.
+     * @param res HTTP request
      */
-    public static AppResponse getHomeTimeline(Map<String, String> params) {
+    public static void getHomeTimeline(Map<String, String> params, HTTPResponse res) {
     	Logger.log("Returning JSON of home timeline of " + params.get(PARAMS_MY_ID_KEY));
         Long userId = null;
         Long count = null;
@@ -120,13 +131,14 @@ public class StatusesController extends Controller {
                         homeTimelineUserIds, count, maxId);
             statuses = StatusData.getInstance().getStatuses(statusIds);
         } catch (IllegalArgumentException e) {
-            return generateInvalidParamResponse(e.getMessage());
+            respondWithJSONError(StatusCode.BAD_REQUEST, e.getMessage(), res);
+            return;
         } catch (InternalError e) {
-            return generateInternalErrorResponse(e.getMessage());
+            respondWithJSONError(StatusCode.SERVER_ERROR, e.getMessage(), res);
+            return;
         }
 
-        return generateSuccessResponse(generateJSONOfTweets(statuses)
-                .toString());
+        res.send(StatusCode.OK, generateJSONOfTweets(statuses).toString());
     }
 
     /**
@@ -142,10 +154,8 @@ public class StatusesController extends Controller {
      * 
      * @param params Parameters that must include the key "user_id" and may
      * include "count" and "max_id"
-     * @return AppResponse with a body of a format as specified in generateJSONOfTweets on success,
-     * or an error message with an appropriate response status on failure.
      */
-    public static AppResponse getUserTimeline(Map<String, String> params) {
+    public static void getUserTimeline(Map<String, String> params, HTTPResponse res) {
     	Logger.log("Returning JSON of user timeline of " + params.get(PARAMS_MY_ID_KEY));
         Long userId = null;
         Long count = null;
@@ -159,13 +169,14 @@ public class StatusesController extends Controller {
                         userId, count, maxId);
             statuses = StatusData.getInstance().getStatuses(statusIds);
         } catch (IllegalArgumentException e) {
-            return generateInvalidParamResponse(e.getMessage());
+            respondWithJSONError(StatusCode.BAD_REQUEST, e.getMessage(), res);
+            return;
         } catch (InternalError e) {
-            return generateInternalErrorResponse(e.getMessage());
+            respondWithJSONError(StatusCode.SERVER_ERROR, e.getMessage(), res);
+            return;
         }
 
-        return generateSuccessResponse(generateJSONOfTweets(statuses)
-                .toString());
+        res.send(StatusCode.OK, generateJSONOfTweets(statuses).toString());
     }
 
     /**

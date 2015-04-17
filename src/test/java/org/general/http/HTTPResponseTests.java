@@ -64,8 +64,7 @@ public class HTTPResponseTests {
             HTTPResponse res = new HTTPResponse(
                     receivedSocket.getOutputStream(), "TestServer");
             JSONList list = genJSONList();
-            res.setBody(list.toString());
-            res.sendSuccess(HTTPResponse.StatusCode.OK);
+            res.send(HTTPResponse.StatusCode.OK, list.toString());
             BufferedReader reader = new BufferedReader(new InputStreamReader(
                     clientSocket.getInputStream()));
 
@@ -98,8 +97,11 @@ public class HTTPResponseTests {
             Socket receivedSocket = ss.accept();
             HTTPResponse res = new HTTPResponse(
                     receivedSocket.getOutputStream(), "TestServer");
+            JSONMap map = new JSONMap();
+            
             String errorMsg = "Params Error";
-            res.sendError(HTTPResponse.StatusCode.BAD_REQUEST, errorMsg);
+            map.put("ErrorMsg", errorMsg);
+            res.send(HTTPResponse.StatusCode.BAD_REQUEST, map.toString());
             BufferedReader reader = new BufferedReader(new InputStreamReader(
                     clientSocket.getInputStream()));
 
@@ -115,8 +117,7 @@ public class HTTPResponseTests {
                 line = reader.readLine();
             }
             line = reader.readLine();
-            JSONMap map = new JSONMap();
-            map.put("ErrorMsg", errorMsg);
+            
             assertEquals(line, map.toString());
             receivedSocket.close();
             clientSocket.close();

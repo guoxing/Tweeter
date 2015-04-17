@@ -4,10 +4,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.general.application.ApplicationInterface;
-import org.general.application.ApplicationInterface.AppRequest;
-import org.general.application.ApplicationInterface.AppResponse;
-import org.general.application.ApplicationInterface.AppResponse.AppResponseStatus;
 import org.general.application.InternalError;
 import org.general.data.AppData;
 import org.general.http.HTTPRequest;
@@ -30,8 +26,6 @@ public class TweeterServer extends HTTPServer {
 		super(port, name);
 	}
 
-	private static ApplicationInterface appInterface;
-    
     private static HTTPServer server;
 
     /**
@@ -56,9 +50,6 @@ public class TweeterServer extends HTTPServer {
     		server = new TweeterServer("Tweeter/1.0");
     	}
     	
-        appInterface = new Router();
-        
-        
         try {
         	// spin up data modules
             FriendshipData.getInstance();
@@ -87,29 +78,8 @@ public class TweeterServer extends HTTPServer {
     	return argOptions;
     }
     
-    protected void handle(HTTPRequest httpReq, HTTPResponse httpRes) {
-        AppRequest appReq = new AppRequest(httpReq.getMethod() + 
-        		" " + httpReq.getURI(), httpReq.getQueryParams());
-        AppResponse appRes = appInterface.respondToAppReq(appReq);
-        String body = appRes.getBody();
-        AppResponseStatus result = appRes.getResponseStatus();
-        httpRes.setBody(body);
-        
-        switch (result) {
-            case SUCCESS:
-                httpRes.sendSuccess(HTTPResponse.StatusCode.OK);
-                return;
-            case INVALID_PARAMETERS:
-                httpRes.sendError(HTTPResponse.StatusCode.BAD_REQUEST, body);
-                return;
-            case INVALID_DESTINATION:
-                httpRes.sendError(HTTPResponse.StatusCode.NOT_FOUND,
-                        "File not found: "+appReq.getAddress());
-                return;
-            case INTERNAL_ERROR:
-                httpRes.sendError(HTTPResponse.StatusCode.SERVER_ERROR, "Server error.");
-                return;
-        }
+    protected void handle(HTTPRequest req, HTTPResponse res) {
+        Router.route(req, res);
     }
     
 }

@@ -78,49 +78,13 @@ public class HTTPResponse {
         headers.put(key, value);
     }
 
-    public void setBody(String body) {
-        this.body = body;
-    }
-
-    /**
-     * Send this response with a success status code.
-     * 
-     * @param code
-     * 
-     * @return A boolean indicating whether the send is success
-     */
-    public boolean sendSuccess(StatusCode code) {
-        if (code != StatusCode.OK) {
-            return false;
-        }
-        statusCode = code;
-        return doSend();
-    }
-
-    /**
-     * Send this response with an error status code together with an error
-     * message. This method resets body to the error message.
-     * 
-     * @param code
-     * @param message
-     * 
-     * @return A boolean indicating whether the send is success
-     */
-    public boolean sendError(StatusCode code, String message) {
-        if (code == StatusCode.OK) {
-            return false;
-        }
-        statusCode = code;
-        JSONMap newBody = new JSONMap();
-        newBody.put("ErrorMsg", message);
-        body = newBody.toString();
-        return doSend();
-    }
-
-    private boolean doSend() {
+    public boolean send(StatusCode code, String body) {
         if (sent) {
+            // Prevents re-sending of the same response
             return false;
         }
+        this.statusCode = code;
+        this.body = body;
         // set date header
         SimpleDateFormat dateFormatGmt = new SimpleDateFormat(DATE_FORMAT);
         dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));

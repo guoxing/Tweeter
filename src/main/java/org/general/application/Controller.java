@@ -2,8 +2,9 @@ package org.general.application;
 
 import java.util.Map;
 
-import org.general.application.ApplicationInterface.AppResponse;
-import org.general.application.ApplicationInterface.AppResponse.AppResponseStatus;
+import org.general.http.HTTPResponse;
+import org.general.http.HTTPResponse.StatusCode;
+import org.general.json.JSONMap;
 
 /**
  * Abstract class that is the base controller for application logic.
@@ -14,46 +15,7 @@ import org.general.application.ApplicationInterface.AppResponse.AppResponseStatu
  *
  */
 public abstract class Controller {
-	
-	/**
-	 * Returns an AppResponse with the response status set to success
-	 * and the body being the parameter passed in. Body must not be
-	 * null.
-	 * @param body String that must not be null.
-	 * @throws NullPointerException Thrown if body is null
-	 * @return AppResponse object with success status and body passed in
-	 */
-    public static AppResponse generateSuccessResponse(String body) throws NullPointerException {
-    	if (body == null) throw new NullPointerException("AppResponse body must not be null");
-        return new AppResponse(body, AppResponseStatus.SUCCESS);
-    }
-
-    /**
-	 * Returns an AppResponse with the response status set to INVALID_PARAMETER
-	 * and the body being the message parameter passed in. Message must not be
-	 * null.
-	 * @param message String that must not be null.
-	 * @throws NullPointerException Thrown if message is null
-	 * @return AppResponse object with invalid parameter status and body set to the message passed in
-	 */
-    public static AppResponse generateInvalidParamResponse(String message) {
-    	if (message == null) throw new NullPointerException("AppResponse message must not be null");
-        return new AppResponse(message, AppResponseStatus.INVALID_PARAMETERS);
-    }
-
-    /**
-	 * Returns an AppResponse with the response status set to INTERNAL_ERROR
-	 * and the body being message passed in. Message must not be null.
-	 * @param message String that must not be null.
-	 * @throws NullPointerException Thrown if message is null
-	 * @return AppResponse object with internal error status and body of message passed in
-	 */
-    public static AppResponse generateInternalErrorResponse(String message) {
-    	if (message == null) throw new NullPointerException("AppResponse message must not be null");
-        return new AppResponse(message,
-                AppResponseStatus.INTERNAL_ERROR);
-    }
-
+    
     /**
      * Retrieves a string value associated with a passed in string key 
      * from params map. Use this when the controller action requires
@@ -130,5 +92,11 @@ public abstract class Controller {
         }
 
         return val;
+    }
+    
+    public static void respondWithJSONError(StatusCode code, String errorMessage, HTTPResponse res) {
+        JSONMap json = new JSONMap();
+        json.put("error", errorMessage);
+        res.send(code, json.toString());
     }
 }

@@ -1,9 +1,10 @@
 package org.tweeter.config;
 
-import java.util.Map;
-
-import org.general.application.ApplicationInterface;
-import org.general.application.ApplicationInterface.AppResponse.AppResponseStatus;
+import org.general.application.Controller;
+import org.general.http.HTTPRequest;
+import org.general.http.HTTPResponse;
+import org.general.http.HTTPResponse.StatusCode;
+import org.general.json.JSONMap;
 import org.tweeter.controllers.FriendshipsController;
 import org.tweeter.controllers.StatusesController;
 
@@ -13,7 +14,7 @@ import org.tweeter.controllers.StatusesController;
  * @author marcelpuyat
  *
  */
-public class Router implements ApplicationInterface {
+public class Router {
 	/**
 	 * To add a new action (aka a new API endpoint):
 	 * 		1. Create a new address (comprised of a method and a path, i.e. POST /friendships/create)
@@ -57,43 +58,44 @@ public class Router implements ApplicationInterface {
 	 * Address for updating a user's home timeline
 	 */
 	private static final String GET_HOME_TIMELINE_ADDRESS = "GET /statuses/home_timeline.json";
-	
+	    
 	/**
-	 * Responds to application request with an application response object.
-	 * @param request Application request (must not be null)
-	 * @throws NullPointerException if request is null
-	 * @return Application response
+	 * Default message prefix for when a path is invalid
 	 */
-    public AppResponse respondToAppReq(AppRequest request) {
-    	if (request == null) throw new NullPointerException("App request cannot be null");
-        return route(request);
-    }
-    
+	private static final String FILE_NOT_FOUND_MESSAGE = "File not found: ";
+	
     /**
      * Routes the given request to a controller's action and returns
      * the response of that action.
-     * @param request Application request
-     * @return Application response.
+     * @param request HTTP Request
+     * @return body response
      */
-    private static AppResponse route(AppRequest request) {
-        Map<String, String> params = request.getParams();
-        switch(request.getAddress()) {
+    static void route(HTTPRequest req, HTTPResponse res) {
+        switch(req.getMethod() + " " + req.getURI()) {
             case CREATE_FRIENDSHIP_ADDRESS:
-                return FriendshipsController.createFriendship(params);
+                FriendshipsController.createFriendship(req.getQueryParams(), res);
+                return;
             case DESTROY_FRIENDSHIP_ADDRESS:
-                return FriendshipsController.deleteFriendship(params);
+                FriendshipsController.deleteFriendship(req.getQueryParams(), res);
+                return;
             case GET_FOLLOWERS_ADDRESS:
-                return FriendshipsController.getFollowers(params);
+                FriendshipsController.getFollowers(req.getQueryParams(), res);
+                return;
             case GET_FRIENDS_ADDRESS:
-                return FriendshipsController.getFriends(params);
+                FriendshipsController.getFriends(req.getQueryParams(), res);
+                return;
             case UPDATE_STATUS_ADDRESS:
-                return StatusesController.updateStatus(params);
+                StatusesController.updateStatus(req.getQueryParams(), res);
+                return;
             case GET_USER_TIMELINE_ADDRESS:
-                return StatusesController.getUserTimeline(params);
+                StatusesController.getUserTimeline(req.getQueryParams(), res);
+                return;
             case GET_HOME_TIMELINE_ADDRESS:
-                return StatusesController.getHomeTimeline(params);
+                StatusesController.getHomeTimeline(req.getQueryParams(), res);
+                return;
             default:
-                return new AppResponse("Invalid destination", AppResponseStatus.INVALID_DESTINATION);
+                Controller.respondWithJSONError(StatusCode.NOT_FOUND, 
+                        FILE_NOT_FOUND_MESSAGE + req.getAbsoluteURI(), res);
         }
     }
 }
