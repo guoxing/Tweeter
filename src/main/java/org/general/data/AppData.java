@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public abstract class AppData {
 
-    static final char RESERVERD_HEADER = '\\';
+    static final char RESERVED_HEADER = '\\';
     static final Map<String, String> ENCODE_MAP;
     static {
         ENCODE_MAP = new HashMap<String, String>();

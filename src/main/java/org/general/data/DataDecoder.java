@@ -25,14 +25,14 @@ class DataDecoder {
                 String decoded = AppData.DECODE_MAP.get(original);
                 if (decoded == null) {
                     sb.append(original);
-                    if (in.charAt(i) == AppData.RESERVERD_HEADER) {
+                    if (in.charAt(i) == AppData.RESERVED_HEADER) {
                         matchMode = true;
                     }
                 } else {
                     sb.append(decoded);
                 }
             } else {
-                if (in.charAt(i) == AppData.RESERVERD_HEADER) {
+                if (in.charAt(i) == AppData.RESERVED_HEADER) {
                     matchMode = true;
                 } else {
                     sb.append(in.charAt(i));
