@@ -1,6 +1,5 @@
 package org.general.data;
 
-import java.util.Map.Entry;
 
 /**
  * Encoder used to encode entries to file storage.
@@ -11,15 +10,21 @@ import java.util.Map.Entry;
 class DataEncoder {
 
     /**
-     * Not efficient... I know
+     * Encode the input String using AppData.ENCODE_MAP
      * 
      * @param in
-     * @return A encoded String
+     * @return An encoded String
      */
     static String encode(String in) {
-        for (Entry<String, String> entry : AppData.ENCODE_MAP.entrySet()) {
-            in = in.replaceAll(entry.getKey(), entry.getValue());
+        StringBuilder sb = new StringBuilder();
+        for (char ch : in.toCharArray()) {
+            String encoded = AppData.ENCODE_MAP.get(String.valueOf(ch));
+            if (encoded != null) {
+                sb.append(encoded);
+            } else {
+                sb.append(ch);
+            }
         }
-        return in;
+        return sb.toString();
     }
 }

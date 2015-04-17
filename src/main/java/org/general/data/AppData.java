@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,16 +32,17 @@ import org.general.logger.Logger;
  */
 public abstract class AppData {
 
+    static final char RESERVERD_HEADER = '\\';
     static final Map<String, String> ENCODE_MAP;
     static {
-        ENCODE_MAP = new LinkedHashMap<String, String>();
+        ENCODE_MAP = new HashMap<String, String>();
         ENCODE_MAP.put("\\", "\\\\");
         ENCODE_MAP.put("\t", "\\t");
         ENCODE_MAP.put("\n", "\\n");
     }
     static final Map<String, String> DECODE_MAP;
     static {
-        DECODE_MAP = new LinkedHashMap<String, String>();
+        DECODE_MAP = new HashMap<String, String>();
         DECODE_MAP.put("\\\\", "\\");
         DECODE_MAP.put("\\t", "\t");
         DECODE_MAP.put("\\n", "\n");
@@ -232,14 +233,14 @@ public abstract class AppData {
             lastLineReadInBlockPos = newBlockLength;
         }
 
-        private List<String> readEntryInBlock() throws InternalError {
+        private String readEntryStrInBlock() throws InternalError {
             int i = lastLineReadInBlockPos - 1;
             String line = null;
             while (i >= 0) {
                 if (data[i] == (byte) ROW_DELIMITER) {
                     // found new line
                     int lineStart = i + 1;
-                    int lineLength = Math.min(0, lastLineReadInBlockPos
+                    int lineLength = Math.max(0, lastLineReadInBlockPos
                             - lineStart);
                     byte[] lineData = new byte[lineLength];
                     System.arraycopy(data, lineStart, lineData, 0, lineLength);
@@ -264,7 +265,7 @@ public abstract class AppData {
                     lastLineReadInBlockPos = 0;
                 }
             }
-            return line == null ? null : breakLine(line);
+            return line;
         }
 
         /**
@@ -275,8 +276,11 @@ public abstract class AppData {
          * @throws InvalidDataFormattingException
          */
         public List<String> readEntry() throws InternalError {
-            List<String> entry = readEntryInBlock();
-            while (entry == null) {
+            String entryStr = readEntryStrInBlock();
+            // the first entryStr will always be empty since the last character
+            // is always \n
+            entryStr = readEntryStrInBlock();
+            while (entryStr == null) {
                 if (!isLastBlock) {
                     // keep reading in new blocks until we find a new line
                     // character
@@ -286,14 +290,14 @@ public abstract class AppData {
 						e.printStackTrace();
 						throw new InternalError();
 					}
-                    entry = readEntryInBlock();
+                    entryStr = readEntryStrInBlock();
                 } else {
                     // if it's the last block, and entry is null, it means we
                     // are hitting the end of the file, return null
                     break;
                 }
             }
-            return entry;
+            return entryStr == null ? null : breakLine(entryStr);
         }
 
         /**

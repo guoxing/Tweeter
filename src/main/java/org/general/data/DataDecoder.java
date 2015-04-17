@@ -1,6 +1,5 @@
 package org.general.data;
 
-import java.util.Map.Entry;
 
 /**
  * Decoder used to decode entries from file storage.
@@ -11,16 +10,39 @@ import java.util.Map.Entry;
 class DataDecoder {
 
     /**
-     * Not efficient... I know
+     * Decode the input String using AppData.DECODE_MAP
      * 
      * @param in
      * @return A decoded String
      */
     static String decode(String in) {
-        for (Entry<String, String> entry : AppData.DECODE_MAP.entrySet()) {
-            in = in.replaceAll(entry.getKey(), entry.getValue());
+        StringBuilder sb = new StringBuilder();
+        boolean matchMode = false;
+        for (int i = 0; i < in.length(); ++i) {
+            if (matchMode) {
+                matchMode = false;
+                String original = in.substring(i - 1, i + 1);
+                String decoded = AppData.DECODE_MAP.get(original);
+                if (decoded == null) {
+                    sb.append(original);
+                    if (in.charAt(i) == AppData.RESERVERD_HEADER) {
+                        matchMode = true;
+                    }
+                } else {
+                    sb.append(decoded);
+                }
+            } else {
+                if (in.charAt(i) == AppData.RESERVERD_HEADER) {
+                    matchMode = true;
+                } else {
+                    sb.append(in.charAt(i));
+                }
+            }
         }
-        return in;
+        if (matchMode) {
+            sb.append(in.charAt(in.length() - 1));
+        }
+        return sb.toString();
     }
 
 }
