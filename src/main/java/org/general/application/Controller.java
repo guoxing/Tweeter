@@ -29,7 +29,7 @@ public abstract class Controller {
      * @throws IllegalArgumentException
      *             Thrown if map does not contain given key
      */
-    public static String getRequiredString(String paramKey,
+    protected static String getRequiredString(String paramKey,
             Map<String, String> params) throws IllegalArgumentException {
         String val = params.get(paramKey);
         if (val == null) {
@@ -53,7 +53,7 @@ public abstract class Controller {
      *             Thrown if map does not contain given key or if map contains
      *             given key but value cannot be parsed into a long
      */
-    public static Long getRequiredLong(String paramKey,
+    protected static Long getRequiredLong(String paramKey,
             Map<String, String> params) throws IllegalArgumentException {
 
         if (params.get(paramKey) == null) {
@@ -89,7 +89,7 @@ public abstract class Controller {
      *             Thrown if map contains given key but value cannot be parsed
      *             into a long
      */
-    public static Long getOptionalLongOrDefault(String paramKey,
+    protected static Long getOptionalLongOrDefault(String paramKey,
             Map<String, String> params, Long defaultValue)
             throws IllegalArgumentException {
         if (params.get(paramKey) == null)
@@ -106,6 +106,32 @@ public abstract class Controller {
         return val;
     }
     
+    /**
+     * Respond with JSON formed as:
+     * {"error": "OK"}
+     * 
+     * Where the message is the string form of the StatusCode passed in.
+     * @param code
+     *              Status code of response
+     * @param res
+     *              HTTP Response
+     */
+    public static void respondWithJSONError(StatusCode code, HTTPResponse res) {
+        respondWithJSONError(code, code.getMessage(), res);
+    }
+    
+    /**
+     * Respond with JSON formed as:
+     * {"error": "Message here"}
+     * 
+     * Where the message is the errorMessage passed in.
+     * @param code
+     *              Status code of response
+     * @param errorMessage
+     *              Message to include in JSON response
+     * @param res
+     *              HTTP Response
+     */
     public static void respondWithJSONError(StatusCode code, String errorMessage, HTTPResponse res) {
         JSONMap json = new JSONMap();
         json.put("error", errorMessage);

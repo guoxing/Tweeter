@@ -61,7 +61,7 @@ public class Router {
 	/**
 	 * Default message prefix for when a path is invalid
 	 */
-	private static final String FILE_NOT_FOUND_MESSAGE = "File not found: ";
+	private static final String FILE_NOT_FOUND_MESSAGE = "File not found:";
 	
     /**
      * Routes the given request to a controller's action and returns
@@ -95,7 +95,7 @@ public class Router {
                 return;
             default:
                 Controller.respondWithJSONError(StatusCode.NOT_FOUND, 
-                        FILE_NOT_FOUND_MESSAGE + req.getURI(), res);
+                        FILE_NOT_FOUND_MESSAGE + " " + req.getURI(), res);
         }
     }
 }

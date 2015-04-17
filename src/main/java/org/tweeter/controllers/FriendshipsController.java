@@ -75,7 +75,7 @@ public class FriendshipsController extends Controller {
             return;
         } catch (IOException | InvalidDataFormattingException e) {
             e.printStackTrace();
-            respondWithJSONError(StatusCode.SERVER_ERROR, e.getMessage(), res);
+            respondWithJSONError(StatusCode.SERVER_ERROR, res);
             return;
         }
         res.send(StatusCode.OK, new JSONMap().toString());
@@ -112,7 +112,7 @@ public class FriendshipsController extends Controller {
             return;
         } catch (IOException | InvalidDataFormattingException e) {
             e.printStackTrace();
-            respondWithJSONError(StatusCode.SERVER_ERROR, e.getMessage(), res);
+            respondWithJSONError(StatusCode.SERVER_ERROR, res);
             return;
         }
 
