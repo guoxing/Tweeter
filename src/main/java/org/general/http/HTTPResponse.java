@@ -72,7 +72,7 @@ public class HTTPResponse {
                     + "before sending");
         }
         if (body == null) {
-            throw new NullPointerException("HTTP response body cannot be null");
+            body = "";
         }
         if (code == null) {
             throw new NullPointerException("HTTP Status Code cannot be null");
