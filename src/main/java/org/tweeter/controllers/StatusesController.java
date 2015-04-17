@@ -24,7 +24,7 @@ import org.tweeter.entities.Status;
  * 
  * {"error": "Error message here"}
  * 
- * With an HTTP Status code of StatusCode.BAD_REQUEST if the parameters
+ * with an HTTP Status code of StatusCode.BAD_REQUEST if the parameters
  * passed in are malformed, or StatusCode.SERVER_ERROR if an internal
  * error occurs.
  * 
@@ -151,7 +151,7 @@ public class StatusesController extends Controller {
     }
 
     /**
-     * Returns the user timeline (in json) of a given user. The user timeline
+     * Responds with the user timeline (in json) of a given user. The user timeline
      * includes all the statuses of the user.
      * 
      * See generateJSONOfTweets method for format of JSON object returned.
@@ -194,10 +194,16 @@ public class StatusesController extends Controller {
 
     /**
      * Generates JSON List of statuses given a list of statuses (that should not
-     * be null). Will be of the form: {"tweets": [ {"id": 20115, "user": 84,
-     * "time": "Mon Oct 27 18:02:57 PDT 2014", "text": "On my way home"}, {"id":
-     * 18442, "user": 84, "time": "Sun Oct 26 20:52:35 PDT 2014", "text":
-     * "Just saw a flying saucer!"} ]} In the same order as given in the list.
+     * be null). Will be of the form: 
+     * 
+     * {"tweets": [ 
+     * {"id": 20115, "user": 84, "time": "Mon Oct 27 18:02:57 PDT 2014", 
+     * "text": "On my way home"},
+     * {"id": 18442, "user": 84, "time": "Sun Oct 26 20:52:35 PDT 2014", 
+     * "text": "Just saw a flying saucer!"}
+     *  ]} 
+     *  
+     *  with tweets in the same order as given in the list.
      * 
      * @param statuses
      *            List of statuses

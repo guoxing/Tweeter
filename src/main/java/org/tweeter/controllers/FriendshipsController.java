@@ -23,7 +23,7 @@ import org.tweeter.data.FriendshipData;
  * 
  * {"error": "Error message here"}
  * 
- * With an HTTP Status code of StatusCode.BAD_REQUEST if the parameters
+ * with an HTTP Status code of StatusCode.BAD_REQUEST if the parameters
  * passed in are malformed, or StatusCode.SERVER_ERROR if an internal
  * error occurs.
  * 
@@ -125,13 +125,13 @@ public class FriendshipsController extends Controller {
      * Returns {ids: []} if user has no followers.
      * 
      * Params must contain a long value associated with PARAMS_USER_ID_KEY, or
-     * response will contain error message and have an invalid parameter status.
+     * response will contain error message and have a bad request status.
      * 
      * @param params
      *            Map that should contain value for PARAMS_USER_ID_KEY. Should
      *            not be null.
-     * @return Response that will have a body with a JSON object formatted as
-     *         mentioned above on success, or a message with an error.
+     * @param res
+     *            HTTP Response
      */
     public static void getFollowers(Map<String, String> params, HTTPResponse res) {
     	Logger.log("Getting followers JSON of " 
@@ -152,20 +152,19 @@ public class FriendshipsController extends Controller {
     }
 
     /**
-     * Returns an AppResponse with a body containing the friends of a given
-     * user.
+     * Responds with JSON array of the friends of a given user.
      * 
-     * On success, body of the response contains a JSONObject of the form: {ids:
-     * [1, 2, 3, etc...]} Returns {ids: []} if user has no friends.
+     * On success, body of the response contains a JSONObject of the form: {"ids":
+     * [1, 2, 3, etc...]} Returns {"ids": []} if user has no friends.
      * 
      * Params must contain a long value associated with PARAMS_USER_ID_KEY, or
-     * response will contain error message and have an invalid parameter status.
+     * response will contain error message and have a bad request status.
      * 
      * @param params
      *            Map that should contain value for PARAMS_USER_ID_KEY. Should
      *            not be null.
-     * @return Response that will have a body with a JSON object formatted as
-     *         mentioned above on success, or a message with an error.
+     * @param res
+     *            HTTP Response
      */
     public static void getFriends(Map<String, String> params, HTTPResponse res) {
     	Logger.log("Getting friends JSON of " + params.get(PARAMS_USER_ID_KEY));
