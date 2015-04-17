@@ -63,6 +63,8 @@ public class HTTPResponseTests {
             Socket receivedSocket = ss.accept();
             HTTPResponse res = new HTTPResponse(
                     receivedSocket.getOutputStream(), "TestServer");
+            String defaultVersion = "HTTP/1.1";
+            res.setVersion(defaultVersion);
             JSONList list = genJSONList();
             res.send(HTTPResponse.StatusCode.OK, list.toString());
             BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -71,11 +73,10 @@ public class HTTPResponseTests {
             String line = reader.readLine();
             assertEquals(
                     line,
-                    "HTTP/1.1 "
+                    defaultVersion + " "
                             + HTTPResponse.StatusCode.OK.getNum()
                             + " "
-                            + HTTPResponse.StatusMessage
-                                    .get(HTTPResponse.StatusCode.OK));
+                            + HTTPResponse.StatusCode.OK.getMessage());
             while (!line.isEmpty()) {
                 line = reader.readLine();
             }
@@ -97,6 +98,8 @@ public class HTTPResponseTests {
             Socket receivedSocket = ss.accept();
             HTTPResponse res = new HTTPResponse(
                     receivedSocket.getOutputStream(), "TestServer");
+            String defaultVersion = "HTTP/1.1";
+            res.setVersion(defaultVersion);
             JSONMap map = new JSONMap();
             
             String errorMsg = "Params Error";
@@ -108,11 +111,10 @@ public class HTTPResponseTests {
             String line = reader.readLine();
             assertEquals(
                     line,
-                    "HTTP/1.1 "
+                    defaultVersion + " " + 
                             + HTTPResponse.StatusCode.BAD_REQUEST.getNum()
                             + " "
-                            + HTTPResponse.StatusMessage
-                                    .get(HTTPResponse.StatusCode.BAD_REQUEST));
+                            + HTTPResponse.StatusCode.BAD_REQUEST.getMessage());
             while (!line.isEmpty()) {
                 line = reader.readLine();
             }

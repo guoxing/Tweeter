@@ -15,17 +15,22 @@ public class HTTPResponse {
 
     // HTTP status code
     public enum StatusCode {
-        OK(200),
-        BAD_REQUEST(400),
-        NOT_FOUND(404),
-        SERVER_ERROR(500);
+        OK(200, "OK"),
+        BAD_REQUEST(400, "Bad Request"),
+        NOT_FOUND(404, "Not Found"),
+        SERVER_ERROR(500, "Internal Server Error");
         
         private int num;
-        private StatusCode(int num) {
+        private String message;
+        private StatusCode(int num, String message) {
             this.num = num;
+            this.message = message;
         }
         public int getNum() {
             return this.num;
+        }
+        public String getMessage() {
+            return this.message;
         }
     }
 
@@ -36,20 +41,8 @@ public class HTTPResponse {
         public static final String CONTENT_LENGTH = "Content-Length";
     }
 
-    public static final Map<StatusCode, String> StatusMessage;
-    static {
-        StatusMessage = new HashMap<StatusCode, String>();
-        StatusMessage.put(StatusCode.OK, "OK");
-        StatusMessage.put(StatusCode.BAD_REQUEST, "Bad Request");
-        StatusMessage.put(StatusCode.NOT_FOUND, "Not Found");
-        StatusMessage.put(StatusCode.SERVER_ERROR, "Interal Server Error");
-    }
-
     private PrintWriter out;
-    private StatusCode statusCode;
     private Map<String, String> headers;
-    @SuppressWarnings("unused")
-    private String body;
     private String version;
     private boolean sent; // whether this response has been sent
 
@@ -73,15 +66,24 @@ public class HTTPResponse {
             // Prevents re-sending of the same response
             return false;
         }
-        this.statusCode = code;
-        this.body = body;
-
+        
+        if (this.version == null) {
+            throw new NullPointerException("HTTP version must be set "
+                    + "before sending");
+        }
+        if (body == null) {
+            throw new NullPointerException("HTTP response body cannot be null");
+        }
+        if (code == null) {
+            throw new NullPointerException("HTTP Status Code cannot be null");
+        }
+        
         // set content-length
         headers.put(HeaderField.CONTENT_LENGTH, Integer.toString(body.length()));
 
         // write to stream
-        out.println(version + " " + Integer.toString(statusCode.getNum()) + " "
-                + StatusMessage.get(statusCode));
+        out.println(version + " " + Integer.toString(code.getNum()) + " "
+                + code.getMessage());
         for (String key : headers.keySet()) {
             out.println(key + ": " + headers.get(key));
         }

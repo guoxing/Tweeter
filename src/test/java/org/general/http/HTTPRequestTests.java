@@ -52,11 +52,12 @@ public class HTTPRequestTests {
     @Test
     public void testMalformattedReq() {
         try {
+            // Test where there is no space between method and path
             @SuppressWarnings("unused")
 			HTTPRequest req = generateRequest(HTTPRequest.Method.POST
                     + "/path  " + DEFAULT_VERSION + "\n", "name=Guoxing Li");
         } catch (Exception e) {
-            e.printStackTrace();
+            // Should enter this
             return;
         }
         fail("Expected error not found.");

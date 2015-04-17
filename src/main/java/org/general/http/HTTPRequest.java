@@ -27,8 +27,6 @@ public class HTTPRequest {
     // QUERYREGEX is used to separate path and query string
     private static final String QUERYREGEX = "([^?]+)(?:\\?(.+))?";
 
-    private BufferedReader in;
-
     private String method;
     private String absoluteURI;
     private String URI;
@@ -44,8 +42,7 @@ public class HTTPRequest {
      * @throws Exception
      */
     public HTTPRequest(InputStream in) throws Exception {
-        this.in = new BufferedReader(new InputStreamReader(in));
-        process();
+        process(new BufferedReader(new InputStreamReader(in)));
     }
 
     /**
@@ -53,7 +50,7 @@ public class HTTPRequest {
      * 
      * @throws Exception
      */
-    private void process() throws Exception {
+    private void process(BufferedReader in) throws Exception {
         String requestLine = in.readLine();
         String[] splited = requestLine.split("\\s+");
         method = splited[0];
