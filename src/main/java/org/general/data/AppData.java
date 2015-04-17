@@ -177,12 +177,14 @@ public abstract class AppData {
         private boolean isLastBlock;
         private byte[] leftOver;
         private byte[] data;
+        private boolean firstRead;
 
         private BackwardReader() throws IOException {
             raFile = new RandomAccessFile(storage, "r");
             totalByteLength = raFile.length();
             lastBlockReadPos = totalByteLength;
             isLastBlock = false;
+            firstRead = true;
             readNewBlock(null);
         }
 
@@ -264,9 +266,12 @@ public abstract class AppData {
         public List<String> readEntry() throws InvalidDataFormattingException,
                 IOException {
             String entryStr = readEntryStrInBlock();
-            // the first entryStr will always be empty since the last character
-            // is always \n
-            entryStr = readEntryStrInBlock();
+            if (firstRead) {
+                // the first entryStr will always be empty since the last
+                // character is always \n
+                entryStr = readEntryStrInBlock();
+                firstRead = false;
+            }
             while (entryStr == null) {
                 if (!isLastBlock) {
                     // keep reading in new blocks until we find a new line
