@@ -45,9 +45,14 @@ public abstract class JSONObject {
      * Returns valid JSON as a string
      */
     public abstract String toString();
+    
+    protected static final String ILLEGAL_JSON_VALUE_TYPE_MESSAGE = 
+            "JSON value must be int, double, long, boolean, string or other jsonobject";
 
     /**
      * Returns string form of object that adheres to JSON format.
+     * 
+     * Object must be a valid JSON value type.
      * 
      * Rules:
      * 	 If object is a string, will replace special characters (see escapeChars)
@@ -59,6 +64,7 @@ public abstract class JSONObject {
      *   Else, simply returns the return value of the object's toString method.
      * 
      * @param val Object to be escaped
+     * @throws IllegalArgumentException if object is not a valid JSON value type
      * @return json-escaped string form of object
      */
     public static String jsonEscape(Object val) {
@@ -66,9 +72,27 @@ public abstract class JSONObject {
             return "null";
         } else if (val instanceof String) {
             return "\"" + replaceSpecialChars(val.toString()) + "\"";
-        } else {
+        } else if (isValidJSONValueType(val)) {
             return val.toString();
+        } else {
+            throw new IllegalArgumentException(ILLEGAL_JSON_VALUE_TYPE_MESSAGE);
         }
+    }
+    
+    /**
+     * Returns whether or not an object is a valid JSON value type.
+     * @param val
+     *          Object to check validity of
+     * @return
+     *          True if val is a valid json value type, false otherwise
+     */
+    public static boolean isValidJSONValueType(Object val) {
+        return (val instanceof Integer
+             || val instanceof Double
+             || val instanceof Long
+             || val instanceof Boolean
+             || val instanceof String
+             || val instanceof JSONObject);
     }
 
     /**
