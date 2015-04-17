@@ -9,7 +9,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.general.application.InternalError;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +31,7 @@ public class AppDataTests extends AppData {
     private List<String> testEntry1;
     private List<String> testEntry2;
 
-    public AppDataTests() throws InternalError {
+    public AppDataTests() throws IOException, InvalidDataFormattingException {
         super(FILE_NAME, NUM_COLS_IN_ENTRY);
     }
 
@@ -40,7 +39,7 @@ public class AppDataTests extends AppData {
      * Dummy recover method.
      */
     @Override
-    protected void recover() throws InternalError {
+    protected void recover() throws IOException, InvalidDataFormattingException {
     }
 
     private void clearFile() {
@@ -62,7 +61,7 @@ public class AppDataTests extends AppData {
         try {
             appendToFile(testEntry1);
             appendToFile(testEntry2);
-        } catch (InternalError e) {
+        } catch (IOException | InvalidDataFormattingException e) {
             e.printStackTrace();
             fail("Write Exception");
         }
@@ -79,7 +78,7 @@ public class AppDataTests extends AppData {
             ForwardReader fr = getForwardReader();
             List<String> entry = fr.readEntry();
             assertEquals(entry, testEntry1);
-        } catch (IOException | InternalError e) {
+        } catch (IOException | InvalidDataFormattingException e) {
             e.printStackTrace();
             fail("Forward Reader Exception");
         }
@@ -91,9 +90,10 @@ public class AppDataTests extends AppData {
             BackwardReader br = getBackwardReader();
             List<String> entry = br.readEntry();
             assertEquals(entry, testEntry2);
-        } catch (IOException | InternalError e) {
+        } catch (IOException | InvalidDataFormattingException e) {
             e.printStackTrace();
             fail("Backward Reader Exception");
         }
     }
+
 }

@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.general.json.JSONMap;
-
 /**
  * A class that represents an HTTP response.
  *
@@ -56,6 +54,7 @@ public class HTTPResponse {
     private PrintWriter out;
     private StatusCode statusCode;
     private Map<String, String> headers;
+    @SuppressWarnings("unused")
     private String body;
     private String version;
     private boolean sent; // whether this response has been sent

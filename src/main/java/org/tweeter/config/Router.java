@@ -4,7 +4,6 @@ import org.general.application.Controller;
 import org.general.http.HTTPRequest;
 import org.general.http.HTTPResponse;
 import org.general.http.HTTPResponse.StatusCode;
-import org.general.json.JSONMap;
 import org.tweeter.controllers.FriendshipsController;
 import org.tweeter.controllers.StatusesController;
 

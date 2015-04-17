@@ -15,15 +15,16 @@ import org.general.json.JSONSerializable;
  */
 public class Status implements JSONSerializable {
 
-	/**
-	 * Date format wherein: <br>
-	 * 	1st token is 3 letters of the day of the week <br>
-	 * 	2nd token is 3 letters of the month <br>
-	 *  3rd token is the date (using 2 characters) <br>
-	 *  4th token is 2 digits of the hours:2 digits of the minutes:2 digits of the seconds <br>
-	 *  5th token is the time zone <br>
-	 *  6th token is 4 digits of the year
-	 */
+    /**
+     * Date format wherein: <br>
+     * 1st token is 3 letters of the day of the week <br>
+     * 2nd token is 3 letters of the month <br>
+     * 3rd token is the date (using 2 characters) <br>
+     * 4th token is 2 digits of the hours:2 digits of the minutes:2 digits of
+     * the seconds <br>
+     * 5th token is the time zone <br>
+     * 6th token is 4 digits of the year
+     */
     private static final String DATE_FORMAT = "EEE MMM dd HH:mm:ss z yyyy";
 
     /**
@@ -31,43 +32,48 @@ public class Status implements JSONSerializable {
      * statuses that were created earlier.
      */
     private long statusId;
-    
+
     /**
      * This is a 64-bit non-negative integer corresponding to the user id of the
      * user who created this status.
      */
     private long userId;
-    
+
     /**
-     * Text of the status. This must be shorter than MAX_TWEET_LENGTH characters.
+     * Text of the status. This must be shorter than MAX_TWEET_LENGTH
+     * characters.
      */
     private String text;
-    
+
     /**
      * Time this status was created (as a string). This will be formatted using
      * SimpleDateFormat and the DATE_FORMAT string specified above.
      */
     private String time;
-    
+
     /**
      * Max number of characters permitted in a status.
      */
     private static final int MAX_TWEET_LENGTH = 140;
 
     /**
-     * Constructs a Status object, passing in the statusId, userId, text and time.
+     * Constructs a Status object, passing in the statusId, userId, text and
+     * time.
      * 
      * Note that time here is passed in as a Date object.
-     * 		
-     * @param statusId status id
-     * @param userId user id
-     * @param text status text
-     * @param time time (as a Date object)
-     * @throws IllegalArgumentException Thrown if length of text is greater than
-     * MAX_TWEET_LENGTH
+     * 
+     * @param statusId
+     *            status id
+     * @param userId
+     *            user id
+     * @param text
+     *            status text
+     * @param time
+     *            time (as a Date object)
+     * @throws IllegalArgumentException
+     *             Thrown if length of text is greater than MAX_TWEET_LENGTH
      */
-    public Status(long statusId, long userId, String text, Date time)
-    	throws IllegalArgumentException {
+    public Status(long statusId, long userId, String text, Date time) {
         SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
         this.statusId = statusId;
         this.userId = userId;
@@ -80,20 +86,24 @@ public class Status implements JSONSerializable {
     }
 
     /**
-     * Constructs a Status object, passing in the statusId, userId, text and time.
+     * Constructs a Status object, passing in the statusId, userId, text and
+     * time.
      * 
-     * Note that time here is passed in as a string of the form DATE_FORMAT
-     * (see comments of instance variable DATE_FORMAT above)
-     * 		
-     * @param statusId status id
-     * @param userId user id
-     * @param text status text
-     * @param time time string
-     * @throws IllegalArgumentException Thrown if length of text is greater than
-     * MAX_TWEET_LENGTH
+     * Note that time here is passed in as a string of the form DATE_FORMAT (see
+     * comments of instance variable DATE_FORMAT above)
+     * 
+     * @param statusId
+     *            status id
+     * @param userId
+     *            user id
+     * @param text
+     *            status text
+     * @param time
+     *            time string
+     * @throws IllegalArgumentException
+     *             Thrown if length of text is greater than MAX_TWEET_LENGTH
      */
-    public Status(long statusId, long userId, String text, String time)
-    		throws IllegalArgumentException{
+    public Status(long statusId, long userId, String text, String time) {
         this.statusId = statusId;
         this.userId = userId;
         if (text.length() > MAX_TWEET_LENGTH) {
@@ -106,6 +116,7 @@ public class Status implements JSONSerializable {
 
     /**
      * Returns id of status. See Status class comments for info on a status id.
+     * 
      * @return status id
      */
     public long getStatusId() {
@@ -114,6 +125,7 @@ public class Status implements JSONSerializable {
 
     /**
      * Returns user id of status creator
+     * 
      * @return user id (of type long) of status creator
      */
     public long getUserId() {
@@ -122,6 +134,7 @@ public class Status implements JSONSerializable {
 
     /**
      * Returns the text of the status
+     * 
      * @return text of the status
      */
     public String getText() {
@@ -129,8 +142,8 @@ public class Status implements JSONSerializable {
     }
 
     /**
-     * Returns time the status was created, formatted as DATE_FORMAT
-     * (see comments of instance variable DATE_FORMAT for details)
+     * Returns time the status was created, formatted as DATE_FORMAT (see
+     * comments of instance variable DATE_FORMAT for details)
      * 
      * @return time (as a string) this status was created
      */
@@ -139,13 +152,12 @@ public class Status implements JSONSerializable {
     }
 
     /**
-     * Returns a JSONObject of the form: 
-     * {"id": 123, "user": 321, "text":
+     * Returns a JSONObject of the form: {"id": 123, "user": 321, "text":
      * "This is a status of at most 140 chars", "time":
      * "Sun Oct 26 20:52:35 PDT 2014"}
      * 
-     * Wherein the fields are filled in with the private instance
-     * variables of the status instance.
+     * Wherein the fields are filled in with the private instance variables of
+     * the status instance.
      */
     @Override
     public JSONObject toJSON() {
