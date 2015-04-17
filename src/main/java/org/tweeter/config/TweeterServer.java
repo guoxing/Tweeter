@@ -1,12 +1,16 @@
 package org.tweeter.config;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.general.data.AppData;
 import org.general.http.HTTPRequest;
 import org.general.http.HTTPResponse;
+import org.general.http.HTTPResponse.HeaderField;
 import org.general.http.HTTPServer;
 
 public class TweeterServer extends HTTPServer {
@@ -15,9 +19,13 @@ public class TweeterServer extends HTTPServer {
     private static final String PORT_OPTION = "-port";
     private static final String WORKSPACE_OPTION = "-workspace";
     private static final String DEFAULT_SERVER_NAME = "Tweeter/1.0";
+    private static int DEFAULT_PORT = 8080;
+    private static final String DEFAULT_RESPONSE_VERSION = "HTTP/1.1";
+    private static final String DEFAULT_RESPONSE_CONTENT_TYPE = "application/json;charset=UTF-8";
+    private static final String RESPONSE_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss z";
 
     private TweeterServer(String name) {
-        super(name);
+        super(DEFAULT_PORT, name);
     }
 
     private TweeterServer(int port, String name) {
@@ -77,7 +85,16 @@ public class TweeterServer extends HTTPServer {
     }
     
     protected void handle(HTTPRequest req, HTTPResponse res) {
+        setDefaultsOnResponse(res);
         Router.route(req, res);
+    }
+    
+    private void setDefaultsOnResponse(HTTPResponse res) {
+        res.setVersion(DEFAULT_RESPONSE_VERSION);
+        res.setHeader(HeaderField.CONTENT_TYPE, DEFAULT_RESPONSE_CONTENT_TYPE);
+        SimpleDateFormat dateFormatGmt = new SimpleDateFormat(RESPONSE_DATE_FORMAT);
+        dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
+        res.setHeader(HeaderField.DATE, dateFormatGmt.format(new Date()));
     }
 
 }

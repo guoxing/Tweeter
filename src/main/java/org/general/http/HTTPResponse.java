@@ -47,9 +47,6 @@ public class HTTPResponse {
         StatusMessage.put(StatusCode.NOT_FOUND, "Not Found");
         StatusMessage.put(StatusCode.SERVER_ERROR, "Interal Server Error");
     }
-    private static final String DEFAULT_VERSION = "HTTP/1.1";
-    private static final String DEFAULT_CONTENT_TYPE = "application/json;charset=UTF-8";
-    private static final String DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss z";
 
     private PrintWriter out;
     private StatusCode statusCode;
@@ -64,13 +61,10 @@ public class HTTPResponse {
         headers = new HashMap<String, String>();
         headers.put(HeaderField.SERVER, serverName);
         sent = false;
-        setDefaultFields();
     }
-
-    private void setDefaultFields() {
-        version = DEFAULT_VERSION;
-        headers.put(HeaderField.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
-        headers.put(HeaderField.CONTENT_TYPE, DEFAULT_CONTENT_TYPE);
+    
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public void setHeader(String key, String value) {
@@ -84,10 +78,6 @@ public class HTTPResponse {
         }
         this.statusCode = code;
         this.body = body;
-        // set date header
-        SimpleDateFormat dateFormatGmt = new SimpleDateFormat(DATE_FORMAT);
-        dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
-        headers.put(HeaderField.DATE, dateFormatGmt.format(new Date()));
 
         // set content-length
         headers.put(HeaderField.CONTENT_LENGTH, Integer.toString(body.length()));

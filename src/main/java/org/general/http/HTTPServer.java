@@ -17,15 +17,8 @@ public abstract class HTTPServer {
     // server name
     public String name;
 
-    private static int DEFAULT_PORT = 8080;
-
     private ServerSocket ss;
     private int port;
-    
-
-    protected HTTPServer(String name) {
-        this(DEFAULT_PORT, name);
-    }
 
     protected HTTPServer(int port, String name) {
         this.port = port;
