@@ -13,14 +13,25 @@ public class URLDecoder {
         int pos = -1;
         for (char c : in.toCharArray()) {
             if (c == '%') {
+                if (pos >= 0) {
+                    sb.append(temp.toString());
+                    temp = new StringBuilder();
+                }
                 pos = 0;
             }
             if (pos >= 0) {
                 temp.append(c);
                 pos++;
                 if (pos == 3) {
-                    char decoded = (char) Integer.parseInt(temp.substring(1),
-                            16);
+                    char decoded = 0;
+                    try {
+                        int code = Integer.parseInt(temp.substring(1), 16);
+                        if (code >= 32 && code <= 255) {
+                            decoded = (char) code;
+                        }
+                    } catch (NumberFormatException e) {
+                        // invalid, ignore and move on
+                    }
                     if (decoded >= 32) {
                         sb.append(decoded);
                     } else {

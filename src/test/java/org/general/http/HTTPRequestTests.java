@@ -37,7 +37,7 @@ public class HTTPRequestTests {
         try {
             req = generateRequest(HTTPRequest.Method.POST
                     + " /path/to/resource?id=122 " + DEFAULT_VERSION + "\n",
-                    "id=123&name=Guoxing%20Li");
+                    "id=123&name=Guoxing%%20Li");
         } catch (Exception e) {
             e.printStackTrace();
             fail("Initialization fails.");
@@ -46,7 +46,7 @@ public class HTTPRequestTests {
         assertEquals(req.getURI(), "/path/to/resource");
         assertEquals(req.getHeaders().get("Host"), "www.google.com");
         assertEquals(req.getQueryParams().get("id"), "123");
-        assertEquals(req.getQueryParams().get("name"), "Guoxing Li");
+        assertEquals(req.getQueryParams().get("name"), "Guoxing% Li");
     }
 
     @Test
