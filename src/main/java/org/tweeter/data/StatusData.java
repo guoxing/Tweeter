@@ -91,7 +91,7 @@ public class StatusData extends AppData {
         if (ownershipCache.get(userId) == null) {
             ownershipCache.put(userId, new ArrayList<Long>());
         }
-        ownershipCache.get(userId).add(status.getStatusId());
+        ownershipCache.get(userId).add(0, status.getStatusId());
 
         // write to disk
         appendToFile(toEntry(status));
