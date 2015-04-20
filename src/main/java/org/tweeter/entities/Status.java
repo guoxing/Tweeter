@@ -8,7 +8,8 @@ import org.general.json.JSONObject;
 import org.general.json.JSONSerializable;
 
 /**
- * Represents a status.
+ * Represents a status. A status is not modifiable after creation to avoid
+ * arbitrary modification on status data in cache.
  * 
  * @author Guoxing Li
  *
