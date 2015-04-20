@@ -3,9 +3,9 @@ package org.general.json;
 import java.util.HashMap;
 
 /**
- * Abstract class that represents a JSON object. The interface of
- * this class permits one only to retrieve (not modify) the JSON representation
- * of an instance using its toString method.
+ * Abstract class that represents a JSON object. The interface of this class
+ * permits one only to retrieve (not modify) the JSON representation of an
+ * instance using its toString method.
  * 
  * See http://json.org/ for more details on JSON formatting.
  * 
@@ -13,13 +13,12 @@ import java.util.HashMap;
  *
  */
 public abstract class JSONObject {
-	/**
-	 * Classes that subclass off of this must provide an implementation
-	 * for a toString method that returns a string that adheres to valid
-	 * JSON formatting.
-	 */
-    
-	
+    /**
+     * Classes that subclass off of this must provide an implementation for a
+     * toString method that returns a string that adheres to valid JSON
+     * formatting.
+     */
+
     /**
      * Mapping from JSON characters that should be escaped to their appropriate
      * replacements. Static initializer sets up the hashmap for use in the
@@ -49,16 +48,16 @@ public abstract class JSONObject {
     /**
      * Returns string form of object that adheres to JSON format.
      * 
-     * Rules:
-     * 	 If object is a string, will replace special characters (see escapeChars)
-     * 	 and wrap string in double quotes
-     * 	
-     * 	 If object is null, will return "null" (note this is a non-empty String of 4
-     * 	 characters, and not a null value)
+     * Rules: If object is a string, will replace special characters (see
+     * escapeChars) and wrap string in double quotes
      * 
-     *   Else, simply returns the return value of the object's toString method.
+     * If object is null, will return "null" (note this is a non-empty String of
+     * 4 characters, and not a null value)
      * 
-     * @param val Object to be escaped
+     * Else, simply returns the return value of the object's toString method.
+     * 
+     * @param val
+     *            Object to be escaped
      * @return json-escaped string form of object
      */
     public static String jsonEscape(Object val) {
@@ -76,7 +75,8 @@ public abstract class JSONObject {
      * their replacements) to return a string with these characters replaced
      * appropriately.
      * 
-     * @param str String to be escaped
+     * @param str
+     *            String to be escaped
      * @return escaped string
      */
     private static String replaceSpecialChars(String str) {
@@ -85,7 +85,7 @@ public abstract class JSONObject {
         }
         return str;
     }
-    
+
     /**
      * Subclasses must implement equals method.
      */

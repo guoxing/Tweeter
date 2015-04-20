@@ -56,7 +56,7 @@ public abstract class HTTPServer {
             s.close();
         }
     }
-    
+
     protected abstract void handle(HTTPRequest req, HTTPResponse res);
 
     public void shutdown() throws IOException {

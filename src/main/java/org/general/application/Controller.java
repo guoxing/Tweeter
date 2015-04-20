@@ -105,34 +105,35 @@ public abstract class Controller {
 
         return val;
     }
-    
+
     /**
-     * Respond with JSON formed as:
-     * {"error": "OK"}
+     * Respond with JSON formed as: {"error": "OK"}
      * 
      * Where the message is the string form of the StatusCode passed in.
+     * 
      * @param code
-     *              Status code of response
+     *            Status code of response
      * @param res
-     *              HTTP Response
+     *            HTTP Response
      */
     public static void respondWithJSONError(StatusCode code, HTTPResponse res) {
         respondWithJSONError(code, code.getMessage(), res);
     }
-    
+
     /**
-     * Respond with JSON formed as:
-     * {"error": "Message here"}
+     * Respond with JSON formed as: {"error": "Message here"}
      * 
      * Where the message is the errorMessage passed in.
+     * 
      * @param code
-     *              Status code of response
+     *            Status code of response
      * @param errorMessage
-     *              Message to include in JSON response
+     *            Message to include in JSON response
      * @param res
-     *              HTTP Response
+     *            HTTP Response
      */
-    public static void respondWithJSONError(StatusCode code, String errorMessage, HTTPResponse res) {
+    public static void respondWithJSONError(StatusCode code,
+            String errorMessage, HTTPResponse res) {
         JSONMap json = new JSONMap();
         json.put("error", errorMessage);
         res.send(code, json.toString());

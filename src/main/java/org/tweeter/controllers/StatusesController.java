@@ -19,14 +19,13 @@ import org.tweeter.entities.Status;
 /**
  * In charge of API endpoints regarding users' statuses.
  * 
- * On failure of any of this classes methods, will respond with
- * JSON formatted as such:
+ * On failure of any of this classes methods, will respond with JSON formatted
+ * as such:
  * 
  * {"error": "Error message here"}
  * 
- * with an HTTP Status code of StatusCode.BAD_REQUEST if the parameters
- * passed in are malformed, or StatusCode.SERVER_ERROR if an internal
- * error occurs.
+ * with an HTTP Status code of StatusCode.BAD_REQUEST if the parameters passed
+ * in are malformed, or StatusCode.SERVER_ERROR if an internal error occurs.
  * 
  * @author marcelpuyat
  *
@@ -72,8 +71,8 @@ public class StatusesController extends Controller {
      * Parameters must include a user_id (which must be parsable into a long)
      * and a status.
      * 
-     * Will respond with an empty JSON object as a result on success, or a message
-     * with an error (and a corresponding response status) on failure.
+     * Will respond with an empty JSON object as a result on success, or a
+     * message with an error (and a corresponding response status) on failure.
      * 
      * @param params
      *            Parameters that must include the keys "user_id" and "status"
@@ -101,8 +100,9 @@ public class StatusesController extends Controller {
     }
 
     /**
-     * Responds with the home timeline (in json) of a given user. The home timeline includes
-     * statuses of all the user's friends and the user's own statuses.
+     * Responds with the home timeline (in json) of a given user. The home
+     * timeline includes statuses of all the user's friends and the user's own
+     * statuses.
      * 
      * See generateJSONOfTweets method for format of JSON object returned.
      * 
@@ -111,14 +111,16 @@ public class StatusesController extends Controller {
      * max number of tweets to get and a max_id to indicate the max id of any
      * status to be retrieved.
      * 
-     * @param params 
-     *             Parameters that must include the key "user_id" and may
-     *             include "count" and "max_id"
-     * @param res 
-     *             HTTP request
+     * @param params
+     *            Parameters that must include the key "user_id" and may include
+     *            "count" and "max_id"
+     * @param res
+     *            HTTP request
      */
-    public static void getHomeTimeline(Map<String, String> params, HTTPResponse res) {
-    	Logger.log("Returning JSON of home timeline of " + params.get(PARAMS_MY_ID_KEY));
+    public static void getHomeTimeline(Map<String, String> params,
+            HTTPResponse res) {
+        Logger.log("Returning JSON of home timeline of "
+                + params.get(PARAMS_MY_ID_KEY));
         Long userId = null;
         Long count = null;
         Long maxId = null;
@@ -151,8 +153,8 @@ public class StatusesController extends Controller {
     }
 
     /**
-     * Responds with the user timeline (in json) of a given user. The user timeline
-     * includes all the statuses of the user.
+     * Responds with the user timeline (in json) of a given user. The user
+     * timeline includes all the statuses of the user.
      * 
      * See generateJSONOfTweets method for format of JSON object returned.
      * 
@@ -161,11 +163,14 @@ public class StatusesController extends Controller {
      * number of tweets to get and a max_id to indicate the max id of any status
      * to be retrieved.
      * 
-     * @param params Parameters that must include the key "user_id" and may
-     * include "count" and "max_id"
+     * @param params
+     *            Parameters that must include the key "user_id" and may include
+     *            "count" and "max_id"
      */
-    public static void getUserTimeline(Map<String, String> params, HTTPResponse res) {
-    	Logger.log("Returning JSON of user timeline of " + params.get(PARAMS_MY_ID_KEY));
+    public static void getUserTimeline(Map<String, String> params,
+            HTTPResponse res) {
+        Logger.log("Returning JSON of user timeline of "
+                + params.get(PARAMS_MY_ID_KEY));
         Long userId = null;
         Long count = null;
         Long maxId = null;
@@ -194,16 +199,14 @@ public class StatusesController extends Controller {
 
     /**
      * Generates JSON List of statuses given a list of statuses (that should not
-     * be null). Will be of the form: 
+     * be null). Will be of the form:
      * 
-     * {"tweets": [ 
-     * {"id": 20115, "user": 84, "time": "Mon Oct 27 18:02:57 PDT 2014", 
-     * "text": "On my way home"},
-     * {"id": 18442, "user": 84, "time": "Sun Oct 26 20:52:35 PDT 2014", 
-     * "text": "Just saw a flying saucer!"}
-     *  ]} 
-     *  
-     *  with tweets in the same order as given in the list.
+     * {"tweets": [ {"id": 20115, "user": 84, "time":
+     * "Mon Oct 27 18:02:57 PDT 2014", "text": "On my way home"}, {"id": 18442,
+     * "user": 84, "time": "Sun Oct 26 20:52:35 PDT 2014", "text":
+     * "Just saw a flying saucer!"} ]}
+     * 
+     * with tweets in the same order as given in the list.
      * 
      * @param statuses
      *            List of statuses

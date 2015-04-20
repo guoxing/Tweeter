@@ -71,12 +71,9 @@ public class HTTPResponseTests {
                     clientSocket.getInputStream()));
 
             String line = reader.readLine();
-            assertEquals(
-                    line,
-                    defaultVersion + " "
-                            + HTTPResponse.StatusCode.OK.getNum()
-                            + " "
-                            + HTTPResponse.StatusCode.OK.getMessage());
+            assertEquals(line, defaultVersion + " "
+                    + HTTPResponse.StatusCode.OK.getNum() + " "
+                    + HTTPResponse.StatusCode.OK.getMessage());
             while (!line.isEmpty()) {
                 line = reader.readLine();
             }
@@ -101,7 +98,7 @@ public class HTTPResponseTests {
             String defaultVersion = "HTTP/1.1";
             res.setVersion(defaultVersion);
             JSONMap map = new JSONMap();
-            
+
             String errorMsg = "Params Error";
             map.put("ErrorMsg", errorMsg);
             res.send(HTTPResponse.StatusCode.BAD_REQUEST, map.toString());
@@ -109,17 +106,14 @@ public class HTTPResponseTests {
                     clientSocket.getInputStream()));
 
             String line = reader.readLine();
-            assertEquals(
-                    line,
-                    defaultVersion + " " + 
-                            + HTTPResponse.StatusCode.BAD_REQUEST.getNum()
-                            + " "
-                            + HTTPResponse.StatusCode.BAD_REQUEST.getMessage());
+            assertEquals(line, defaultVersion + " "
+                    + +HTTPResponse.StatusCode.BAD_REQUEST.getNum() + " "
+                    + HTTPResponse.StatusCode.BAD_REQUEST.getMessage());
             while (!line.isEmpty()) {
                 line = reader.readLine();
             }
             line = reader.readLine();
-            
+
             assertEquals(line, map.toString());
             receivedSocket.close();
             clientSocket.close();

@@ -18,14 +18,13 @@ import org.tweeter.data.FriendshipData;
 /**
  * In charge of API endpoints regarding friendships between users.
  * 
- * On failure of any of this classes methods, will respond with
- * JSON formatted as such:
+ * On failure of any of this classes methods, will respond with JSON formatted
+ * as such:
  * 
  * {"error": "Error message here"}
  * 
- * with an HTTP Status code of StatusCode.BAD_REQUEST if the parameters
- * passed in are malformed, or StatusCode.SERVER_ERROR if an internal
- * error occurs.
+ * with an HTTP Status code of StatusCode.BAD_REQUEST if the parameters passed
+ * in are malformed, or StatusCode.SERVER_ERROR if an internal error occurs.
  * 
  * @author marcelpuyat
  *
@@ -46,23 +45,23 @@ public class FriendshipsController extends Controller {
      * Creates a friendship from the long value in params associated with
      * "my_id" to the long value in params associated with "user_id".
      * 
-     * Will respond with an empty JSON object on success, or a message with an 
+     * Will respond with an empty JSON object on success, or a message with an
      * error (and a corresponding response status) otherwise.
      * 
      * If the friendship already exists, will still respond with empty JSON
      * object and success.
      * 
-     * @param params 
-     *              Map that should contain values for PARAMS_MY_ID_KEY 
-     *              and PARAMS_USER_ID_KEY. Should not be null.
-     * @param res 
-     *              HTTP Response
+     * @param params
+     *            Map that should contain values for PARAMS_MY_ID_KEY and
+     *            PARAMS_USER_ID_KEY. Should not be null.
+     * @param res
+     *            HTTP Response
      */
-    public static void createFriendship(Map<String, String> params, 
+    public static void createFriendship(Map<String, String> params,
             HTTPResponse res) {
-    	Logger.log("Creating friendship between " + 
-    			params.get(PARAMS_MY_ID_KEY) + " and " + 
-    	        params.get(PARAMS_USER_ID_KEY));
+        Logger.log("Creating friendship between "
+                + params.get(PARAMS_MY_ID_KEY) + " and "
+                + params.get(PARAMS_USER_ID_KEY));
         Long userId = null;
         Long friendId = null;
         try {
@@ -85,21 +84,23 @@ public class FriendshipsController extends Controller {
      * Deletes a friendship from the long value in params associated with
      * "my_id" to the long value in params associated with "user_id".
      * 
-     * Will respond with an empty JSON object on success, or a message with an 
+     * Will respond with an empty JSON object on success, or a message with an
      * error (and a corresponding response status) otherwise.
      * 
      * If the friendship did not exist, will still respond with empty JSON
      * object and success.
      * 
-     * @param params 
-     *              Map that should contain values for PARAMS_MY_ID_KEY 
-     *              and PARAMS_USER_ID_KEY. Should not be null. 
-     * @param res 
-     *              HTTP Response
+     * @param params
+     *            Map that should contain values for PARAMS_MY_ID_KEY and
+     *            PARAMS_USER_ID_KEY. Should not be null.
+     * @param res
+     *            HTTP Response
      */
-    public static void deleteFriendship(Map<String, String> params, HTTPResponse res) {
-    	Logger.log("Deleting friendship between " + 
-    			params.get(PARAMS_MY_ID_KEY) + " and " + params.get(PARAMS_USER_ID_KEY));
+    public static void deleteFriendship(Map<String, String> params,
+            HTTPResponse res) {
+        Logger.log("Deleting friendship between "
+                + params.get(PARAMS_MY_ID_KEY) + " and "
+                + params.get(PARAMS_USER_ID_KEY));
         Long userId = null;
         Long friendId = null;
         try {
@@ -120,9 +121,8 @@ public class FriendshipsController extends Controller {
     }
 
     /**
-     * On success, body of the response contains a JSONObject of the form:
-     * 		{ids: [1, 2, 3, etc...]}
-     * Returns {ids: []} if user has no followers.
+     * On success, body of the response contains a JSONObject of the form: {ids:
+     * [1, 2, 3, etc...]} Returns {ids: []} if user has no followers.
      * 
      * Params must contain a long value associated with PARAMS_USER_ID_KEY, or
      * response will contain error message and have a bad request status.
@@ -134,8 +134,8 @@ public class FriendshipsController extends Controller {
      *            HTTP Response
      */
     public static void getFollowers(Map<String, String> params, HTTPResponse res) {
-    	Logger.log("Getting followers JSON of " 
-    	        + params.get(PARAMS_USER_ID_KEY));
+        Logger.log("Getting followers JSON of "
+                + params.get(PARAMS_USER_ID_KEY));
         Long userId = null;
         List<Long> followerIds = new ArrayList<Long>();
         try {
@@ -154,8 +154,8 @@ public class FriendshipsController extends Controller {
     /**
      * Responds with JSON array of the friends of a given user.
      * 
-     * On success, body of the response contains a JSONObject of the form: {"ids":
-     * [1, 2, 3, etc...]} Returns {"ids": []} if user has no friends.
+     * On success, body of the response contains a JSONObject of the form:
+     * {"ids": [1, 2, 3, etc...]} Returns {"ids": []} if user has no friends.
      * 
      * Params must contain a long value associated with PARAMS_USER_ID_KEY, or
      * response will contain error message and have a bad request status.
@@ -167,7 +167,7 @@ public class FriendshipsController extends Controller {
      *            HTTP Response
      */
     public static void getFriends(Map<String, String> params, HTTPResponse res) {
-    	Logger.log("Getting friends JSON of " + params.get(PARAMS_USER_ID_KEY));
+        Logger.log("Getting friends JSON of " + params.get(PARAMS_USER_ID_KEY));
         Long userId = null;
         List<Long> friendIds = new ArrayList<Long>();
         try {

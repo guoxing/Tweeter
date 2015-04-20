@@ -15,20 +15,21 @@ public class HTTPResponse {
 
     // HTTP status code
     public enum StatusCode {
-        OK(200, "OK"),
-        BAD_REQUEST(400, "Bad Request"),
-        NOT_FOUND(404, "Not Found"),
-        SERVER_ERROR(500, "Internal Server Error");
-        
+        OK(200, "OK"), BAD_REQUEST(400, "Bad Request"), NOT_FOUND(404,
+                "Not Found"), SERVER_ERROR(500, "Internal Server Error");
+
         private int num;
         private String message;
+
         private StatusCode(int num, String message) {
             this.num = num;
             this.message = message;
         }
+
         public int getNum() {
             return this.num;
         }
+
         public String getMessage() {
             return this.message;
         }
@@ -52,7 +53,7 @@ public class HTTPResponse {
         headers.put(HeaderField.SERVER, serverName);
         sent = false;
     }
-    
+
     public void setVersion(String version) {
         this.version = version;
     }
@@ -66,7 +67,7 @@ public class HTTPResponse {
             // Prevents re-sending of the same response
             return false;
         }
-        
+
         if (this.version == null) {
             throw new NullPointerException("HTTP version must be set "
                     + "before sending");
@@ -77,7 +78,7 @@ public class HTTPResponse {
         if (code == null) {
             throw new NullPointerException("HTTP Status Code cannot be null");
         }
-        
+
         // set content-length
         headers.put(HeaderField.CONTENT_LENGTH, Integer.toString(body.length()));
 

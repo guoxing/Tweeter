@@ -1,6 +1,5 @@
 package org.general.data;
 
-
 /**
  * Encoder used to encode entries to file storage.
  *

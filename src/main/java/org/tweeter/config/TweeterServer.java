@@ -43,22 +43,22 @@ public class TweeterServer extends HTTPServer {
      *             Thrown if there is a problem
      */
     public static void main(String[] args) throws IOException {
-    	
-    	Map<String, String> argOptions = parseArgumentOptions(args);
-    	if (argOptions.containsKey(HELP_OPTION)) {
-    		System.out.println("-port port_number\n-workspace path");
-    		return;
-    	}
-    	if (argOptions.containsKey(WORKSPACE_OPTION)) {
-    		AppData.setPathToWorkspace(argOptions.get(WORKSPACE_OPTION));
-    	}
-    	if (argOptions.containsKey(PORT_OPTION)) {
-    		server = new TweeterServer(Integer.parseInt(argOptions.get(PORT_OPTION)),
-    				DEFAULT_SERVER_NAME);
-    	} else {
-    		server = new TweeterServer("Tweeter/1.0");
-    	}
-    	
+
+        Map<String, String> argOptions = parseArgumentOptions(args);
+        if (argOptions.containsKey(HELP_OPTION)) {
+            System.out.println("-port port_number\n-workspace path");
+            return;
+        }
+        if (argOptions.containsKey(WORKSPACE_OPTION)) {
+            AppData.setPathToWorkspace(argOptions.get(WORKSPACE_OPTION));
+        }
+        if (argOptions.containsKey(PORT_OPTION)) {
+            server = new TweeterServer(Integer.parseInt(argOptions
+                    .get(PORT_OPTION)), DEFAULT_SERVER_NAME);
+        } else {
+            server = new TweeterServer("Tweeter/1.0");
+        }
+
         try {
             server.start();
         } catch (IOException e) {
@@ -83,16 +83,17 @@ public class TweeterServer extends HTTPServer {
         }
         return argOptions;
     }
-    
+
     protected void handle(HTTPRequest req, HTTPResponse res) {
         setDefaultsOnResponse(res);
         Router.route(req, res);
     }
-    
+
     private void setDefaultsOnResponse(HTTPResponse res) {
         res.setVersion(DEFAULT_RESPONSE_VERSION);
         res.setHeader(HeaderField.CONTENT_TYPE, DEFAULT_RESPONSE_CONTENT_TYPE);
-        SimpleDateFormat dateFormatGmt = new SimpleDateFormat(RESPONSE_DATE_FORMAT);
+        SimpleDateFormat dateFormatGmt = new SimpleDateFormat(
+                RESPONSE_DATE_FORMAT);
         dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
         res.setHeader(HeaderField.DATE, dateFormatGmt.format(new Date()));
     }

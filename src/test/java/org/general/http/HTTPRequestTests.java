@@ -54,7 +54,7 @@ public class HTTPRequestTests {
         try {
             // Test where there is no space between method and path
             @SuppressWarnings("unused")
-			HTTPRequest req = generateRequest(HTTPRequest.Method.POST
+            HTTPRequest req = generateRequest(HTTPRequest.Method.POST
                     + "/path  " + DEFAULT_VERSION + "\n", "name=Guoxing Li");
         } catch (Exception e) {
             // Should enter this

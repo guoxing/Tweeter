@@ -1,6 +1,5 @@
 package org.general.data;
 
-
 /**
  * Decoder used to decode entries from file storage.
  *
