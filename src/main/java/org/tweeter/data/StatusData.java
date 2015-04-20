@@ -190,6 +190,13 @@ public class StatusData extends AppData {
 
         // number of userIds that finished searching
         int searched = 0;
+        for (int i = 0; i < userIds.size(); ++i) {
+            if (positions.get(i) >= statusIds.get(i).size()) {
+                // hit the end, finished searching
+                searched++;
+                positions.set(i, -1);
+            }
+        }
         // use a merge sort like approach to select at most #numStatues ids
         while (res.size() < numStatuses && searched < userIds.size()) {
             int maxIdx = -1;
