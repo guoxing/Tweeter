@@ -102,6 +102,7 @@ public class FriendshipData extends AppData {
      * @param userId
      * @return A set of ids which is a clone of the original set in cache
      */
+    @SuppressWarnings("unchecked")
     public Set<Long> getUserFollowers(long userId) {
         Logger.log("Getting followers of " + userId);
         HashSet<Long> res = (HashSet<Long>) followerCache.get(userId);
