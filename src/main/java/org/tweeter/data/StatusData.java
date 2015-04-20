@@ -81,8 +81,10 @@ public class StatusData extends AppData {
         // evict older status in cache if cache is full
         if (statusCache.size() >= STATUS_CACHE_SIZE) {
             long evictId = currentId - STATUS_CACHE_SIZE;
+            Logger.log("[Log]: StatusData Cache evict status: " + evictId);
             if (statusCache.remove(evictId) == null) {
-                Logger.log("[Error]: Cache corrupted");
+                Logger.log("[Error]: Cache corruption, failure to evict "
+                        + evictId);
             }
         }
         statusCache.put(currentId, status);
