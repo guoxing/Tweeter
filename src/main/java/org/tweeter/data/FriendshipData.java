@@ -156,12 +156,12 @@ public class FriendshipData extends AppData {
     public void recover() throws IOException, InvalidDataFormattingException {
         followingCache = new HashMap<Long, Set<Long>>();
         followerCache = new HashMap<Long, Set<Long>>();
-        ForwardReader fr;
-        fr = getForwardReader();
+        ForwardReader fr = getForwardReader();
         List<String> entry;
         while ((entry = fr.readEntry()) != null) {
             replayEntry(entry);
         }
+        fr.close();
     }
 
     private static final String FRIENDSHIP_INVALID_DATA_MSG = "Log entry for friendship must have 3 "
