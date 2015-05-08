@@ -71,11 +71,8 @@ public class FriendshipData {
      */
     public Set<Long> getUserFriends(long userId) {
         Logger.log("Getting friends of " + userId);
-        Set<Long> res = friendCache.get(userId);
-        if (res == null) {
-            res = new HashSet<Long>();
-        }
-        return Collections.unmodifiableSet(res);
+        return Collections.unmodifiableSet(friendCache.getOrDefault(userId,
+                new HashSet<Long>()));
     }
 
     /**
@@ -88,11 +85,8 @@ public class FriendshipData {
      */
     public Set<Long> getUserFollowers(long userId) {
         Logger.log("Getting followers of " + userId);
-        Set<Long> res = followerCache.get(userId);
-        if (res == null) {
-            res = new HashSet<Long>();
-        }
-        return Collections.unmodifiableSet(res);
+        return Collections.unmodifiableSet(followerCache.getOrDefault(userId,
+                new HashSet<Long>()));
     }
 
     /**
@@ -105,6 +99,9 @@ public class FriendshipData {
      */
     public void addFriend(Long userId, Long friendId) {
         Logger.log(friendId + " is now " + userId + "'s friend");
+        if (friendCache.get(userId).contains(friendId)) {
+            return;
+        }
         FriendshipEntry entry = new FriendshipEntry(FriendshipEntry.ACTION_ADD,
                 userId, friendId);
         storage.appendToFile(entry);
@@ -121,6 +118,9 @@ public class FriendshipData {
      */
     public void deleteFriend(Long userId, Long friendId) {
         Logger.log(friendId + " is no longer " + userId + "'s friend");
+        if (!friendCache.get(userId).contains(friendId)) {
+            return;
+        }
         FriendshipEntry entry = new FriendshipEntry(
                 FriendshipEntry.ACTION_REMOVE, userId, friendId);
         storage.appendToFile(entry);

@@ -99,9 +99,7 @@ public class StatusData {
             }
         }
         statusCache.put(maxStatusId, status);
-        if (ownershipCache.get(userId) == null) {
-            ownershipCache.put(userId, new ArrayList<Long>());
-        }
+        ownershipCache.putIfAbsent(userId, new ArrayList<Long>());
         ownershipCache.get(userId).add(0, status.getStatusId());
 
         // write to disk
@@ -148,19 +146,11 @@ public class StatusData {
         return result;
     }
 
-    public Set<Long> getStatusIdsOnUserId(long userId, long numStatuses) {
-        return getStatusIdsOnUserId(userId, numStatuses, maxStatusId);
-    }
-
     public Set<Long> getStatusIdsOnUserId(long userId, long numStatuses,
             long maxId) {
         Set<Long> userIds = new HashSet<Long>();
         userIds.add(userId);
         return getStatusIdsOnUserIds(userIds, numStatuses, maxId);
-    }
-
-    public Set<Long> getStatusIdsOnUserIds(Set<Long> userIds, long numStatuses) {
-        return getStatusIdsOnUserIds(userIds, numStatuses, maxStatusId);
     }
 
     /**
