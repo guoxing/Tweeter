@@ -4,11 +4,12 @@ import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.general.data.DataEntry;
-import org.general.json.JSONMap;
 import org.general.json.JSONObject;
-import org.general.json.JSONSerializable;
+import org.general.json.JSONObject.JSONSerializable;
 
 /**
  * Represents a status. A status is immutable after creation.
@@ -146,13 +147,13 @@ public class Status extends DataEntry implements JSONSerializable {
      * the status instance.
      */
     @Override
-    public JSONObject toJSON() {
-        JSONMap json = new JSONMap();
-        json.put("id", statusId);
-        json.put("user", userId);
-        json.put("text", text);
-        json.put("time", time);
-        return json;
+    public JSONObject toJsonObject() {
+        Map<String, JSONObject> map = new HashMap<>();
+        map.put("id", new JSONObject(statusId));
+        map.put("user", new JSONObject(userId));
+        map.put("text", new JSONObject(text));
+        map.put("time", new JSONObject(time));
+        return new JSONObject(map);
     }
 
     @Override

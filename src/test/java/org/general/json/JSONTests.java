@@ -2,6 +2,12 @@ package org.general.json;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.general.json.JSONObject.JSONSerializable;
 import org.junit.Test;
 
 public class JSONTests {
@@ -11,30 +17,25 @@ public class JSONTests {
         private String name;
         private int age;
         private String address;
-        private String[] petNames;
+        private List<String> petNames;
 
         public JSONSerializablePerson(String name, int age, String address,
                 String... petNames) {
             this.age = age;
             this.name = name;
             this.address = address;
-            this.petNames = petNames;
+            this.petNames = Arrays.asList(petNames);
         }
 
         @Override
-        public JSONObject toJSON() {
-            JSONMap jsonMap = new JSONMap();
-            jsonMap.put("name", name);
-            jsonMap.put("age", age);
-            jsonMap.put("address", address);
-
-            JSONList petNamesList = new JSONList();
-            for (String petName : petNames) {
-                petNamesList.add(petName);
-            }
-
-            jsonMap.put("petNames", petNamesList);
-            return jsonMap;
+        public JSONObject toJsonObject() {
+            Map<String, JSONObject> map = new HashMap<>();
+            map.put("name", new JSONObject(name));
+            map.put("age", new JSONObject(age));
+            map.put("address", new JSONObject(address));
+            map.put("petNames", JSONObject.fromStrings(petNames));
+            
+            return new JSONObject(map);
         }
 
     }
@@ -50,18 +51,19 @@ public class JSONTests {
         JSONSerializablePerson person = new JSONSerializablePerson(TEST_NAME,
                 TEST_AGE, TEST_ADDRESS, TEST_PETNAME_ONE, TEST_PETNAME_TWO);
         JSONObject correctResult = createCorrectResult();
-        assertTrue(person.toJSON().equals(correctResult));
+        HashMap<String, String> str = new HashMap<>();
+        str.put("Marcel", "LOL");
+        HashMap<String, String> str2 = new HashMap<>();
+        str2.put("Marcel", "LOL");
+        assertTrue(person.toJsonObject().equals(correctResult));
     }
 
     private JSONObject createCorrectResult() {
-        JSONMap correctResult = new JSONMap();
-        correctResult.put("name", TEST_NAME);
-        correctResult.put("age", TEST_AGE);
-        correctResult.put("address", TEST_ADDRESS);
-        JSONList array = new JSONList();
-        array.add(TEST_PETNAME_ONE);
-        array.add(TEST_PETNAME_TWO);
-        correctResult.put("petNames", array);
-        return correctResult;
+        Map<String, JSONObject> correctResult = new HashMap<>();
+        correctResult.put("name", new JSONObject(TEST_NAME));
+        correctResult.put("age", new JSONObject(TEST_AGE));
+        correctResult.put("address", new JSONObject(TEST_ADDRESS));
+        correctResult.put("petNames", JSONObject.fromStrings(Arrays.asList(new String[]{TEST_PETNAME_ONE, TEST_PETNAME_TWO})));
+        return new JSONObject(correctResult);
     }
 }

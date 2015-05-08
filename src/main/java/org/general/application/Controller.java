@@ -1,10 +1,11 @@
 package org.general.application;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.general.http.HTTPResponse;
 import org.general.http.HTTPResponse.StatusCode;
-import org.general.json.JSONMap;
+import org.general.json.JSONObject;
 
 /**
  * Abstract class that is the base controller for application logic.
@@ -134,8 +135,8 @@ public abstract class Controller {
      */
     public static void respondWithJSONError(StatusCode code,
             String errorMessage, HTTPResponse res) {
-        JSONMap json = new JSONMap();
-        json.put("error", errorMessage);
-        res.send(code, json.toString());
+        Map<String, JSONObject> map = new HashMap<>();
+        map.put("error", new JSONObject(errorMessage));
+        res.send(code, new JSONObject(map).toJson());
     }
 }

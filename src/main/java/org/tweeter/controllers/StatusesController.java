@@ -1,15 +1,17 @@
 package org.tweeter.controllers;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.general.application.Controller;
 import org.general.http.HTTPResponse;
 import org.general.http.HTTPResponse.StatusCode;
-import org.general.json.JSONList;
-import org.general.json.JSONMap;
+import org.general.json.JSONObject;
 import org.general.logger.Logger;
 import org.tweeter.data.FriendshipData;
 import org.tweeter.data.Status;
@@ -91,7 +93,7 @@ public class StatusesController extends Controller {
             respondWithJSONError(StatusCode.BAD_REQUEST, e.getMessage(), res);
             return;
         }
-        res.send(StatusCode.OK, new JSONMap().toString());
+        res.send(StatusCode.OK, new JSONObject(new HashMap<>()).toJson());
     }
 
     /**
@@ -142,7 +144,7 @@ public class StatusesController extends Controller {
             return;
         }
 
-        res.send(StatusCode.OK, generateJSONOfTweets(statuses).toString());
+        res.send(StatusCode.OK, generateJSONOfTweets(statuses).toJson());
     }
 
     /**
@@ -183,7 +185,7 @@ public class StatusesController extends Controller {
             return;
         }
 
-        res.send(StatusCode.OK, generateJSONOfTweets(statuses).toString());
+        res.send(StatusCode.OK, generateJSONOfTweets(statuses).toJson());
     }
 
     /**
@@ -201,9 +203,9 @@ public class StatusesController extends Controller {
      *            List of statuses
      * @return JSON object of tweets formatted as described above
      */
-    private static JSONMap generateJSONOfTweets(List<Status> statuses) {
-        JSONMap tweets = new JSONMap();
-        tweets.put("tweets", JSONList.toJSONList(statuses));
-        return tweets;
+    private static JSONObject generateJSONOfTweets(List<Status> statuses) {
+        Map<String, JSONObject> tweets = new HashMap<>();
+        tweets.put("tweets", JSONObject.fromSerializables(statuses));
+        return new JSONObject(tweets);
     }
 }

@@ -1,14 +1,14 @@
 package org.tweeter.controllers;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.general.application.Controller;
 import org.general.http.HTTPResponse;
 import org.general.http.HTTPResponse.StatusCode;
-import org.general.json.JSONList;
-import org.general.json.JSONMap;
 import org.general.json.JSONObject;
 import org.general.logger.Logger;
 import org.tweeter.data.FriendshipData;
@@ -71,7 +71,7 @@ public class FriendshipsController extends Controller {
             respondWithJSONError(StatusCode.BAD_REQUEST, e.getMessage(), res);
             return;
         }
-        res.send(StatusCode.OK, new JSONMap().toString());
+        res.send(StatusCode.OK, new JSONObject(new HashMap<>()).toJson());
     }
 
     /**
@@ -107,7 +107,7 @@ public class FriendshipsController extends Controller {
             return;
         }
 
-        res.send(StatusCode.OK, new JSONMap().toString());
+        res.send(StatusCode.OK, new JSONObject(new HashMap<>()).toJson());
     }
 
     /**
@@ -138,7 +138,7 @@ public class FriendshipsController extends Controller {
             return;
         }
 
-        res.send(StatusCode.OK, generateJSONIdList(followerIds).toString());
+        res.send(StatusCode.OK, generateJSONIdList(followerIds).toJson());
     }
 
     /**
@@ -170,7 +170,7 @@ public class FriendshipsController extends Controller {
             return;
         }
 
-        res.send(StatusCode.OK, generateJSONIdList(friendIds).toString());
+        res.send(StatusCode.OK, generateJSONIdList(friendIds).toJson());
     }
 
     /**
@@ -181,13 +181,8 @@ public class FriendshipsController extends Controller {
      * @return
      */
     private static JSONObject generateJSONIdList(List<Long> ids) {
-        JSONMap jSONresponse = new JSONMap();
-        JSONList listOfIds = new JSONList();
-        for (Long id : ids) {
-            listOfIds.add(id);
-        }
-        jSONresponse.put("ids", listOfIds);
-
-        return jSONresponse;
+        Map<String, JSONObject> map = new HashMap<>();
+        map.put("ids", JSONObject.fromNumbers(ids));
+        return new JSONObject(map);
     }
 }

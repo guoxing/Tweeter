@@ -8,9 +8,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.general.json.JSONList;
-import org.general.json.JSONMap;
+import org.general.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,12 +51,12 @@ public class HTTPResponseTests {
         }
     }
 
-    private JSONList genJSONList() {
-        JSONList list = new JSONList();
+    private JSONObject genJSONList() {
+        List<Number> list = new ArrayList<>();
         list.add(100);
         list.add(200);
         list.add(300);
-        return list;
+        return JSONObject.fromNumbers(list);
     }
 
     @Test
@@ -65,7 +68,7 @@ public class HTTPResponseTests {
                     receivedSocket.getOutputStream(), "TestServer");
             String defaultVersion = "HTTP/1.1";
             res.setVersion(defaultVersion);
-            JSONList list = genJSONList();
+            JSONObject list = genJSONList();
             res.send(HTTPResponse.StatusCode.OK, list.toString());
             BufferedReader reader = new BufferedReader(new InputStreamReader(
                     clientSocket.getInputStream()));
@@ -97,11 +100,11 @@ public class HTTPResponseTests {
                     receivedSocket.getOutputStream(), "TestServer");
             String defaultVersion = "HTTP/1.1";
             res.setVersion(defaultVersion);
-            JSONMap map = new JSONMap();
-
-            String errorMsg = "Params Error";
-            map.put("ErrorMsg", errorMsg);
-            res.send(HTTPResponse.StatusCode.BAD_REQUEST, map.toString());
+            Map<String, JSONObject> map = new HashMap<>();
+            map.put("ErrorMsg", new JSONObject("Params Error"));
+            JSONObject jsonMap = new JSONObject(map);
+            
+            res.send(HTTPResponse.StatusCode.BAD_REQUEST, jsonMap.toJson());
             BufferedReader reader = new BufferedReader(new InputStreamReader(
                     clientSocket.getInputStream()));
 
@@ -114,7 +117,7 @@ public class HTTPResponseTests {
             }
             line = reader.readLine();
 
-            assertEquals(line, map.toString());
+            assertEquals(line, jsonMap.toJson());
             receivedSocket.close();
             clientSocket.close();
         } catch (IOException e) {
