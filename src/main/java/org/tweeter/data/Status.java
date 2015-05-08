@@ -1,20 +1,22 @@
-package org.tweeter.entities;
+package org.tweeter.data;
 
+import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
+import org.general.data.DataEntry;
 import org.general.json.JSONMap;
 import org.general.json.JSONObject;
 import org.general.json.JSONSerializable;
 
 /**
- * Represents a status. A status is not modifiable after creation to avoid
- * arbitrary modification on status data in cache.
+ * Represents a status. A status is immutable after creation.
  * 
  * @author Guoxing Li
  *
  */
-public class Status implements JSONSerializable {
+public class Status extends DataEntry implements JSONSerializable {
 
     /**
      * Date format wherein: <br>
@@ -56,6 +58,18 @@ public class Status implements JSONSerializable {
      * Max number of characters permitted in a status.
      */
     private static final int MAX_TWEET_LENGTH = 140;
+    private static final int MAX_DATE_LENGTH = 140;
+
+    // Entry size in bytes. Used for DataStorage.
+    // statusId + userId + text + date
+    public static final int ENTRY_SIZE = Long.BYTES + Long.BYTES
+            + MAX_TWEET_LENGTH + MAX_DATE_LENGTH;
+
+    /**
+     * Nullary constructor required by DataStorage.
+     */
+    public Status() {
+    }
 
     /**
      * Constructs a Status object, passing in the statusId, userId, text and
@@ -84,35 +98,6 @@ public class Status implements JSONSerializable {
         }
         this.text = text;
         this.time = dateFormat.format(time);
-    }
-
-    /**
-     * Constructs a Status object, passing in the statusId, userId, text and
-     * time.
-     * 
-     * Note that time here is passed in as a string of the form DATE_FORMAT (see
-     * comments of instance variable DATE_FORMAT above)
-     * 
-     * @param statusId
-     *            status id
-     * @param userId
-     *            user id
-     * @param text
-     *            status text
-     * @param time
-     *            time string
-     * @throws IllegalArgumentException
-     *             Thrown if length of text is greater than MAX_TWEET_LENGTH
-     */
-    public Status(long statusId, long userId, String text, String time) {
-        this.statusId = statusId;
-        this.userId = userId;
-        if (text.length() > MAX_TWEET_LENGTH) {
-            throw new IllegalArgumentException("Tweet must be at most "
-                    + MAX_TWEET_LENGTH + " characters (" + text + ")");
-        }
-        this.text = text;
-        this.time = time;
     }
 
     /**
@@ -169,4 +154,29 @@ public class Status implements JSONSerializable {
         json.put("time", time);
         return json;
     }
+
+    @Override
+    public void unmarshal(ByteBuffer in) {
+        checkValid(in, ENTRY_SIZE);
+        statusId = in.getLong();
+        userId = in.getLong();
+        text = readString(in, MAX_TWEET_LENGTH);
+        time = readString(in, MAX_DATE_LENGTH);
+    }
+
+    @Override
+    public ByteBuffer marshal() {
+        ByteBuffer out = ByteBuffer.allocate(ENTRY_SIZE);
+        out.putLong(statusId);
+        out.putLong(userId);
+        out.put(Arrays.copyOf(text.getBytes(), MAX_TWEET_LENGTH));
+        if (time.length() > MAX_DATE_LENGTH) {
+            throw new IllegalStateException(
+                    "Time string length is too large. Max: " + MAX_DATE_LENGTH
+                            + " Received: " + time.length());
+        }
+        out.put(Arrays.copyOf(time.getBytes(), MAX_DATE_LENGTH));
+        return out;
+    }
+
 }

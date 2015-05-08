@@ -1,5 +1,6 @@
 package org.tweeter.data;
 
+import java.io.IOError;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,10 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.general.data.AppData;
-import org.general.data.InvalidDataFormattingException;
+import org.general.data.DataStorage;
 import org.general.logger.Logger;
-import org.tweeter.entities.Status;
 
 /**
  * Singleton class to query/update status data.
@@ -21,19 +20,15 @@ import org.tweeter.entities.Status;
  * @author Guoxing Li
  *
  */
-public class StatusData extends AppData {
-
-    private static final int NUM_COLS_IN_ENTRY = 4;
-    private static final int ENTRY_STATUS_ID_IDX = 0;
-    private static final int ENTRY_USER_ID_IDX = 1;
-    private static final int ENTRY_TEXT_IDX = 2;
-    private static final int ENTRY_TIME_IDX = 3;
+public class StatusData {
 
     private static final String FILE_NAME = "status.db";
     private static final int STATUS_CACHE_SIZE = 1_000;
 
+    // persistent storage
+    private DataStorage<Status> storage;
     // the current maximum id
-    private long currentId;
+    private long maxStatusId;
     // caches most recent statuses, statusId -> status
     private Map<Long, Status> statusCache;
     // caches all status ownership information, userId -> list of statusId, list
@@ -42,8 +37,31 @@ public class StatusData extends AppData {
 
     private static StatusData statusData;
 
-    private StatusData() throws IOException, InvalidDataFormattingException {
-        super(FILE_NAME, NUM_COLS_IN_ENTRY);
+    private StatusData() {
+        storage = new DataStorage<Status>(FILE_NAME, Status.class,
+                Status.ENTRY_SIZE);
+        maxStatusId = -1;
+        // warm up cache
+        statusCache = new HashMap<Long, Status>();
+        ownershipCache = new HashMap<Long, List<Long>>();
+        DataStorage<Status>.EntryReader reader = storage.new EntryReader(true);
+        Status entry;
+        while ((entry = reader.readPrevious()) != null) {
+            if (statusCache.size() < STATUS_CACHE_SIZE) {
+                statusCache.put(entry.getStatusId(), entry);
+                if (entry.getStatusId() > maxStatusId) {
+                    maxStatusId = entry.getStatusId();
+                }
+            }
+            ownershipCache
+                    .putIfAbsent(entry.getUserId(), new ArrayList<Long>());
+            ownershipCache.get(entry.getUserId()).add(entry.getStatusId());
+        }
+        try {
+            reader.close();
+        } catch (IOException e) {
+            throw new IOError(e);
+        }
     }
 
     /**
@@ -53,12 +71,7 @@ public class StatusData extends AppData {
      */
     public static StatusData getInstance() {
         if (statusData == null) {
-            try {
-                statusData = new StatusData();
-            } catch (IOException | InvalidDataFormattingException e) {
-                e.printStackTrace();
-                throw new Error("Error in initializing StatusData");
-            }
+            statusData = new StatusData();
         }
         return statusData;
     }
@@ -72,29 +85,27 @@ public class StatusData extends AppData {
      * @param text
      *            status text
      * @throws IOException
-     * @throws InvalidDataFormattingException
      */
-    public void updateStatus(long userId, String text) throws IOException,
-            InvalidDataFormattingException {
-        currentId++;
-        Status status = new Status(currentId, userId, text, new Date());
+    public void updateStatus(long userId, String text) {
+        maxStatusId++;
+        Status status = new Status(maxStatusId, userId, text, new Date());
         // evict older status in cache if cache is full
         if (statusCache.size() >= STATUS_CACHE_SIZE) {
-            long evictId = currentId - STATUS_CACHE_SIZE;
+            long evictId = maxStatusId - STATUS_CACHE_SIZE;
             Logger.log("[Log]: StatusData Cache evict status: " + evictId);
             if (statusCache.remove(evictId) == null) {
                 Logger.log("[Error]: Cache corruption, failure to evict "
                         + evictId);
             }
         }
-        statusCache.put(currentId, status);
+        statusCache.put(maxStatusId, status);
         if (ownershipCache.get(userId) == null) {
             ownershipCache.put(userId, new ArrayList<Long>());
         }
         ownershipCache.get(userId).add(0, status.getStatusId());
 
         // write to disk
-        appendToFile(toEntry(status));
+        storage.appendToFile(status);
     }
 
     /**
@@ -102,14 +113,12 @@ public class StatusData extends AppData {
      * order. Ids don't have to be sorted.
      * 
      * @param ids
-     * @return A list of statuses.
-     * @throws IOException
-     * @throws InvalidDataFormattingException
+     * @return A list of statuses. Status will be missing if its id doesn't
+     *         exist.
      */
-    public List<Status> getStatuses(Set<Long> ids)
-            throws InvalidDataFormattingException, IOException {
+    public List<Status> getStatuses(Set<Long> ids) {
         List<Long> idList = new ArrayList<Long>(ids);
-        List<Status> list = new ArrayList<Status>(idList.size());
+        List<Status> result = new ArrayList<Status>(idList.size());
         Collections.sort(idList, Collections.reverseOrder());
         int i = 0;
         // fetch from cache if possible
@@ -119,27 +128,28 @@ public class StatusData extends AppData {
             if (status == null) {
                 break;
             }
-            list.add(status);
+            result.add(status);
             i++;
         }
-        // fetch from persistent storage
-        BackwardReader br = getBackwardReader();
-
-        List<String> entry;
-        while ((entry = br.readEntry()) != null && i < idList.size()) {
-            Status status = parseEntry(entry);
-            if (status.getStatusId() == idList.get(i)) {
-                list.add(status);
-                i++;
-            }
+        // fetch older statuses from persistent storage
+        DataStorage<Status>.EntryReader reader = storage.new EntryReader();
+        Status entry;
+        // assumes the n'th entry has id (n-1)
+        while (i < idList.size()
+                && (entry = reader.readAt(idList.get(i))) != null) {
+            result.add(entry);
+            i++;
         }
-        br.close();
-
-        return list;
+        try {
+            reader.close();
+        } catch (IOException e) {
+            throw new IOError(e);
+        }
+        return result;
     }
 
     public Set<Long> getStatusIdsOnUserId(long userId, long numStatuses) {
-        return getStatusIdsOnUserId(userId, numStatuses, currentId);
+        return getStatusIdsOnUserId(userId, numStatuses, maxStatusId);
     }
 
     public Set<Long> getStatusIdsOnUserId(long userId, long numStatuses,
@@ -150,7 +160,7 @@ public class StatusData extends AppData {
     }
 
     public Set<Long> getStatusIdsOnUserIds(Set<Long> userIds, long numStatuses) {
-        return getStatusIdsOnUserIds(userIds, numStatuses, currentId);
+        return getStatusIdsOnUserIds(userIds, numStatuses, maxStatusId);
     }
 
     /**
@@ -167,7 +177,7 @@ public class StatusData extends AppData {
      */
     public Set<Long> getStatusIdsOnUserIds(Set<Long> userIds, long numStatuses,
             long maxId) {
-        maxId = Math.min(currentId, maxId);
+        maxId = Math.min(maxStatusId, maxId);
         Set<Long> res = new HashSet<Long>();
         Set<Long> temp = new HashSet<Long>();
         for (long userId : userIds) {
@@ -222,47 +232,6 @@ public class StatusData extends AppData {
             }
         }
         return res;
-    }
-
-    @Override
-    public void recover() throws InvalidDataFormattingException, IOException {
-        statusCache = new HashMap<Long, Status>();
-        ownershipCache = new HashMap<Long, List<Long>>();
-        BackwardReader br = getBackwardReader();
-        List<String> entry;
-        while ((entry = br.readEntry()) != null) {
-            Status status = parseEntry(entry);
-            if (statusCache.size() < STATUS_CACHE_SIZE) {
-                statusCache.put(status.getStatusId(), status);
-                if (status.getStatusId() > currentId) {
-                    currentId = status.getStatusId();
-                }
-            }
-            List<Long> ids = ownershipCache.get(status.getUserId());
-            if (ids == null) {
-                ids = new ArrayList<Long>();
-                ownershipCache.put(status.getUserId(), ids);
-            }
-            ids.add(status.getStatusId());
-        }
-        br.close();
-    }
-
-    private static List<String> toEntry(Status status) {
-        List<String> entry = new ArrayList<String>();
-        entry.add(String.valueOf(status.getStatusId()));
-        entry.add(String.valueOf(status.getUserId()));
-        entry.add(status.getText());
-        entry.add(status.getTime());
-        return entry;
-    }
-
-    private static Status parseEntry(List<String> entry) {
-        long statusId = Long.parseLong(entry.get(ENTRY_STATUS_ID_IDX));
-        long userId = Long.parseLong(entry.get(ENTRY_USER_ID_IDX));
-        String text = entry.get(ENTRY_TEXT_IDX);
-        String time = entry.get(ENTRY_TIME_IDX);
-        return new Status(statusId, userId, text, time);
     }
 
 }

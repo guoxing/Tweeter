@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.general.data.AppData;
+import org.general.data.DataStorage;
 import org.general.http.HTTPRequest;
 import org.general.http.HTTPResponse;
 import org.general.http.HTTPResponse.HeaderField;
@@ -50,7 +50,7 @@ public class TweeterServer extends HTTPServer {
             return;
         }
         if (argOptions.containsKey(WORKSPACE_OPTION)) {
-            AppData.setPathToWorkspace(argOptions.get(WORKSPACE_OPTION));
+            DataStorage.setPathToWorkspace(argOptions.get(WORKSPACE_OPTION));
         }
         if (argOptions.containsKey(PORT_OPTION)) {
             server = new TweeterServer(Integer.parseInt(argOptions

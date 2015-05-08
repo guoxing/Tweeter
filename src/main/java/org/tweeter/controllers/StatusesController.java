@@ -1,6 +1,6 @@
 package org.tweeter.controllers;
 
-import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -8,13 +8,12 @@ import java.util.Set;
 import org.general.application.Controller;
 import org.general.http.HTTPResponse;
 import org.general.http.HTTPResponse.StatusCode;
-import org.general.data.InvalidDataFormattingException;
 import org.general.json.JSONList;
 import org.general.json.JSONMap;
 import org.general.logger.Logger;
 import org.tweeter.data.FriendshipData;
+import org.tweeter.data.Status;
 import org.tweeter.data.StatusData;
-import org.tweeter.entities.Status;
 
 /**
  * In charge of API endpoints regarding users' statuses.
@@ -91,10 +90,6 @@ public class StatusesController extends Controller {
             e.printStackTrace();
             respondWithJSONError(StatusCode.BAD_REQUEST, e.getMessage(), res);
             return;
-        } catch (IOException | InvalidDataFormattingException e) {
-            e.printStackTrace();
-            respondWithJSONError(StatusCode.SERVER_ERROR, res);
-            return;
         }
         res.send(StatusCode.OK, new JSONMap().toString());
     }
@@ -132,20 +127,18 @@ public class StatusesController extends Controller {
             maxId = getOptionalLongOrDefault(PARAMS_MAX_ID_KEY, params,
                     DEFAULT_MAX_ID);
 
-            Set<Long> homeTimelineUserIds = FriendshipData.getInstance()
+            Set<Long> friendIds = FriendshipData.getInstance()
                     .getUserFriends(userId);
-            homeTimelineUserIds.add(userId);
+            Set<Long> userIds = new HashSet<Long>();
+            userIds.addAll(friendIds);
+            userIds.add(userId);
 
             Set<Long> statusIds = StatusData.getInstance()
-                    .getStatusIdsOnUserIds(homeTimelineUserIds, count, maxId);
+                    .getStatusIdsOnUserIds(userIds, count, maxId);
             statuses = StatusData.getInstance().getStatuses(statusIds);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             respondWithJSONError(StatusCode.BAD_REQUEST, e.getMessage(), res);
-            return;
-        } catch (IOException | InvalidDataFormattingException e) {
-            e.printStackTrace();
-            respondWithJSONError(StatusCode.SERVER_ERROR, res);
             return;
         }
 
@@ -187,10 +180,6 @@ public class StatusesController extends Controller {
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             respondWithJSONError(StatusCode.BAD_REQUEST, e.getMessage(), res);
-            return;
-        } catch (IOException | InvalidDataFormattingException e) {
-            e.printStackTrace();
-            respondWithJSONError(StatusCode.SERVER_ERROR, res);
             return;
         }
 

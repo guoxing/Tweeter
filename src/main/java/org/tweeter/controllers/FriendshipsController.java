@@ -1,6 +1,5 @@
 package org.tweeter.controllers;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +7,6 @@ import java.util.Map;
 import org.general.application.Controller;
 import org.general.http.HTTPResponse;
 import org.general.http.HTTPResponse.StatusCode;
-import org.general.data.InvalidDataFormattingException;
 import org.general.json.JSONList;
 import org.general.json.JSONMap;
 import org.general.json.JSONObject;
@@ -72,10 +70,6 @@ public class FriendshipsController extends Controller {
             e.printStackTrace();
             respondWithJSONError(StatusCode.BAD_REQUEST, e.getMessage(), res);
             return;
-        } catch (IOException | InvalidDataFormattingException e) {
-            e.printStackTrace();
-            respondWithJSONError(StatusCode.SERVER_ERROR, res);
-            return;
         }
         res.send(StatusCode.OK, new JSONMap().toString());
     }
@@ -110,10 +104,6 @@ public class FriendshipsController extends Controller {
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             respondWithJSONError(StatusCode.BAD_REQUEST, e.getMessage(), res);
-            return;
-        } catch (IOException | InvalidDataFormattingException e) {
-            e.printStackTrace();
-            respondWithJSONError(StatusCode.SERVER_ERROR, res);
             return;
         }
 

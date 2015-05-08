@@ -1,14 +1,13 @@
 package org.tweeter.data;
 
+import java.io.IOError;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import org.general.data.AppData;
-import org.general.data.InvalidDataFormattingException;
+import org.general.data.DataStorage;
 import org.general.logger.Logger;
 
 /**
@@ -22,44 +21,33 @@ import org.general.logger.Logger;
  * @author marcelpuyat
  *
  */
-public class FriendshipData extends AppData {
+public class FriendshipData {
 
     private static final String FILE_NAME = "friend.db";
-    private static final int ENTRY_USER_ID_INDEX = 0;
-    private static final int ENTRY_FRIEND_ID_INDEX = 1;
-    private static final int ENTRY_ACTION_INDEX = 2;
-    private static final int NUM_COLS_IN_ENTRY = 3;
 
-    private HashMap<Long, Set<Long>> followingCache;
+    // persistent storage
+    private DataStorage<FriendshipEntry> storage;
+    private HashMap<Long, Set<Long>> friendCache;
     private HashMap<Long, Set<Long>> followerCache;
-
-    private enum FriendAction {
-        ADD(1), DELETE(0);
-
-        private int num;
-
-        private FriendAction(int num) {
-            this.num = num;
-        }
-
-        public static FriendAction parseAction(String str)
-                throws InvalidDataFormattingException {
-            switch (Integer.parseInt(str)) {
-            case 0:
-                return FriendAction.DELETE;
-            case 1:
-                return FriendAction.ADD;
-            default:
-                throw new InvalidDataFormattingException(
-                        "Action must be either 0 (for deletion) or 1 (for addition)");
-            }
-        }
-    }
 
     private static FriendshipData friendshipData;
 
-    private FriendshipData() throws IOException, InvalidDataFormattingException {
-        super(FILE_NAME, NUM_COLS_IN_ENTRY);
+    private FriendshipData() {
+        storage = new DataStorage<FriendshipEntry>(FILE_NAME,
+                FriendshipEntry.class, FriendshipEntry.ENTRY_SIZE);
+        // warm up cache
+        friendCache = new HashMap<Long, Set<Long>>();
+        followerCache = new HashMap<Long, Set<Long>>();
+        DataStorage<FriendshipEntry>.EntryReader reader = storage.new EntryReader();
+        FriendshipEntry entry;
+        while ((entry = reader.readNext()) != null) {
+            updateFriendshipCache(entry);
+        }
+        try {
+            reader.close();
+        } catch (IOException e) {
+            throw new IOError(e);
+        }
     }
 
     /**
@@ -69,45 +57,42 @@ public class FriendshipData extends AppData {
      */
     public static FriendshipData getInstance() {
         if (friendshipData == null) {
-            try {
-                friendshipData = new FriendshipData();
-            } catch (IOException | InvalidDataFormattingException e) {
-                e.printStackTrace();
-                throw new Error("Error on initializing FriendshipData");
-            }
+            friendshipData = new FriendshipData();
         }
         return friendshipData;
     }
 
     /**
-     * Returns list of ids of friends (followings) of the given user. Will be
-     * empty if the user has no friends.
+     * Returns set of ids of friends of the given user.
      * 
      * @param userId
-     * @return A set of ids which is a clone of the original set in cache
+     * @return A unmodifiable set of friend ids. Empty if the user has no
+     *         friends.
      */
-    @SuppressWarnings("unchecked")
     public Set<Long> getUserFriends(long userId) {
         Logger.log("Getting friends of " + userId);
-        HashSet<Long> res = (HashSet<Long>) followingCache.get(userId);
-        res = res == null ? new HashSet<Long>() : (HashSet<Long>) res.clone();
-        return res;
+        Set<Long> res = friendCache.get(userId);
+        if (res == null) {
+            res = new HashSet<Long>();
+        }
+        return Collections.unmodifiableSet(res);
     }
 
     /**
-     * Returns list of ids of followers (i.e. those users that have added this
-     * user as their friend) of the given user. Will be empty if the user has no
-     * followers.
+     * Returns a set of ids of followers (i.e. those users that have added this
+     * user as their friend) of the given user.
      * 
      * @param userId
-     * @return A set of ids which is a clone of the original set in cache
+     * @return A unmodifiable set of follower ids. Empty if the user has no
+     *         followers.
      */
-    @SuppressWarnings("unchecked")
     public Set<Long> getUserFollowers(long userId) {
         Logger.log("Getting followers of " + userId);
-        HashSet<Long> res = (HashSet<Long>) followerCache.get(userId);
-        res = res == null ? new HashSet<Long>() : (HashSet<Long>) res.clone();
-        return res;
+        Set<Long> res = followerCache.get(userId);
+        if (res == null) {
+            res = new HashSet<Long>();
+        }
+        return Collections.unmodifiableSet(res);
     }
 
     /**
@@ -117,18 +102,13 @@ public class FriendshipData extends AppData {
      * 
      * @param userId
      * @param friendId
-     * @throws InvalidDataFormattingException
-     * @throws IOException
      */
-    public void addFriend(Long userId, Long friendId) throws IOException,
-            InvalidDataFormattingException {
+    public void addFriend(Long userId, Long friendId) {
         Logger.log(friendId + " is now " + userId + "'s friend");
-
-        List<String> addFriendEntry = Arrays.asList(new String[] {
-                userId.toString(), friendId.toString(),
-                String.valueOf(FriendAction.ADD.num) });
-        appendToFile(addFriendEntry);
-        addFriendshipToCache(userId, friendId);
+        FriendshipEntry entry = new FriendshipEntry(FriendshipEntry.ACTION_ADD,
+                userId, friendId);
+        storage.appendToFile(entry);
+        updateFriendshipCache(entry);
     }
 
     /**
@@ -138,76 +118,33 @@ public class FriendshipData extends AppData {
      * 
      * @param userId
      * @param friendId
-     * @throws InvalidDataFormattingException
-     * @throws IOException
      */
-    public void deleteFriend(Long userId, Long friendId) throws IOException,
-            InvalidDataFormattingException {
+    public void deleteFriend(Long userId, Long friendId) {
         Logger.log(friendId + " is no longer " + userId + "'s friend");
-
-        List<String> deleteFriendEntry = Arrays.asList(new String[] {
-                userId.toString(), friendId.toString(),
-                String.valueOf(FriendAction.DELETE.num) });
-        appendToFile(deleteFriendEntry);
-        removeFriendshipFromCache(userId, friendId);
+        FriendshipEntry entry = new FriendshipEntry(
+                FriendshipEntry.ACTION_REMOVE, userId, friendId);
+        storage.appendToFile(entry);
+        updateFriendshipCache(entry);
     }
 
-    @Override
-    public void recover() throws IOException, InvalidDataFormattingException {
-        followingCache = new HashMap<Long, Set<Long>>();
-        followerCache = new HashMap<Long, Set<Long>>();
-        ForwardReader fr = getForwardReader();
-        List<String> entry;
-        while ((entry = fr.readEntry()) != null) {
-            replayEntry(entry);
-        }
-        fr.close();
-    }
-
-    private static final String FRIENDSHIP_INVALID_DATA_MSG = "Log entry for friendship must have 3 "
-            + "delimited values: userId (a 64-bit positive integer), friendId (a 64-bit positive integer), "
-            + "action (0 for remove, 1 for add)";
-
-    private void replayEntry(List<String> entry)
-            throws InvalidDataFormattingException {
-        Long userId;
-        Long friendId;
-        FriendAction action;
-        try {
-            userId = Long.parseLong(entry.get(ENTRY_USER_ID_INDEX));
-            friendId = Long.parseLong(entry.get(ENTRY_FRIEND_ID_INDEX));
-        } catch (Exception e) {
-            throw new InvalidDataFormattingException(
-                    FRIENDSHIP_INVALID_DATA_MSG);
-        }
-        action = FriendAction.parseAction(entry.get(ENTRY_ACTION_INDEX));
-
-        if (action == FriendAction.ADD) {
-            addFriendshipToCache(userId, friendId);
+    /*
+     * Update both friendCache and followerCache based on the passed in entry.
+     */
+    private void updateFriendshipCache(FriendshipEntry entry) {
+        if (entry.action == FriendshipEntry.ACTION_ADD) {
+            friendCache.putIfAbsent(entry.userId, new HashSet<Long>());
+            friendCache.get(entry.userId).add(entry.friendId);
+            followerCache.putIfAbsent(entry.friendId, new HashSet<Long>());
+            followerCache.get(entry.friendId).add(entry.userId);
         } else {
-            removeFriendshipFromCache(userId, friendId);
-        }
-    }
-
-    private void addFriendshipToCache(Long userId, Long friendId) {
-        if (followingCache.get(userId) == null) {
-            followingCache.put(userId, new HashSet<Long>());
-        }
-        followingCache.get(userId).add(friendId);
-        if (followerCache.get(friendId) == null) {
-            followerCache.put(friendId, new HashSet<Long>());
-        }
-        followerCache.get(friendId).add(userId);
-    }
-
-    private void removeFriendshipFromCache(Long userId, Long friendId) {
-        Set<Long> followingSet = followingCache.get(userId);
-        if (followingSet != null) {
-            followingSet.remove(friendId);
-        }
-        Set<Long> followerSet = followerCache.get(friendId);
-        if (followerSet != null) {
-            followerSet.remove(userId);
+            Set<Long> followingSet = friendCache.get(entry.userId);
+            if (followingSet != null) {
+                followingSet.remove(entry.friendId);
+            }
+            Set<Long> followerSet = followerCache.get(entry.friendId);
+            if (followerSet != null) {
+                followerSet.remove(entry.userId);
+            }
         }
     }
 }
