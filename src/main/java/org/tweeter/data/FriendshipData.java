@@ -99,7 +99,7 @@ public class FriendshipData {
      */
     public void addFriend(Long userId, Long friendId) {
         Logger.log(friendId + " is now " + userId + "'s friend");
-        if (friendCache.get(userId).contains(friendId)) {
+        if (friendCache.containsKey(userId) && friendCache.get(userId).contains(friendId)) {
             return;
         }
         FriendshipEntry entry = new FriendshipEntry(FriendshipEntry.ACTION_ADD,
@@ -118,7 +118,7 @@ public class FriendshipData {
      */
     public void deleteFriend(Long userId, Long friendId) {
         Logger.log(friendId + " is no longer " + userId + "'s friend");
-        if (!friendCache.get(userId).contains(friendId)) {
+        if (friendCache.containsKey(userId) && !friendCache.get(userId).contains(friendId)) {
             return;
         }
         FriendshipEntry entry = new FriendshipEntry(
