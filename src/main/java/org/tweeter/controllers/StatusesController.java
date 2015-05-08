@@ -1,12 +1,10 @@
 package org.tweeter.controllers;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.general.application.Controller;
 import org.general.http.HTTPResponse;
@@ -134,10 +132,8 @@ public class StatusesController extends Controller {
             Set<Long> userIds = new HashSet<Long>();
             userIds.addAll(friendIds);
             userIds.add(userId);
-
-            Set<Long> statusIds = StatusData.getInstance()
-                    .getStatusIdsOnUserIds(userIds, count, maxId);
-            statuses = StatusData.getInstance().getStatuses(statusIds);
+            statuses = StatusData.getInstance().getStatusesOnUserIds(userIds,
+                    count, maxId);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             respondWithJSONError(StatusCode.BAD_REQUEST, e.getMessage(), res);
@@ -176,9 +172,8 @@ public class StatusesController extends Controller {
                     DEFAULT_TIMELINE_SIZE);
             maxId = getOptionalLongOrDefault(PARAMS_MAX_ID_KEY, params,
                     DEFAULT_MAX_ID);
-            Set<Long> statusIds = StatusData.getInstance()
-                    .getStatusIdsOnUserId(userId, count, maxId);
-            statuses = StatusData.getInstance().getStatuses(statusIds);
+            statuses = StatusData.getInstance().getStatusesOnUserId(userId,
+                    count, maxId);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             respondWithJSONError(StatusCode.BAD_REQUEST, e.getMessage(), res);
