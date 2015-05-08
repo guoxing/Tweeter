@@ -35,7 +35,7 @@ public class DataStorage<Entry extends DataEntry> {
     /**
      * Construct a DataStorage with fixed entrySize.
      * 
-     * Example: StatusStorage storage =
+     * Example: {@literal DataStorage<Status>} storage =
      * {@literal new DataStorage<Status>("status.db", Status.class)}
      * 
      * @param filename
