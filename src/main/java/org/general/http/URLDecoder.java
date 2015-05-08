@@ -1,50 +1,36 @@
 package org.general.http;
 
 /**
- * URLDecoder.
+ * URLDecoder used to decode URL according to
+ * https://tools.ietf.org/html/rfc3986.
  *
  * @author Guoxing Li
  *
  */
 public class URLDecoder {
     public static String decode(String in) {
-        StringBuilder sb = new StringBuilder();
-        StringBuilder temp = new StringBuilder();
-        int pos = -1;
-        for (char c : in.toCharArray()) {
-            if (c == '%') {
-                if (pos >= 0) {
-                    sb.append(temp.toString());
-                    temp = new StringBuilder();
-                }
-                pos = 0;
-            }
-            if (pos >= 0) {
-                temp.append(c);
-                pos++;
-                if (pos == 3) {
-                    char decoded = 0;
+        StringBuilder result = new StringBuilder();
+        int pos = 0;
+        while (pos < in.length()) {
+            if (in.charAt(pos) == '%') {
+                if (pos + 2 < in.length()) {
                     try {
-                        int code = Integer.parseInt(temp.substring(1), 16);
+                        int code = Integer.parseInt(
+                                in.substring(pos + 1, pos + 3), 16);
                         if (code >= 32 && code <= 255) {
-                            decoded = (char) code;
+                            result.append((char) code);
+                            pos += 3;
+                            continue;
                         }
                     } catch (NumberFormatException e) {
                         // invalid, ignore and move on
                     }
-                    if (decoded >= 32) {
-                        sb.append(decoded);
-                    } else {
-                        sb.append(temp.toString());
-                    }
-                    pos = -1;
-                    temp = new StringBuilder();
                 }
-            } else {
-                sb.append(c);
             }
+            // normal character or failed on parsing, move on
+            result.append(in.charAt(pos));
+            pos++;
         }
-        sb.append(temp.toString());
-        return sb.toString();
+        return result.toString();
     }
 }
