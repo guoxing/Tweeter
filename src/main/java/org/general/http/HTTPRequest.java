@@ -1,6 +1,7 @@
 package org.general.http;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
@@ -49,17 +50,9 @@ public class HTTPRequest {
      * @param in
      * @throws Exception
      */
-    public HTTPRequest(InputStream in) throws Exception {
-        process(new BufferedReader(new InputStreamReader(in)));
-    }
-
-    /**
-     * Process the request, set the corresponding properties.
-     * 
-     * @throws Exception
-     */
-    private void process(BufferedReader in) throws Exception {
-        String requestLine = in.readLine();
+    public HTTPRequest(InputStream in) throws IOException {
+        BufferedReader inReader = new BufferedReader(new InputStreamReader(in));
+        String requestLine = inReader.readLine();
         String[] splited = requestLine.split("\\s+");
         method = Method.valueOf(splited[0]);
         absoluteURI = splited[1];
@@ -86,12 +79,12 @@ public class HTTPRequest {
 
         // populate headers
         headers = new HashMap<String, String>();
-        String line = in.readLine();
+        String line = inReader.readLine();
         while (line != null && !line.isEmpty()) {
             String key = line.split(":")[0].trim();
             String value = line.split(":")[1].trim();
             headers.put(key, value);
-            line = in.readLine();
+            line = inReader.readLine();
         }
 
         // process body
@@ -100,7 +93,7 @@ public class HTTPRequest {
             if (contentLength <= 0)
                 return;
             char[] bodyBuffer = new char[contentLength];
-            in.read(bodyBuffer, 0, contentLength);
+            inReader.read(bodyBuffer, 0, contentLength);
             String bodyAsString = URLDecoder.decode(String
                     .copyValueOf(bodyBuffer));
             if (bodyAsString != null && method.equals(Method.POST)) {
@@ -108,8 +101,8 @@ public class HTTPRequest {
             }
         }
     }
-
-    private void addQueryParams(String queryString) throws Exception {
+    
+    private void addQueryParams(String queryString) throws IOException {
         String[] queries = queryString.split("&");
         for (String query : queries) {
             String key = query.split("=")[0];

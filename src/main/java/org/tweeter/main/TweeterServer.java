@@ -41,7 +41,7 @@ public class TweeterServer extends HTTPServer {
      * @param args
      *            can include a port option, help option, and workspace option
      * @throws IOException
-     *             Thrown if there is a problem
+     *             Thrown if there is a problem shutting down server.
      */
     public static void main(String[] args) throws IOException {
 

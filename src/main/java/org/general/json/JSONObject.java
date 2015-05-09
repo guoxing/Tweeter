@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * TODO: update these comments
+ * An immutable class that represents JSON formatting.
  * 
  * See http://json.org/ for more details on JSON formatting.
  * 
@@ -21,7 +21,7 @@ public class JSONObject {
     }
     private Type type;
     
-    // Only one of these 4 will not be null, depending on the type of the JSONObject
+    // Only 1 of these 4 will not be null, depending on the type of the JSONObject
     private Map<String, JSONObject> map;
     private List<JSONObject> list;
     private String str;
@@ -30,7 +30,7 @@ public class JSONObject {
     public JSONObject(Number num) { this.type = Type.NUMBER; this.num = num; }
     public JSONObject(String str) { this.type = Type.STRING; this.str = str; }
     public JSONObject(Collection<? extends JSONObject> list) { 
-        this.type = Type.LIST; 
+        this.type = Type.LIST;
         this.list = new ArrayList<JSONObject>(list); 
     }
     public JSONObject(Map<String, ? extends JSONObject> map) { 
@@ -56,7 +56,7 @@ public class JSONObject {
     }
 
     /**
-     * TODO: Update comments
+     * Returns string form (in valid JSON formatting) of the internal object. 
      */
     public String toJson() {
         switch (type) {

@@ -35,14 +35,13 @@ public class Router {
      */
     private static Map<String, Pair<HTTPRequest.Method, ControllerMethod<HTTPRequest, JSONObject>>> routerMap = new HashMap<>();
     static {
-        addRoute("/statuses/update", HTTPRequest.Method.POST, StatusesController::updateStatus);
-        addRoute("/statuses/home_timeline.json", HTTPRequest.Method.GET, StatusesController::getHomeTimeline);
-        addRoute("/statuses/user_timeline.json", HTTPRequest.Method.GET, StatusesController::getUserTimeline);
-
-        addRoute("/friends/ids.json", HTTPRequest.Method.GET, FriendshipsController::getFriends);
-        addRoute("/followers/ids.json", HTTPRequest.Method.GET, FriendshipsController::getFollowers);
-        addRoute("/friendships/destroy", HTTPRequest.Method.POST, FriendshipsController::deleteFriendship);
-        addRoute("/friendships/create", HTTPRequest.Method.POST, FriendshipsController::createFriendship);
+        addRoute(HTTPRequest.Method.POST, "/statuses/update",            StatusesController::updateStatus);
+        addRoute(HTTPRequest.Method.GET,  "/statuses/home_timeline.json",StatusesController::getHomeTimeline);
+        addRoute(HTTPRequest.Method.GET,  "/statuses/user_timeline.json",StatusesController::getUserTimeline);
+        addRoute(HTTPRequest.Method.GET,  "/friends/ids.json",           FriendshipsController::getFriends);
+        addRoute(HTTPRequest.Method.GET,  "/followers/ids.json",         FriendshipsController::getFollowers);
+        addRoute(HTTPRequest.Method.POST, "/friendships/destroy",        FriendshipsController::deleteFriendship);
+        addRoute(HTTPRequest.Method.POST, "/friendships/create",         FriendshipsController::createFriendship);
     }
 
     /**
@@ -82,12 +81,13 @@ public class Router {
     /**
      * Assigns a particular HTTP method and controller method to an API endpoint path in our routerMap.
      */
-    private static void addRoute(String path, HTTPRequest.Method method, ControllerMethod<HTTPRequest, JSONObject> reqHandler) {
+    private static void addRoute(HTTPRequest.Method method, String path, ControllerMethod<HTTPRequest, JSONObject> reqHandler) {
+        /* This is a thin method that hides the ugly syntax for creating a pair of this type over and over
+           when creating routes */
         routerMap.put(path, new Pair<HTTPRequest.Method, ControllerMethod<HTTPRequest, JSONObject>>(method, reqHandler));
     }
     
-    private static void respondWithJSONError(StatusCode code,
-            String errorMessage, HTTPResponse res) {
+    private static void respondWithJSONError(StatusCode code, String errorMessage, HTTPResponse res) {
         Map<String, JSONObject> map = new HashMap<>();
         map.put("error", new JSONObject(errorMessage));
         res.send(code, new JSONObject(map).toJson());

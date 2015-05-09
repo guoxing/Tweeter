@@ -39,20 +39,15 @@ public abstract class HTTPServer {
 
             try {
                 request = new HTTPRequest(s.getInputStream());
-            } catch (Exception e) {
+            } catch (IOException e) {
                 e.printStackTrace();
                 response.send(HTTPResponse.StatusCode.BAD_REQUEST,
                         "Request is malformatted");
                 s.close();
                 continue;
             }
-            try {
-                handle(request, response);
-            } catch (Exception e) {
-                e.printStackTrace();
-                response.send(HTTPResponse.StatusCode.SERVER_ERROR,
-                        "Internal server error");
-            }
+            
+            handle(request, response);
             s.close();
         }
     }

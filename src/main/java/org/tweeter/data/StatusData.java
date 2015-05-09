@@ -57,11 +57,7 @@ public class StatusData {
             ownershipCache.putIfAbsent(entry.getUserId(), new TreeSet<Long>());
             ownershipCache.get(entry.getUserId()).add(entry.getStatusId());
         }
-        try {
-            reader.close();
-        } catch (IOException e) {
-            throw new IOError(e);
-        }
+        tryClosingReader(reader);
     }
 
     /**
@@ -173,6 +169,7 @@ public class StatusData {
      * @return A list of statuses. Status will be missing if its id doesn't
      *         exist.
      */
+    @SuppressWarnings("resource")
     private List<Status> getStatuses(NavigableSet<Long> statusIds) {
         if (statusIds.size() == 0) {
             return new ArrayList<Status>(0);
@@ -190,11 +187,7 @@ public class StatusData {
                 // assumes the n'th entry has id (n-1)
                 status = reader.readAt(currentStatusId);
                 if (status == null) {
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                        throw new IOError(e);
-                    }
+                    tryClosingReader(reader);
                     throw new IllegalArgumentException(
                             "StatusId out of range. Received id: "
                                     + currentStatusId + " . Range: [0, "
@@ -203,12 +196,19 @@ public class StatusData {
             }
             result.add(status);
         }
+        tryClosingReader(reader);
+        return result;
+    }
+    
+    /**
+     * Tries to close reader and upgrades IOException to a thrown IOError on failure.
+     */
+    private void tryClosingReader(DataStorage<Status>.EntryReader reader) {
         try {
             reader.close();
         } catch (IOException e) {
             throw new IOError(e);
         }
-        return result;
     }
 
 }
