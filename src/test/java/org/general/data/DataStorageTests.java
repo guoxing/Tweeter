@@ -3,6 +3,7 @@ package org.general.data;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -61,30 +62,33 @@ public class DataStorageTests {
     }
 
     @Test
-    public void testForwardReads() {
+    public void testForwardReads() throws IOException {
         DataStorage<TestFruitEntry>.EntryReader reader = storage.new EntryReader();
         TestFruitEntry entry = reader.readNext();
         assertEquals(entry, apple);
+        reader.close();
     }
 
     @Test
-    public void testBackwardReads() {
+    public void testBackwardReads() throws IOException {
         DataStorage<TestFruitEntry>.EntryReader reader = storage.new EntryReader(
                 true);
         TestFruitEntry entry = reader.readPrevious();
         assertEquals(entry, banana);
         entry = reader.readNext();
         assertEquals(entry, banana);
+        reader.close();
     }
 
     @Test
-    public void testRandomReads() {
+    public void testRandomReads() throws IOException {
         DataStorage<TestFruitEntry>.EntryReader reader = storage.new EntryReader();
         TestFruitEntry entry = reader.readAt(1);
         assertEquals(entry, orange);
         entry = reader.readNext();
         assertEquals(entry, banana);
         assertNull(reader.readNext());
+        reader.close();
     }
 
 }
