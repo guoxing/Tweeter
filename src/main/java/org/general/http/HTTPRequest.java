@@ -19,16 +19,12 @@ import java.util.regex.Pattern;
  *
  */
 public class HTTPRequest {
-
-    // HTTP methods
     public static enum Method {
-        GET("GET"),
-        POST("POST");
+        GET("GET"), POST("POST");
         private String str;
         private Method(String str) {
             this.str = str;
         }
-        @Override
         public String toString() {
             return str;
         }

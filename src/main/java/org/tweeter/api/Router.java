@@ -13,7 +13,10 @@ import org.general.util.Pair;
 
 /**
  * Responds to an HTTP request by routing the request to a particular controller's method.
+ * 
  * In Tweeter's current implementation, these responses will always be in JSON.
+ * 
+ * This class handles errors regarding invalid paths/HTTP methods & invalid params.
  * 
  * @author marcelpuyat
  *
@@ -35,6 +38,7 @@ public class Router {
         addRoute("/statuses/update", HTTPRequest.Method.POST, StatusesController::updateStatus);
         addRoute("/statuses/home_timeline.json", HTTPRequest.Method.GET, StatusesController::getHomeTimeline);
         addRoute("/statuses/user_timeline.json", HTTPRequest.Method.GET, StatusesController::getUserTimeline);
+
         addRoute("/friends/ids.json", HTTPRequest.Method.GET, FriendshipsController::getFriends);
         addRoute("/followers/ids.json", HTTPRequest.Method.GET, FriendshipsController::getFollowers);
         addRoute("/friendships/destroy", HTTPRequest.Method.POST, FriendshipsController::deleteFriendship);

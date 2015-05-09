@@ -75,7 +75,7 @@ public class JSONObject {
             }
             case STRING: return jsonEscape(str);
             case NUMBER: return String.valueOf(num);
-            default: return null;
+            default: return null; // Will never reach here bec type is always declared.
         }
     }
 
@@ -133,7 +133,7 @@ public class JSONObject {
         }
     }
     
-    // Convenience functions for generating a JSONObject of type list
+    // Convenience methods for generating a JSONObject of type list
     
     /**
      * Returns a JSONObject of type list given a list of objects that are JSONSerializable
@@ -154,7 +154,11 @@ public class JSONObject {
     }
     
     /**
-     * Returns a JSONObject of type list given a list of numbers
+     * Returns a JSONObject of type list given a list of numbers.
+     * 
+     * Note that although the body of this method is the same as
+     * that of fromStrings, they refer to different JSONObject::new
+     * methods and thus cannot be combined.
      */
     public static JSONObject fromNumbers(List<? extends Number> list) {
         return new JSONObject(list.stream()
