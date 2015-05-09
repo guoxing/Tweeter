@@ -1,27 +1,47 @@
-package org.tweeter.api;
+package org.tweeter.main;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
+import org.general.data.DataStorage;
 import org.general.http.HTTPRequest;
 import org.general.http.HTTPResponse;
-import org.general.http.HTTPResponse.StatusCode;
 import org.general.http.InvalidHttpParametersException;
+import org.general.http.HTTPResponse.HeaderField;
+import org.general.http.HTTPResponse.StatusCode;
+import org.general.http.HTTPServer;
 import org.general.json.JSONObject;
 import org.general.util.Logger;
 import org.general.util.Pair;
+import org.tweeter.controllers.FriendshipsController;
+import org.tweeter.controllers.StatusesController;
 
 /**
- * Responds to an HTTP request by routing the request to a particular controller's method.
- * 
- * In Tweeter's current implementation, these responses will always be in JSON.
- * 
- * This class handles errors regarding invalid paths/HTTP methods & invalid params.
- * 
+ * In charge of starting up an http server with passed in argument options, routing
+ * requests to appropriate controllers and handling all application errors.
  * @author marcelpuyat
  *
  */
-public class Router {
+public class Tweeter {
+
+    // Command line options
+    private static final String HELP_OPTION = "-help";
+    private static final String PORT_OPTION = "-port";
+    private static final String WORKSPACE_OPTION = "-workspace";
+    
+    // Default fields for http specific to Tweeter
+    private static final String DEFAULT_SERVER_NAME = "Tweeter/1.0";
+    private static int DEFAULT_PORT = 8080;
+    private static final String DEFAULT_RESPONSE_VERSION = "HTTP/1.1";
+    private static final String DEFAULT_RESPONSE_CONTENT_TYPE = "application/json;charset=UTF-8";
+    private static final String RESPONSE_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss z";
+    
+    private static HTTPServer server;
+    
     /**
      * To add a new API endpoint:
      * 1. Define a method in a controller that takes in an HTTPRequest and returns a JSONObject
@@ -45,6 +65,56 @@ public class Router {
     }
 
     /**
+     * Parses argument options and then starts up server.
+     * 
+     * @param args
+     *            can include a port option, help option, and workspace option
+     * @throws IOException
+     *             Thrown if there is a problem shutting down server. Stack trace
+     *             is printed.
+     */
+    public static void main(String[] args) throws IOException {
+
+        Map<String, String> argOptions = parseArgumentOptions(args);
+        if (argOptions.containsKey(HELP_OPTION)) {
+            System.out.println("-port port_number\n-workspace path");
+            return;
+        }
+        if (argOptions.containsKey(WORKSPACE_OPTION)) {
+            DataStorage.setPathToWorkspace(argOptions.get(WORKSPACE_OPTION));
+        }
+        if (argOptions.containsKey(PORT_OPTION)) {
+            server = new HTTPServer(Integer.parseInt(argOptions
+                    .get(PORT_OPTION)), DEFAULT_SERVER_NAME, Tweeter::handle);
+        } else {
+            server = new HTTPServer(DEFAULT_PORT, DEFAULT_SERVER_NAME, Tweeter::handle);
+        }
+
+        try {
+            server.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+            server.shutdown();
+        }
+    }
+
+    private static Map<String, String> parseArgumentOptions(String[] args) {
+        Map<String, String> argOptions = new HashMap<String, String>();
+        for (int i = 0; i < args.length; i += 2) {
+            if (args[i].equals(PORT_OPTION) && i + 1 < args.length) {
+                argOptions.put(PORT_OPTION, args[i + 1]);
+            }
+            if (args[i].equals(WORKSPACE_OPTION) && i + 1 < args.length) {
+                argOptions.put(WORKSPACE_OPTION, args[i + 1] + "/");
+            }
+            if (args[i].equals(HELP_OPTION)) {
+                argOptions.put(HELP_OPTION, "");
+            }
+        }
+        return argOptions;
+    }
+
+    /**
      * Routes the given request to a controller's method, receives the JSON response from
      * that method and responds with it.
      * 
@@ -53,7 +123,8 @@ public class Router {
      * @param res
      *            HTTP Response that the JSON response is sent over
      */
-    public static void route(HTTPRequest req, HTTPResponse res) {
+    private static void handle(HTTPRequest req, HTTPResponse res) {
+        setDefaultsOnResponse(res);
         String reqURI = req.getURI();
         HTTPRequest.Method httpMethod = req.getMethod();
         Logger.log(httpMethod + " " + req.getURI());
@@ -78,10 +149,20 @@ public class Router {
         }
     }
     
+    private static void setDefaultsOnResponse(HTTPResponse res) {
+        res.setVersion(DEFAULT_RESPONSE_VERSION);
+        res.setHeader(HeaderField.CONTENT_TYPE, DEFAULT_RESPONSE_CONTENT_TYPE);
+        SimpleDateFormat dateFormatGmt = new SimpleDateFormat(
+                RESPONSE_DATE_FORMAT);
+        dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
+        res.setHeader(HeaderField.DATE, dateFormatGmt.format(new Date()));
+    }
+    
     /**
      * Assigns a particular HTTP method and controller method to an API endpoint path in our routerMap.
      */
-    private static void addRoute(HTTPRequest.Method method, String path, ControllerMethod<HTTPRequest, JSONObject> reqHandler) {
+    private static void addRoute(HTTPRequest.Method method, String path, 
+            ControllerMethod<HTTPRequest, JSONObject> reqHandler) {
         /* This is a thin method that hides the ugly syntax for creating a pair of this type over and over
            when creating routes */
         routerMap.put(path, new Pair<HTTPRequest.Method, ControllerMethod<HTTPRequest, JSONObject>>(method, reqHandler));
@@ -100,7 +181,8 @@ public class Router {
      * 
      * Thanks, Java.
      */
-    private interface ControllerMethod<Req, Res> {
-        Res apply(Req req) throws InvalidHttpParametersException;
+    private interface ControllerMethod<ReqType, ResType> {
+        ResType apply(ReqType req) throws InvalidHttpParametersException;
     }
+    
 }

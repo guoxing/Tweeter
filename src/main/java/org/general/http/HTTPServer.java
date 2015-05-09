@@ -3,26 +3,30 @@ package org.general.http;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.function.BiConsumer;
 
 import org.general.util.Logger;
 
 /**
  * A generic HTTPServer that serves HTTPRequest and HTTPResponse.
+ * In charge of handling invalid HTTP formatting errors.
  *
  * @author Guoxing Li
  *
  */
-public abstract class HTTPServer {
+public class HTTPServer {
 
     // server name
     public String name;
 
     private ServerSocket ss;
     private int port;
+    private BiConsumer<HTTPRequest, HTTPResponse> httpHandler;
 
-    protected HTTPServer(int port, String name) {
+    public HTTPServer(int port, String name, BiConsumer<HTTPRequest, HTTPResponse> httpHandler) {
         this.port = port;
         this.name = name;
+        this.httpHandler = httpHandler;
     }
 
     public void start() throws IOException {
@@ -47,12 +51,10 @@ public abstract class HTTPServer {
                 continue;
             }
             
-            handle(request, response);
+            httpHandler.accept(request, response);
             s.close();
         }
     }
-
-    protected abstract void handle(HTTPRequest req, HTTPResponse res);
 
     public void shutdown() throws IOException {
         if (ss != null) {
