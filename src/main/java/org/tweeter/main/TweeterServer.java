@@ -1,4 +1,4 @@
-package org.tweeter.config;
+package org.tweeter.main;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -12,6 +12,7 @@ import org.general.http.HTTPRequest;
 import org.general.http.HTTPResponse;
 import org.general.http.HTTPResponse.HeaderField;
 import org.general.http.HTTPServer;
+import org.tweeter.api.Router;
 
 public class TweeterServer extends HTTPServer {
 
@@ -88,7 +89,7 @@ public class TweeterServer extends HTTPServer {
         setDefaultsOnResponse(res);
         Router.route(req, res);
     }
-
+    
     private void setDefaultsOnResponse(HTTPResponse res) {
         res.setVersion(DEFAULT_RESPONSE_VERSION);
         res.setHeader(HeaderField.CONTENT_TYPE, DEFAULT_RESPONSE_CONTENT_TYPE);

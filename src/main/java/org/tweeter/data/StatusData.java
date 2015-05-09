@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.general.data.DataStorage;
-import org.general.logger.Logger;
+import org.general.util.Logger;
 
 /**
  * Singleton class to query/update status data.

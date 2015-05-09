@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import org.general.logger.Logger;
+import org.general.util.Logger;
 
 /**
  * A generic HTTPServer that serves HTTPRequest and HTTPResponse.

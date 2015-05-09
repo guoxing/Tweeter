@@ -7,12 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.general.json.JSONObject.JSONSerializable;
+import org.general.json.JSONObject.JSONable;
 import org.junit.Test;
 
 public class JSONTests {
 
-    private class JSONSerializablePerson implements JSONSerializable {
+    private class JSONSerializablePerson implements JSONable {
 
         private String name;
         private int age;

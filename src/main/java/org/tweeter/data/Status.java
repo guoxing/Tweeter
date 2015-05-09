@@ -9,7 +9,7 @@ import java.util.Map;
 
 import org.general.data.DataEntry;
 import org.general.json.JSONObject;
-import org.general.json.JSONObject.JSONSerializable;
+import org.general.json.JSONObject.JSONable;
 
 /**
  * Represents a status. A status is immutable after creation.
@@ -17,7 +17,7 @@ import org.general.json.JSONObject.JSONSerializable;
  * @author Guoxing Li
  *
  */
-public class Status extends DataEntry implements JSONSerializable {
+public class Status extends DataEntry implements JSONable {
 
     /**
      * Date format wherein: <br>

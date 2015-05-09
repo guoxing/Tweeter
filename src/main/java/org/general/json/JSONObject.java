@@ -8,9 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Abstract class that represents a JSON object. The interface of this class
- * permits one only to retrieve (not modify) the JSON representation of an
- * instance using its toString method.
+ * TODO: update these comments
  * 
  * See http://json.org/ for more details on JSON formatting.
  * 
@@ -18,16 +16,9 @@ import java.util.stream.Collectors;
  *
  */
 public class JSONObject {
-    /**
-     * Classes that subclass off of this must provide an implementation for a
-     * toString method that returns a string that adheres to valid JSON
-     * formatting.
-     */
-    
     public static enum Type {
         LIST, MAP, NUMBER, STRING
     }
-    
     private Type type;
     
     // Only one of these 4 will not be null, depending on the type of the JSONObject
@@ -48,43 +39,43 @@ public class JSONObject {
     }
 
     /**
-     * Mapping from JSON characters that should be escaped to their appropriate
-     * replacements. Static initializer sets up the hashmap for use in the
-     * jsonEscape method.
+     * Mapping from characters (that are not unicode) that should be escaped 
+     * to their appropriate replacements. Static initializer sets up the hashmap
+     * for use in the jsonEscape method.
      */
-    private static HashMap<Character, String> escapeChars;
+    private static HashMap<Character, String> nonUnicodeEscapeChars;
     static {
-        escapeChars = new HashMap<Character, String>();
-        escapeChars.put('\b', "\\b");
-        escapeChars.put('\f', "\\f");
-        escapeChars.put('\n', "\\n");
-        escapeChars.put('\r', "\\r");
-        escapeChars.put('\t', "\\t");
-        escapeChars.put('\\', "\\\\");
-        escapeChars.put('\"', "\\\"");
+        nonUnicodeEscapeChars = new HashMap<Character, String>();
+        nonUnicodeEscapeChars.put('\b', "\\b");
+        nonUnicodeEscapeChars.put('\f', "\\f");
+        nonUnicodeEscapeChars.put('\n', "\\n");
+        nonUnicodeEscapeChars.put('\r', "\\r");
+        nonUnicodeEscapeChars.put('\t', "\\t");
+        nonUnicodeEscapeChars.put('\\', "\\\\");
+        nonUnicodeEscapeChars.put('\"', "\\\"");
     }
 
     /**
-     * Returns valid JSON as a string
+     * TODO: Update comments
      */
     public String toJson() {
         switch (type) {
-        case LIST: {
-            return "[" + list.stream()
-                    .map(JSONObject::toJson)
-                    .collect(Collectors.joining(", "))
-                    + "]";
-        }
-        case MAP: {
-            return "{" + map.keySet().stream()
-                    .map(key -> jsonEscape(key)+": "+map.get(key).toJson())
-                    .collect(Collectors.joining(", "))
-                    + "}";
-        }
-            
-        case STRING: return jsonEscape(str);
-        case NUMBER: return String.valueOf(num);
-        default: return null;
+            case LIST: {
+                return "[" + list.stream()
+                        .map(JSONObject::toJson)
+                        .collect(Collectors.joining(", "))
+                        + "]";
+            }
+            case MAP: {
+                return "{" + map.keySet().stream()
+                        .map(key -> 
+                            jsonEscape(key) + ": " + map.get(key).toJson())
+                        .collect(Collectors.joining(", "))
+                        + "}";
+            }
+            case STRING: return jsonEscape(str);
+            case NUMBER: return String.valueOf(num);
+            default: return null;
         }
     }
 
@@ -100,8 +91,8 @@ public class JSONObject {
         if (str == null) return "null";
         StringBuilder escapedString = new StringBuilder();
         for (char c : str.toCharArray()) {
-            if (escapeChars.containsKey(c)) {
-                escapedString.append(escapeChars.get(c));
+            if (nonUnicodeEscapeChars.containsKey(c)) {
+                escapedString.append(nonUnicodeEscapeChars.get(c));
             }
             else if (Character.isISOControl(c)) {
                 escapedString.append("\\u");
@@ -118,7 +109,7 @@ public class JSONObject {
      * @author marcelpuyat
      *
      */
-    public interface JSONSerializable {
+    public interface JSONable {
         public JSONObject toJsonObject();
     }
 
@@ -128,17 +119,17 @@ public class JSONObject {
         JSONObject otherAsJson = (JSONObject)other;
         if (otherAsJson.type != this.type) return false;
         switch (this.type) {
-        case NUMBER:
-            return this.num.equals(otherAsJson.num);
-        case STRING:
-            return this.str.equals(otherAsJson.str);
-        case LIST:
-            return this.list.equals(otherAsJson.list);
-        case MAP:
-            return this.map.equals(otherAsJson.map);
-        default:
-            // Should never reach here
-            return false;
+            case NUMBER:
+                return this.num.equals(otherAsJson.num);
+            case STRING:
+                return this.str.equals(otherAsJson.str);
+            case LIST:
+                return this.list.equals(otherAsJson.list);
+            case MAP:
+                return this.map.equals(otherAsJson.map);
+            default:
+                // Should never reach here
+                return false;
         }
     }
     
@@ -147,7 +138,7 @@ public class JSONObject {
     /**
      * Returns a JSONObject of type list given a list of objects that are JSONSerializable
      */
-    public static JSONObject fromSerializables(List<? extends JSONSerializable> list) {
+    public static JSONObject fromJSONables(List<? extends JSONable> list) {
         return new JSONObject(list.stream()
                 .map(jsonable -> jsonable.toJsonObject())
                 .collect(Collectors.toList()));

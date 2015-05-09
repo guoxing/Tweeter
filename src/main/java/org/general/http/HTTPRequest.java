@@ -10,6 +10,10 @@ import java.util.regex.Pattern;
 
 /**
  * A class that represents an HTTP request.
+ * 
+ * Provides utilities for retrieving required/optional parameters,
+ * throwing exceptions when parameters do not exist or are of
+ * invalid types.
  *
  * @author Guoxing Li
  *
@@ -17,9 +21,17 @@ import java.util.regex.Pattern;
 public class HTTPRequest {
 
     // HTTP methods
-    public static class Method {
-        public static final String GET = "GET";
-        public static final String POST = "POST";
+    public static enum Method {
+        GET("GET"),
+        POST("POST");
+        private String str;
+        private Method(String str) {
+            this.str = str;
+        }
+        @Override
+        public String toString() {
+            return str;
+        }
     }
 
     // URIREGEX is used to extract the path from an absolute URI
@@ -27,7 +39,7 @@ public class HTTPRequest {
     // QUERYREGEX is used to separate path and query string
     private static final String QUERYREGEX = "([^?]+)(?:\\?(.+))?";
 
-    private String method;
+    private Method method;
     private String absoluteURI;
     private String URI;
     @SuppressWarnings("unused")
@@ -53,7 +65,7 @@ public class HTTPRequest {
     private void process(BufferedReader in) throws Exception {
         String requestLine = in.readLine();
         String[] splited = requestLine.split("\\s+");
-        method = splited[0];
+        method = Method.valueOf(splited[0]);
         absoluteURI = splited[1];
         version = splited[2];
 
@@ -114,7 +126,7 @@ public class HTTPRequest {
         return headers;
     }
 
-    public String getMethod() {
+    public Method getMethod() {
         return method;
     }
 
@@ -136,6 +148,57 @@ public class HTTPRequest {
      */
     public Map<String, String> getQueryParams() {
         return queryParams;
+    }
+    
+    /**
+     * Returns value for long param associated with given key.
+     * @throws InvalidHttpParametersException if param does not exist or is not a number
+     */
+    public Long getRequiredLongParam(String key) throws InvalidHttpParametersException {
+        return getLongParam(key, null, true);
+    }
+    
+    /**
+     * Returns value for long param associated with given key if it exists, or default value if not.
+     * @throws InvalidHttpParametersException if param exists but is not a number
+     */
+    public Long getOptionalLongParam(String key, Long defaultValue) throws InvalidHttpParametersException {
+        return getLongParam(key, defaultValue, false);
+    }
+    
+    /**
+     * If isRequired is true, defaultValue is not used.
+     * If isRequired is false, defaultValue is returned if param does not exist.
+     * 
+     * @param key key for the param whose value is to be retrieved
+     * @param defaultValue value to return if isRequired is false
+     * @param isRequired if this is true, will throw exception if param does not exist
+     * @return the long value associated with the given key
+     * @throws InvalidHttpParametersException if the param is required and does not exist, or if the param
+     * exists but is not a number
+     */
+    private Long getLongParam(String key, Long defaultValue, boolean isRequired) throws InvalidHttpParametersException {
+        if (queryParams.get(key) == null) {
+            if (!isRequired) return defaultValue;
+            throw new InvalidHttpParametersException(key + " is a required parameter");
+        }
+        Long val;
+        try {
+            val = Long.parseLong(queryParams.get(key));
+        } catch (NumberFormatException e) {
+            throw new InvalidHttpParametersException(key
+                    + " must be a 64-bit integer. Invalid value given: " + queryParams.get(key));
+        }
+        return val;
+    }
+    
+    /**
+     * Returns value for string param associated with given key
+     * @throws InvalidHttpParametersException if param does not exist
+     */
+    public String getStringRequiredParam(String key) throws InvalidHttpParametersException {
+        if (queryParams.get(key) == null) throw new InvalidHttpParametersException(key + " is a required parameter");
+        return queryParams.get(key);
     }
 
     public String getAbsoluteURI() {

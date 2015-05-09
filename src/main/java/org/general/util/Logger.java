@@ -1,4 +1,4 @@
-package org.general.logger;
+package org.general.util;
 
 /**
  * Logger for printing out useful information for debugging/dev purposes.

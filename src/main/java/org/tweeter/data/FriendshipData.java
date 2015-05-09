@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.general.data.DataStorage;
-import org.general.logger.Logger;
+import org.general.util.Logger;
 
 /**
  * Singleton class that interfaces with the data module to retrieve
