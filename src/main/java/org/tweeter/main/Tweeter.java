@@ -2,6 +2,7 @@ package org.tweeter.main;
 
 import java.io.IOError;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,19 +12,22 @@ import java.util.TimeZone;
 import org.general.data.DataStorage;
 import org.general.http.HTTPRequest;
 import org.general.http.HTTPResponse;
-import org.general.http.HTTPResponse.HeaderField;
 import org.general.http.HTTPResponse.StatusCode;
 import org.general.http.HTTPServer;
+import org.general.http.HTTPServer.HttpServerException;
 import org.general.http.InvalidHttpParametersException;
 import org.general.json.JSONObject;
 import org.general.util.Logger;
+import org.general.util.NumberParser;
 import org.general.util.Pair;
 import org.tweeter.controllers.FriendshipsController;
 import org.tweeter.controllers.StatusesController;
 
 /**
  * In charge of starting up an http server with passed in argument options, routing
- * requests to appropriate controllers and handling all application errors.
+ * requests to appropriate controllers and handling all server and application errors.
+ * 
+ * Contains main entry point for Tweeter program.
  * @author marcelpuyat
  *
  */
@@ -39,9 +43,7 @@ public class Tweeter {
     private static int DEFAULT_PORT = 8080;
     private static final String DEFAULT_RESPONSE_VERSION = "HTTP/1.1";
     private static final String DEFAULT_RESPONSE_CONTENT_TYPE = "application/json;charset=UTF-8";
-    private static final String RESPONSE_DATE_FORMAT = "EEE, dd MMM yyyy HH:mm:ss z";
-    
-    private static HTTPServer server;
+    private static final DateFormat RESPONSE_DATE_FORMAT = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z");
     
     /**
      * To add a new API endpoint:
@@ -68,51 +70,43 @@ public class Tweeter {
     /**
      * Parses argument options and then starts up server.
      * 
-     * @param args
-     *            can include a port option, help option, and workspace option
-     * @throws IOException
-     *             Thrown if there is a problem shutting down server. Stack trace
-     *             is printed.
+     * Main entry point for Tweeter program.
      */
-    public static void main(String[] args) throws IOException {
-
-        Map<String, String> argOptions = parseArgumentOptions(args);
-        if (argOptions.containsKey(HELP_OPTION)) {
-            System.out.println("-port port_number\n-workspace path");
-            return;
-        }
-        if (argOptions.containsKey(WORKSPACE_OPTION)) {
-            DataStorage.setPathToWorkspace(argOptions.get(WORKSPACE_OPTION));
-        }
-        if (argOptions.containsKey(PORT_OPTION)) {
-            server = new HTTPServer(Integer.parseInt(argOptions
-                    .get(PORT_OPTION)), DEFAULT_SERVER_NAME, Tweeter::handle);
-        } else {
-            server = new HTTPServer(DEFAULT_PORT, DEFAULT_SERVER_NAME, Tweeter::handle);
-        }
-
-        try {
-            server.start();
-        } catch (IOError e) {
-            e.printStackTrace();
-            server.shutdown();
-        }
-    }
-
-    private static Map<String, String> parseArgumentOptions(String[] args) {
-        Map<String, String> argOptions = new HashMap<String, String>();
+    public static void main(String[] args) {
+        String portAsStr = null;
+        
         for (int i = 0; i < args.length; i += 2) {
             if (args[i].equals(PORT_OPTION) && i + 1 < args.length) {
-                argOptions.put(PORT_OPTION, args[i + 1]);
+                portAsStr = args[i + 1];
+                if (portAsStr != null && !NumberParser.isNumber(portAsStr)) {
+                    Logger.log("Port must be a number. Invalid port: " + portAsStr);
+                    return;
+                }
             }
             if (args[i].equals(WORKSPACE_OPTION) && i + 1 < args.length) {
-                argOptions.put(WORKSPACE_OPTION, args[i + 1] + "/");
+                DataStorage.setPathToWorkspace(args[i + 1] + "/");
             }
             if (args[i].equals(HELP_OPTION)) {
-                argOptions.put(HELP_OPTION, "");
+                System.out.println("-port port that will listen for requests to Tweeter. Default: 8080"
+                        + "\n-workspace path to files used for data storage. Default: .");
+                return;
             }
         }
-        return argOptions;
+
+        // Will never throw exception because we made sure portAsStr is a number.
+        int port = portAsStr == null ? DEFAULT_PORT : Integer.parseInt(portAsStr); 
+
+        HTTPServer server = null;
+        try {
+            server = new HTTPServer(DEFAULT_SERVER_NAME, port, Tweeter::handle);
+        } catch (HttpServerException | IOError e) {
+            e.printStackTrace();
+            try {
+                server.shutdown();
+            } catch (IOException unableToShutdown) {
+                unableToShutdown.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -125,10 +119,11 @@ public class Tweeter {
      *            HTTP Response that the JSON response is sent over
      */
     private static void handle(HTTPRequest req, HTTPResponse res) {
-        setDefaultsOnResponse(res);
+        res.setDefaults(DEFAULT_RESPONSE_VERSION, DEFAULT_RESPONSE_CONTENT_TYPE, RESPONSE_DATE_FORMAT,
+                TimeZone.getTimeZone("GMT"), new Date());
         String reqURI = req.getURI();
         HTTPRequest.Method httpMethod = req.getMethod();
-        Logger.log(httpMethod + " " + req.getURI());
+        Logger.log(httpMethod + " " + reqURI);
         
         if (!routerMap.containsKey(reqURI)) {
             respondWithJSONError(HTTPResponse.StatusCode.NOT_FOUND , reqURI + " is not a valid API endpoint", res);
@@ -152,15 +147,6 @@ public class Tweeter {
             respondWithJSONError(StatusCode.SERVER_ERROR, "Internal Server Error", res);
             throw new IOError(e);
         }
-    }
-    
-    private static void setDefaultsOnResponse(HTTPResponse res) {
-        res.setVersion(DEFAULT_RESPONSE_VERSION);
-        res.setHeader(HeaderField.CONTENT_TYPE, DEFAULT_RESPONSE_CONTENT_TYPE);
-        SimpleDateFormat dateFormatGmt = new SimpleDateFormat(
-                RESPONSE_DATE_FORMAT);
-        dateFormatGmt.setTimeZone(TimeZone.getTimeZone("GMT"));
-        res.setHeader(HeaderField.DATE, dateFormatGmt.format(new Date()));
     }
     
     /**

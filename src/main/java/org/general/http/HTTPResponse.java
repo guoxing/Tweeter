@@ -2,8 +2,11 @@ package org.general.http;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * A class that represents an HTTP response.
@@ -52,6 +55,14 @@ public class HTTPResponse {
         headers = new HashMap<String, String>();
         headers.put(HeaderField.SERVER, serverName);
         sent = false;
+    }
+    
+    public void setDefaults(String version, String contentType, DateFormat dateFormat,
+            TimeZone timeZone, Date date) {
+        setVersion(version);
+        setHeader(HeaderField.CONTENT_TYPE, contentType);
+        dateFormat.setTimeZone(timeZone);
+        setHeader(HeaderField.DATE, dateFormat.format(date));
     }
 
     public void setVersion(String version) {
