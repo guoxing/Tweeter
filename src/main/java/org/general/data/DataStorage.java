@@ -3,7 +3,6 @@ package org.general.data;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOError;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -16,6 +15,9 @@ import java.nio.ByteBuffer;
  * provides basic functionality to interact the data (read and write) in the
  * format of entries. Clients should create a customized DataEntry class which
  * represents an entry to use this data module.
+ * 
+ * All methods throw IOExceptions which may or may not be permanent errors.
+ * Because this is a generic module, handling of these exceptions is left to the caller. 
  * 
  * @author Guoxing Li
  *
@@ -46,17 +48,13 @@ public class DataStorage<Entry extends DataEntry> {
      * @param entrySize
      *            The size in byte of each entry
      */
-    public DataStorage(String filename, Class<Entry> entryClazz, int entrySize) {
+    public DataStorage(String filename, Class<Entry> entryClazz, int entrySize) throws IOException {
         File workspaceDir = new File(pathToWorkspace);
         if (!workspaceDir.exists()) {
             workspaceDir.mkdirs();
         }
         storage = new File(pathToWorkspace + filename);
-        try {
-            storage.createNewFile();
-        } catch (IOException e) {
-            throw new IOError(e);
-        }
+        storage.createNewFile();
         this.entryClazz = entryClazz;
         this.entrySize = entrySize;
         if (storage.length() % entrySize != 0) {
@@ -72,7 +70,7 @@ public class DataStorage<Entry extends DataEntry> {
      * @param entry
      *            Entry to be appended
      */
-    public void appendToFile(Entry entry) {
+    public void appendToFile(Entry entry) throws IOException {
         byte[] data = entry.marshal().array();
         if (data.length != entrySize) {
             throw new IllegalArgumentException(
@@ -81,13 +79,9 @@ public class DataStorage<Entry extends DataEntry> {
                             + entrySize + ". Received: " + data.length + ".");
         }
 
-        try {
-            FileOutputStream out = new FileOutputStream(storage, true);
-            out.write(data);
-            out.close();
-        } catch (IOException e) {
-            throw new IOError(e);
-        }
+        FileOutputStream out = new FileOutputStream(storage, true);
+        out.write(data);
+        out.close();
     }
 
     /**
@@ -96,6 +90,9 @@ public class DataStorage<Entry extends DataEntry> {
      * reads one entry at a time. There's an entry pointer that points to the
      * location where the next read starts. Clients of DataStorage can
      * instantiate this class to read entries.
+     * 
+     * All methods throw IOExceptions which may or may not be permanent errors.
+     * Because this is a generic module, handling of these exceptions is left to the caller.
      *
      */
     public class EntryReader implements Closeable {
@@ -109,21 +106,17 @@ public class DataStorage<Entry extends DataEntry> {
          * @param reverse
          *            True will set the entry pointer to the end.
          */
-        public EntryReader(boolean reverse) {
-            try {
-                randomReader = new RandomAccessFile(storage, "r");
-                if (reverse) {
-                    randomReader.seek(randomReader.length());
-                }
-            } catch (IOException e) {
-                throw new IOError(e);
+        public EntryReader(boolean reverse) throws IOException {
+            randomReader = new RandomAccessFile(storage, "r");
+            if (reverse) {
+                randomReader.seek(randomReader.length());
             }
         }
 
         /**
          * Creates a EntryReader. Read starts from the first entry.
          */
-        public EntryReader() {
+        public EntryReader() throws IOException {
             this(false);
         }
 
@@ -132,16 +125,13 @@ public class DataStorage<Entry extends DataEntry> {
          * pointer is moved forward one entry.
          * 
          * @return The next entry or null if no more entry to read
+         * @throws IOException 
          */
-        public Entry readNext() {
+        public Entry readNext() throws IOException {
             byte[] data = new byte[entrySize];
-            try {
-                int bytesRead = randomReader.read(data);
-                if (bytesRead == -1) {
-                    return null;
-                }
-            } catch (IOException e) {
-                throw new IOError(e);
+            int bytesRead = randomReader.read(data);
+            if (bytesRead == -1) {
+                return null;
             }
             return createEntryFromBytes(data);
         }
@@ -157,20 +147,16 @@ public class DataStorage<Entry extends DataEntry> {
          * 
          * @return The previous entry or null if no more entry to read
          */
-        public Entry readPrevious() {
+        public Entry readPrevious() throws IOException {
             byte[] data = new byte[entrySize];
-            try {
-                long fp = randomReader.getFilePointer();
-                fp -= entrySize;
-                if (fp < 0) {
-                    return null;
-                }
-                randomReader.seek(fp);
-                randomReader.read(data);
-                randomReader.seek(fp);
-            } catch (IOException e) {
-                throw new IOError(e);
+            long fp = randomReader.getFilePointer();
+            fp -= entrySize;
+            if (fp < 0) {
+                return null;
             }
+            randomReader.seek(fp);
+            randomReader.read(data);
+            randomReader.seek(fp);
             return createEntryFromBytes(data);
         }
 
@@ -181,17 +167,13 @@ public class DataStorage<Entry extends DataEntry> {
          * 
          * @return The idx'th entry or null if idx is out of valid index range.
          */
-        public Entry readAt(long idx) {
+        public Entry readAt(long idx) throws IOException {
             byte[] data = new byte[entrySize];
-            try {
-                if (idx < 0 || (idx + 1) * entrySize > randomReader.length()) {
-                    return null;
-                }
-                randomReader.seek(idx * entrySize);
-                randomReader.read(data);
-            } catch (IOException e) {
-                throw new IOError(e);
+            if (idx < 0 || (idx + 1) * entrySize > randomReader.length()) {
+                return null;
             }
+            randomReader.seek(idx * entrySize);
+            randomReader.read(data);
             return createEntryFromBytes(data);
         }
 

@@ -1,5 +1,6 @@
 package org.tweeter.controllers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,8 +38,9 @@ public class FriendshipsController {
      * object and success.
      *
      * @throws InvalidHttpParametersException if user_id or my_id param does not exist or is not a number 
+     * @throws IOException if unable to write data
      */
-    public static JSONObject createFriendship(HTTPRequest req) throws InvalidHttpParametersException {
+    public static JSONObject createFriendship(HTTPRequest req) throws InvalidHttpParametersException, IOException {
         Long userId = req.getRequiredLongParam(PARAMS_MY_ID_KEY);
         Long friendId = req.getRequiredLongParam(PARAMS_USER_ID_KEY);
         Logger.log("Creating friendship between " + userId + " and "+ friendId);
@@ -55,8 +57,9 @@ public class FriendshipsController {
      * If the friendship did not exist, will still return empty JSON object.
      * 
      * @throws InvalidHttpParametersException if user_id or my_id param does not exist or is not a number
+     * @throws IOException if unable to write data
      */
-    public static JSONObject deleteFriendship(HTTPRequest req) throws InvalidHttpParametersException {
+    public static JSONObject deleteFriendship(HTTPRequest req) throws InvalidHttpParametersException, IOException {
         Long userId = req.getRequiredLongParam(PARAMS_MY_ID_KEY);
         Long friendId = req.getRequiredLongParam(PARAMS_USER_ID_KEY);
         Logger.log("Deleting friendship between " + userId + " and " + friendId);
@@ -70,8 +73,9 @@ public class FriendshipsController {
      * 
      * Params must contain a long value associated with PARAMS_USER_ID_KEY.
      * @throws InvalidHttpParametersException if user_id param does not exist or is not a number
+     * @throws IOException if unable to read data
      */
-    public static JSONObject getFollowers(HTTPRequest req) throws InvalidHttpParametersException {
+    public static JSONObject getFollowers(HTTPRequest req) throws InvalidHttpParametersException, IOException {
         Long userId = req.getRequiredLongParam(PARAMS_USER_ID_KEY);
         Logger.log("Getting followers JSON of "+ userId);
         List<Long> followerIds = new ArrayList<Long>();
@@ -87,8 +91,9 @@ public class FriendshipsController {
      * 
      * Params must contain a long value associated with PARAMS_USER_ID_KEY.
      * @throws InvalidHttpParametersException if user_id param does not exist or is not a number
+     * @throws IOException if unable to read data
      */
-    public static JSONObject getFriends(HTTPRequest req) throws InvalidHttpParametersException {
+    public static JSONObject getFriends(HTTPRequest req) throws InvalidHttpParametersException, IOException {
         Long userId = req.getRequiredLongParam(PARAMS_USER_ID_KEY);
         Logger.log("Getting friends JSON of "+ userId);
         List<Long> friendIds = new ArrayList<Long>();

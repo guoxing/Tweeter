@@ -1,6 +1,5 @@
 package org.tweeter.data;
 
-import java.io.IOError;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,7 +37,10 @@ public class StatusData {
 
     private static StatusData statusData;
 
-    private StatusData() {
+    /**
+     * @throws IOException if cannot instantiate
+     */
+    private StatusData() throws IOException {
         storage = new DataStorage<Status>(FILE_NAME, Status.class,
                 Status.ENTRY_SIZE);
         maxStatusId = -1;
@@ -57,15 +59,16 @@ public class StatusData {
             ownershipCache.putIfAbsent(entry.getUserId(), new TreeSet<Long>());
             ownershipCache.get(entry.getUserId()).add(entry.getStatusId());
         }
-        tryClosingReader(reader);
+        reader.close();
     }
 
     /**
      * Retrieve an (and the only) instance of StatusData
      * 
      * @return An instance of StatusData
+     * @throws IOException on instantiation error
      */
-    public static StatusData getInstance() {
+    public static StatusData getInstance() throws IOException {
         if (statusData == null) {
             statusData = new StatusData();
         }
@@ -80,9 +83,9 @@ public class StatusData {
      *            user id of user that is updating their status
      * @param text
      *            status text
-     * @throws IOException
+     * @throws IOException if unable to update status
      */
-    public void updateStatus(long userId, String text) {
+    public void updateStatus(long userId, String text) throws IOException {
         maxStatusId++;
         Status status = new Status(maxStatusId, userId, text, new Date());
         // evict older status in cache if cache is full
@@ -115,9 +118,10 @@ public class StatusData {
      *            list must have ids no larger than this value.
      * @return A list of statuses in reverse chronological order. Empty if no
      *         statuses owned by userId.
+     * @throws IOException  if cannot get statuses
      */
     public List<Status> getStatusesOnUserId(long userId, long numStatuses,
-            long maxId) {
+            long maxId) throws IOException {
         Set<Long> userIds = new HashSet<Long>();
         userIds.add(userId);
         return getStatusesOnUserIds(userIds, numStatuses, maxId);
@@ -136,9 +140,10 @@ public class StatusData {
      *            list must have ids no larger than this value.
      * @return A list of statuses in reverse chronological order. Empty list if
      *         no statuses owned by userIds.
+     * @throws IOException if cannot get statuses
      */
     public List<Status> getStatusesOnUserIds(Set<Long> userIds,
-            long numStatuses, long maxId) {
+            long numStatuses, long maxId) throws IOException {
         Set<Long> userIdsWithStatus = new HashSet<Long>();
         for (long userId : userIds) {
             if (ownershipCache.get(userId) != null) {
@@ -168,9 +173,9 @@ public class StatusData {
      *            A NavigableSet of statusIds in natural order.
      * @return A list of statuses. Status will be missing if its id doesn't
      *         exist.
+     * @throws IOException if cannot close reader
      */
-    @SuppressWarnings("resource")
-    private List<Status> getStatuses(NavigableSet<Long> statusIds) {
+    private List<Status> getStatuses(NavigableSet<Long> statusIds) throws IOException {
         if (statusIds.size() == 0) {
             return new ArrayList<Status>(0);
         }
@@ -187,7 +192,7 @@ public class StatusData {
                 // assumes the n'th entry has id (n-1)
                 status = reader.readAt(currentStatusId);
                 if (status == null) {
-                    tryClosingReader(reader);
+                    reader.close();
                     throw new IllegalArgumentException(
                             "StatusId out of range. Received id: "
                                     + currentStatusId + " . Range: [0, "
@@ -196,19 +201,8 @@ public class StatusData {
             }
             result.add(status);
         }
-        tryClosingReader(reader);
+        reader.close();
         return result;
-    }
-    
-    /**
-     * Tries to close reader and upgrades IOException to a thrown IOError on failure.
-     */
-    private void tryClosingReader(DataStorage<Status>.EntryReader reader) {
-        try {
-            reader.close();
-        } catch (IOException e) {
-            throw new IOError(e);
-        }
     }
 
 }

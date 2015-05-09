@@ -1,5 +1,6 @@
 package org.tweeter.controllers;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -59,8 +60,9 @@ public class StatusesController {
      * 
      * @throws InvalidHttpParametersException if my_id does not exist or is not a number,
      * or if status does not exist
+     * @throws IOException if unable to read data
      */
-    public static JSONObject updateStatus(HTTPRequest req) throws InvalidHttpParametersException {
+    public static JSONObject updateStatus(HTTPRequest req) throws InvalidHttpParametersException, IOException {
         Long userId = req.getRequiredLongParam(PARAMS_MY_ID_KEY);
         String status = req.getStringRequiredParam(PARAMS_STATUS_KEY);
         Logger.log("Updating status of " + userId);
@@ -82,8 +84,9 @@ public class StatusesController {
      * 
      * @throws InvalidHttpParametersException if user_id param does not exist or is not a number,
      * or if count or max_id param is not a number
+     * @throws IOException if unable to read data
      */
-    public static JSONObject getHomeTimeline(HTTPRequest req) throws InvalidHttpParametersException {
+    public static JSONObject getHomeTimeline(HTTPRequest req) throws InvalidHttpParametersException, IOException {
         Long userId = req.getRequiredLongParam(PARAMS_MY_ID_KEY);
         Long count = req.getOptionalLongParam(PARAMS_COUNT_KEY, DEFAULT_TIMELINE_SIZE);
         Long maxId = req.getOptionalLongParam(PARAMS_MAX_ID_KEY, DEFAULT_MAX_ID);
@@ -112,8 +115,9 @@ public class StatusesController {
 
      * @throws InvalidHttpParametersException if user_id param does not exist or is not a number,
      * or if count or max_id param is not a number
+     * @throws IOException if unable to read data
      */
-    public static JSONObject getUserTimeline(HTTPRequest req) throws InvalidHttpParametersException {
+    public static JSONObject getUserTimeline(HTTPRequest req) throws InvalidHttpParametersException, IOException {
         Long userId = req.getRequiredLongParam(PARAMS_MY_ID_KEY);
         Long count = req.getOptionalLongParam(PARAMS_COUNT_KEY, DEFAULT_TIMELINE_SIZE);
         Long maxId = req.getOptionalLongParam(PARAMS_MAX_ID_KEY, DEFAULT_MAX_ID);

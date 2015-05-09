@@ -36,7 +36,7 @@ public class DataStorageTests {
     }
 
     @Before
-    public void addFruits() {
+    public void addFruits() throws IOException {
         storage = new DataStorage<TestFruitEntry>(FILE_NAME,
                 TestFruitEntry.class, TestFruitEntry.ENTRY_SIZE);
         apple = new TestFruitEntry();

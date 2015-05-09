@@ -1,5 +1,7 @@
 package org.general.http;
 
+import org.general.util.NumberParser;
+
 /**
  * URLDecoder used to decode URL according to
  * https://tools.ietf.org/html/rfc3986.
@@ -14,16 +16,14 @@ public class URLDecoder {
         while (pos < in.length()) {
             if (in.charAt(pos) == '%') {
                 if (pos + 2 < in.length()) {
-                    try {
-                        int code = Integer.parseInt(
-                                in.substring(pos + 1, pos + 3), 16);
+                    String str = in.substring(pos + 1, pos + 3);
+                    if (NumberParser.isNumber(str, 16)) {
+                        int code = Integer.parseInt(in.substring(pos + 1, pos + 3), 16);
                         if (code >= 32 && code <= 255) {
                             result.append((char) code);
                             pos += 3;
                             continue;
                         }
-                    } catch (NumberFormatException e) {
-                        // invalid, ignore and move on
                     }
                 }
             }

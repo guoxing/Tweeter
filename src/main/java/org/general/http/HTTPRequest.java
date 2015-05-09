@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.general.util.NumberParser;
+
 /**
  * A class that represents an HTTP request.
  * 
@@ -50,17 +52,21 @@ public class HTTPRequest {
      * @param in
      * @throws Exception
      */
-    public HTTPRequest(InputStream in) throws IOException {
+    public HTTPRequest(InputStream in) throws IOException, InvalidHttpFormattingException {
         BufferedReader inReader = new BufferedReader(new InputStreamReader(in));
         String requestLine = inReader.readLine();
-        String[] splited = requestLine.split("\\s+");
-        method = Method.valueOf(splited[0]);
-        absoluteURI = splited[1];
-        version = splited[2];
+        String[] splitted = requestLine.split("\\s+");
+        
+        if (splitted.length != 3) 
+            throw new InvalidHttpFormattingException(InvalidHttpFormattingException.INVALID_FIRST_LINE + 
+                    " was given: " + requestLine);
+        method = Method.valueOf(splitted[0]);
+        absoluteURI = splitted[1];
+        version = splitted[2];
 
         // process URI/queryString
         Pattern uriP = Pattern.compile(URIREGEX);
-        Matcher uriM = uriP.matcher(splited[1]);
+        Matcher uriM = uriP.matcher(splitted[1]);
         String fullURI;
         if (uriM.find()) {
             fullURI = uriM.group(1);
@@ -171,14 +177,12 @@ public class HTTPRequest {
             if (!isRequired) return defaultValue;
             throw new InvalidHttpParametersException(key + " is a required parameter");
         }
-        Long val;
-        try {
-            val = Long.parseLong(queryParams.get(key));
-        } catch (NumberFormatException e) {
+        String strForm = queryParams.get(key);
+        if (!NumberParser.isNumber(strForm)) {
             throw new InvalidHttpParametersException(key
-                    + " must be a 64-bit integer. Invalid value given: " + queryParams.get(key));
+                    + " must be a 64-bit integer. Invalid value given: " + strForm);
         }
-        return val;
+        return Long.parseLong(strForm);
     }
     
     /**
@@ -192,6 +196,12 @@ public class HTTPRequest {
 
     public String getAbsoluteURI() {
         return absoluteURI;
+    }
+    
+    public class InvalidHttpFormattingException extends Exception {
+        private static final long serialVersionUID = 1L;
+        public static final String INVALID_FIRST_LINE = "First line must have HTTP Method, URI, and Version.";
+        public InvalidHttpFormattingException(String msg) { super("Invalid HTTP Formatting: " + msg); }
     }
 
 }

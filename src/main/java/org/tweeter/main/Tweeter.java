@@ -1,5 +1,6 @@
 package org.tweeter.main;
 
+import java.io.IOError;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -10,10 +11,10 @@ import java.util.TimeZone;
 import org.general.data.DataStorage;
 import org.general.http.HTTPRequest;
 import org.general.http.HTTPResponse;
-import org.general.http.InvalidHttpParametersException;
 import org.general.http.HTTPResponse.HeaderField;
 import org.general.http.HTTPResponse.StatusCode;
 import org.general.http.HTTPServer;
+import org.general.http.InvalidHttpParametersException;
 import org.general.json.JSONObject;
 import org.general.util.Logger;
 import org.general.util.Pair;
@@ -92,7 +93,7 @@ public class Tweeter {
 
         try {
             server.start();
-        } catch (IOException e) {
+        } catch (IOError e) {
             e.printStackTrace();
             server.shutdown();
         }
@@ -146,6 +147,10 @@ public class Tweeter {
             res.send(HTTPResponse.StatusCode.OK, response.toJson());
         } catch (InvalidHttpParametersException e) {
             respondWithJSONError(StatusCode.BAD_REQUEST, e.getMessage(), res);
+        } catch (IOException e) {
+            e.printStackTrace(); // Print error message so we only reveal cause to devs and not users
+            respondWithJSONError(StatusCode.SERVER_ERROR, "Internal Server Error", res);
+            throw new IOError(e);
         }
     }
     
@@ -182,7 +187,7 @@ public class Tweeter {
      * Thanks, Java.
      */
     private interface ControllerMethod<ReqType, ResType> {
-        ResType apply(ReqType req) throws InvalidHttpParametersException;
+        ResType apply(ReqType req) throws InvalidHttpParametersException, IOException;
     }
     
 }

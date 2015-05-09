@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.function.BiConsumer;
 
+import org.general.http.HTTPRequest.InvalidHttpFormattingException;
 import org.general.util.Logger;
 
 /**
@@ -43,10 +44,16 @@ public class HTTPServer {
 
             try {
                 request = new HTTPRequest(s.getInputStream());
-            } catch (IOException e) {
-                e.printStackTrace();
-                response.send(HTTPResponse.StatusCode.BAD_REQUEST,
-                        "Request is malformatted");
+            } catch (IOException | InvalidHttpFormattingException e) {
+                if (e instanceof InvalidHttpFormattingException) {
+                    response.send(HTTPResponse.StatusCode.BAD_REQUEST,
+                            "Request is malformatted");
+                }
+                else { // IOException
+                    e.printStackTrace();
+                    response.send(HTTPResponse.StatusCode.SERVER_ERROR,
+                            "Internal server error. Unable to parse request.");
+                }
                 s.close();
                 continue;
             }

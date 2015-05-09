@@ -1,6 +1,5 @@
 package org.tweeter.data;
 
-import java.io.IOError;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,7 +31,10 @@ public class FriendshipData {
 
     private static FriendshipData friendshipData;
 
-    private FriendshipData() {
+    /**
+     * @throws IOException if cannot instantiate
+     */
+    private FriendshipData() throws IOException {
         storage = new DataStorage<FriendshipEntry>(FILE_NAME,
                 FriendshipEntry.class, FriendshipEntry.ENTRY_SIZE);
         // warm up cache
@@ -43,19 +45,16 @@ public class FriendshipData {
         while ((entry = reader.readNext()) != null) {
             updateFriendshipCache(entry);
         }
-        try {
-            reader.close();
-        } catch (IOException e) {
-            throw new IOError(e);
-        }
+        reader.close();
     }
 
     /**
      * Retrieve an (and the only) instance of FriendshipData
      * 
      * @return An instance of FriendshipData
+     * @throws IOException on instantiation error
      */
-    public static FriendshipData getInstance() {
+    public static FriendshipData getInstance() throws IOException {
         if (friendshipData == null) {
             friendshipData = new FriendshipData();
         }
@@ -96,8 +95,9 @@ public class FriendshipData {
      * 
      * @param userId
      * @param friendId
+     * @throws IOException if unable to add friend
      */
-    public void addFriend(Long userId, Long friendId) {
+    public void addFriend(Long userId, Long friendId) throws IOException {
         Logger.log(friendId + " is now " + userId + "'s friend");
         if (friendCache.containsKey(userId) && friendCache.get(userId).contains(friendId)) {
             return;
@@ -115,8 +115,9 @@ public class FriendshipData {
      * 
      * @param userId
      * @param friendId
+     * @throws IOException if unable to delete friend
      */
-    public void deleteFriend(Long userId, Long friendId) {
+    public void deleteFriend(Long userId, Long friendId) throws IOException {
         Logger.log(friendId + " is no longer " + userId + "'s friend");
         if (friendCache.containsKey(userId) && !friendCache.get(userId).contains(friendId)) {
             return;
