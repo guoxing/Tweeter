@@ -15,19 +15,15 @@ import org.tweeter.data.FriendshipData;
 /**
  * In charge of API endpoints regarding friendships between users.
  * 
+ * This includes creating and deleting friendships bteween users, as well as retrieving
+ * friends/followers of a given user.
+ * 
  * @author marcelpuyat
  *
  */
 public class FriendshipsController {
-    /**
-     * Key for my_id parameter
-     */
     private static final String PARAMS_MY_ID_KEY = "my_id";
-    /**
-     * Key for user_id parameter
-     */
     private static final String PARAMS_USER_ID_KEY = "user_id";
-
     /**
      * Creates a friendship from the long value in params associated with
      * "my_id" to the long value in params associated with "user_id".

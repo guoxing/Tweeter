@@ -28,16 +28,8 @@ import org.tweeter.controllers.StatusesController;
  * requests to appropriate controllers and handling all server and application errors.
  * 
  * Contains main entry point for Tweeter program.
- * @author marcelpuyat
- *
  */
-public class Tweeter {
-
-    // Command line options
-    private static final String HELP_OPTION = "-help";
-    private static final String PORT_OPTION = "-port";
-    private static final String WORKSPACE_OPTION = "-workspace";
-    
+public class Tweeter {    
     // Default fields for http specific to Tweeter
     private static final String DEFAULT_SERVER_NAME = "Tweeter/1.0";
     private static int DEFAULT_PORT = 8080;
@@ -46,17 +38,16 @@ public class Tweeter {
     private static final DateFormat RESPONSE_DATE_FORMAT = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z");
     
     /**
-     * To add a new API endpoint:
-     * 1. Define a method in a controller that takes in an HTTPRequest and returns a JSONObject
-     * 2. Add a route using addRoute in the static initializer, specifying the path, http method
-     *    and the controller method you created.
-     */
-    
-    /**
      * Map from an API endpoint path to its respective HTTP method and the controller method that is called
      * to handle this endpoint.
      */
-    private static Map<String, Pair<HTTPRequest.Method, ControllerMethod<HTTPRequest, JSONObject>>> routerMap = new HashMap<>();
+    private static Map<String, Pair<HTTPRequest.Method, ControllerMethod>> routerMap = new HashMap<>();
+    /**
+     * To add a new API endpoint:
+     * 1. Define a method in a controller that takes in an HTTPRequest and returns a JSONObject
+     * 2. Add a route using addRoute in the static initializer, specifying the http method, path
+     *    and the controller method you created.
+     */
     static {
         addRoute(HTTPRequest.Method.POST, "/statuses/update",            StatusesController::updateStatus);
         addRoute(HTTPRequest.Method.GET,  "/statuses/home_timeline.json",StatusesController::getHomeTimeline);
@@ -73,29 +64,27 @@ public class Tweeter {
      * Main entry point for Tweeter program.
      */
     public static void main(String[] args) {
-        String portAsStr = null;
-        
+        // Parse arg options
+        int port = DEFAULT_PORT;
         for (int i = 0; i < args.length; i += 2) {
-            if (args[i].equals(PORT_OPTION) && i + 1 < args.length) {
-                portAsStr = args[i + 1];
-                if (portAsStr != null && !NumberParser.isNumber(portAsStr)) {
-                    Logger.log("Port must be a number. Invalid port: " + portAsStr);
+            if (args[i].equals("-port") && i + 1 < args.length) {
+                String portAsStr = args[i + 1];
+                if (!NumberParser.isNumber(portAsStr)) {
+                    Logger.log("Port must be a number. Invalid value given: " + portAsStr);
                     return;
                 }
+                port = Integer.parseInt(portAsStr); // Will not throw exception bec we checked if is number
             }
-            if (args[i].equals(WORKSPACE_OPTION) && i + 1 < args.length) {
+            if (args[i].equals("-workspace") && i + 1 < args.length) {
                 DataStorage.setPathToWorkspace(args[i + 1] + "/");
             }
-            if (args[i].equals(HELP_OPTION)) {
-                System.out.println("-port port that will listen for requests to Tweeter. Default: 8080"
-                        + "\n-workspace path to files used for data storage. Default: .");
+            if (args[i].equals("-help")) {
+                System.out.println("-port\n\tport that will listen for requests to Tweeter. Default: 8080\n"
+                        + "-workspace\n\tpath to files used for data storage. Default: .\n");
                 return;
             }
         }
-
-        // Will never throw exception because we made sure portAsStr is a number.
-        int port = portAsStr == null ? DEFAULT_PORT : Integer.parseInt(portAsStr); 
-
+        
         HTTPServer server = null;
         try {
             server = new HTTPServer(DEFAULT_SERVER_NAME, port, Tweeter::handle);
@@ -113,38 +102,37 @@ public class Tweeter {
      * Routes the given request to a controller's method, receives the JSON response from
      * that method and responds with it.
      * 
-     * @param req
+     * @param httpReq
      *            HTTP Request to route
-     * @param res
+     * @param httpRes
      *            HTTP Response that the JSON response is sent over
      */
-    private static void handle(HTTPRequest req, HTTPResponse res) {
-        res.setDefaults(DEFAULT_RESPONSE_VERSION, DEFAULT_RESPONSE_CONTENT_TYPE, RESPONSE_DATE_FORMAT,
+    private static void handle(HTTPRequest httpReq, HTTPResponse httpRes) {
+        httpRes.setDefaults(DEFAULT_RESPONSE_VERSION, DEFAULT_RESPONSE_CONTENT_TYPE, RESPONSE_DATE_FORMAT,
                 TimeZone.getTimeZone("GMT"), new Date());
-        String reqURI = req.getURI();
-        HTTPRequest.Method httpMethod = req.getMethod();
+        String reqURI = httpReq.getURI();
+        HTTPRequest.Method httpMethod = httpReq.getMethod();
         Logger.log(httpMethod + " " + reqURI);
         
         if (!routerMap.containsKey(reqURI)) {
-            respondWithJSONError(HTTPResponse.StatusCode.NOT_FOUND , reqURI + " is not a valid API endpoint", res);
+            respondWithJSONError(HTTPResponse.StatusCode.NOT_FOUND , reqURI + " is not a valid API endpoint", httpRes);
             return;
         }
-        
         if (routerMap.get(reqURI).getFirst() != httpMethod) {
             // If we reach here, we know path is valid, so this must mean only the HTTP method is invalid.
             respondWithJSONError(HTTPResponse.StatusCode.BAD_REQUEST, "Invalid HTTP Method for path: "
-                    + reqURI + ". Should be "+routerMap.get(reqURI).getFirst()+" instead of "+httpMethod, res);
+                    + reqURI + ". Should be "+routerMap.get(reqURI).getFirst()+" instead of "+httpMethod, httpRes);
             return;
         }
         
         try {
-            JSONObject response = routerMap.get(reqURI).getSecond().apply(req);
-            res.send(HTTPResponse.StatusCode.OK, response.toJson());
+            JSONObject response = routerMap.get(reqURI).getSecond().respond(httpReq);
+            httpRes.send(HTTPResponse.StatusCode.OK, response.toJson());
         } catch (InvalidHttpParametersException e) {
-            respondWithJSONError(StatusCode.BAD_REQUEST, e.getMessage(), res);
+            respondWithJSONError(StatusCode.BAD_REQUEST, e.getMessage(), httpRes);
         } catch (IOException e) {
             e.printStackTrace(); // Print error message so we only reveal cause to devs and not users
-            respondWithJSONError(StatusCode.SERVER_ERROR, "Internal Server Error", res);
+            respondWithJSONError(StatusCode.SERVER_ERROR, "Internal Server Error", httpRes);
             throw new IOError(e);
         }
     }
@@ -152,11 +140,10 @@ public class Tweeter {
     /**
      * Assigns a particular HTTP method and controller method to an API endpoint path in our routerMap.
      */
-    private static void addRoute(HTTPRequest.Method method, String path, 
-            ControllerMethod<HTTPRequest, JSONObject> reqHandler) {
-        /* This is a thin method that hides the ugly syntax for creating a pair of this type over and over
+    private static void addRoute(HTTPRequest.Method method, String path, ControllerMethod reqHandler) {
+        /* Thin method that hides the ugly syntax for creating a pair of this type over and over
            when creating routes */
-        routerMap.put(path, new Pair<HTTPRequest.Method, ControllerMethod<HTTPRequest, JSONObject>>(method, reqHandler));
+        routerMap.put(path, new Pair<HTTPRequest.Method, ControllerMethod>(method, reqHandler));
     }
     
     private static void respondWithJSONError(StatusCode code, String errorMessage, HTTPResponse res) {
@@ -169,11 +156,10 @@ public class Tweeter {
      * This is required in order to make a functional reference to a method that throws an exception.
      * Here is a particularly enlightening StackOverflow post on this:
      * https://stackoverflow.com/questions/18198176/java-8-lambda-function-that-throws-exception
-     * 
      * Thanks, Java.
      */
-    private interface ControllerMethod<ReqType, ResType> {
-        ResType apply(ReqType req) throws InvalidHttpParametersException, IOException;
+    private interface ControllerMethod {
+        JSONObject respond(HTTPRequest req) throws InvalidHttpParametersException, IOException;
     }
     
 }

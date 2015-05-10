@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.security.InvalidKeyException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -46,14 +47,10 @@ public class HTTPRequest {
     private Map<String, String> queryParams;
     private Map<String, String> headers;
 
-    /**
-     * Construct a new HTTPRequest associated with an InputStream from a Socket.
-     * 
-     * @param in
-     * @throws Exception
-     */
     public HTTPRequest(InputStream in) throws IOException, InvalidHttpFormattingException {
         BufferedReader inReader = new BufferedReader(new InputStreamReader(in));
+        
+        // Read in first line of request
         String requestLine = inReader.readLine();
         String[] splitted = requestLine.split("\\s+");
         
@@ -95,6 +92,10 @@ public class HTTPRequest {
 
         // process body
         if (line.isEmpty() && headers.get("Content-Length") != null) {
+            if (!NumberParser.isNumber(headers.get("Content-Length"))) {
+                throw new InvalidHttpFormattingException("Content length must be a number. Was: "
+                        +headers.get("Content-Length"));
+            }
             int contentLength = Integer.parseInt(headers.get("Content-Length"));
             if (contentLength <= 0)
                 return;
@@ -116,9 +117,15 @@ public class HTTPRequest {
             queryParams.put(URLDecoder.decode(key), URLDecoder.decode(value));
         }
     }
-
-    public Map<String, String> getHeaders() {
-        return headers;
+    
+    /**
+     * @throws InvalidKeyException if param with key given does not exist
+     */
+    public String getHeaderValue(String key) throws InvalidKeyException {
+        if (!headers.containsKey(key)) {
+            throw new InvalidKeyException("Header with key: " +key+ " does not exist.");
+        }
+        return headers.get(key);
     }
 
     public Method getMethod() {
@@ -134,15 +141,15 @@ public class HTTPRequest {
     public String getURI() {
         return URI;
     }
-
+    
     /**
-     * Get a map of the query parameters. The parameters could be in the URI or
-     * in the body if it's a POST request. Keys and values are decoded.
-     * 
-     * @return a Map of query parameters
+     * @throws InvalidKeyException if param with key given does not exist
      */
-    public Map<String, String> getQueryParams() {
-        return queryParams;
+    public String getParamValue(String key) throws InvalidKeyException {
+        if (!queryParams.containsKey(key)) {
+            throw new InvalidKeyException("Header with key: " +key+ " does not exist.");
+        }
+        return queryParams.get(key);
     }
     
     /**

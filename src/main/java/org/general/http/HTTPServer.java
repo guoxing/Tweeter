@@ -9,7 +9,9 @@ import org.general.http.HTTPRequest.InvalidHttpFormattingException;
 import org.general.util.Logger;
 
 /**
- * A generic HTTPServer that serves HTTPRequest and HTTPResponse.
+ * A generic HTTPServer that converts sockets into HTTPRequest and HTTResponse objects, and
+ * calls a specified handler to take action given these objects.
+ * 
  * In charge of handling errors when parsing HTTP requests.
  *
  * @author Guoxing Li
@@ -17,17 +19,22 @@ import org.general.util.Logger;
  */
 public class HTTPServer {
 
-    private ServerSocket ss;
+    private ServerSocket serverSocket;
     private String name;
     private int port;
 
+    /**
+     * Will begin listening on given port for HTTP requests, parsing them from
+     * a socket and handing an HTTPReq and HTTPRes object to the given handler.
+     * @throws HttpServerException if server can no longer accept any requests
+     */
     public HTTPServer(String name, int port, BiConsumer<HTTPRequest, HTTPResponse> httpHandler)
             throws HttpServerException {
         this.name = name;
         this.port = port;
         Logger.log("Server " + name + " started on port "+port+".");
         try {
-            ss = new ServerSocket(port);
+            serverSocket = new ServerSocket(port);
         } catch (IOException e) {
             throw new HttpServerException(e.getMessage());
         }
@@ -37,7 +44,7 @@ public class HTTPServer {
             HTTPResponse response = null;
             Socket s = null;
             try {
-                s = ss.accept();
+                s = serverSocket.accept();
                 request = new HTTPRequest(s.getInputStream());
                 response = new HTTPResponse(s.getOutputStream(), name);
             } catch (IOException | InvalidHttpFormattingException e) {
@@ -46,7 +53,8 @@ public class HTTPServer {
                             "Request is malformatted");
                 }
                 else { // IOException
-                    e.printStackTrace();
+                    Logger.log("IOException when parsing HTTP req/res: " + e.getStackTrace());
+                    // Cause of error is printed out to devs but not shown to users
                     response.send(HTTPResponse.StatusCode.SERVER_ERROR,
                             "Internal server error. Unable to parse request.");
                 }
@@ -59,6 +67,9 @@ public class HTTPServer {
         }
     }
     
+    /**
+     * On failure of close, will simply print stack trace.
+     */
     private void tryClose(Socket s) {
         try {
             s.close();
@@ -68,12 +79,16 @@ public class HTTPServer {
     }
 
     public void shutdown() throws IOException {
-        if (ss != null) {
+        if (serverSocket != null) {
             Logger.log("Server " + name + " shut down on port "+port+".");
-            ss.close();
-            ss = null;
+            serverSocket.close();
+            serverSocket = null;
         }
     }
+    
+    /**
+     * An exception wherein an http server can no longer accept any requests.
+     */
     public class HttpServerException extends Exception {
         private static final long serialVersionUID = 1L;
         public HttpServerException(String msg) {

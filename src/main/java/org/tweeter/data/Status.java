@@ -12,7 +12,8 @@ import org.general.json.JSONObject;
 import org.general.json.JSONObject.JSONable;
 
 /**
- * Represents a status. A status is immutable after creation.
+ * Represents a body of text a user has chosen to display on their profile.
+ * This is immutable after creation.
  * 
  * @author Guoxing Li
  *
@@ -33,7 +34,7 @@ public class Status extends DataEntry implements JSONable {
 
     /**
      * This is a 64-bit non-negative integer. Lower status id's correspond to
-     * statuses that were created earlier.
+     * statuses that were created earlier. Unique per status instance.
      */
     private long statusId;
 
@@ -73,10 +74,7 @@ public class Status extends DataEntry implements JSONable {
     }
 
     /**
-     * Constructs a Status object, passing in the statusId, userId, text and
-     * time.
-     * 
-     * Note that time here is passed in as a Date object.
+     * Constructs a Status object.
      * 
      * @param statusId
      *            status id

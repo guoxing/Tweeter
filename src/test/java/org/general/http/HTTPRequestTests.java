@@ -6,6 +6,7 @@ import static org.junit.Assert.fail;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
 
 import org.junit.Test;
 
@@ -32,7 +33,7 @@ public class HTTPRequestTests {
     }
 
     @Test
-    public void testGeneralParse() {
+    public void testGeneralParse() throws InvalidKeyException {
         HTTPRequest req = null;
         try {
             req = generateRequest(HTTPRequest.Method.POST
@@ -44,9 +45,9 @@ public class HTTPRequestTests {
         }
         assertEquals(req.getMethod(), HTTPRequest.Method.POST);
         assertEquals(req.getURI(), "/path/to/resource");
-        assertEquals(req.getHeaders().get("Host"), "www.google.com");
-        assertEquals(req.getQueryParams().get("id"), "123");
-        assertEquals(req.getQueryParams().get("name"), "Guoxing% Li");
+        assertEquals(req.getHeaderValue("Host"), "www.google.com");
+        assertEquals(req.getParamValue("id"), "123");
+        assertEquals(req.getParamValue("name"), "Guoxing% Li");
     }
 
     @Test

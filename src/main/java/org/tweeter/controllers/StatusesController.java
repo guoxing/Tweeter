@@ -18,6 +18,12 @@ import org.tweeter.data.StatusData;
 /**
  * In charge of API endpoints regarding users' statuses.
  * 
+ * This includes updating a user's status and getting the
+ * home timeline or user timeline of a given user.
+ * 
+ * See https://web.stanford.edu/~ouster/cgi-bin/cs190-spring15/tweeter.php
+ * for info on what a home/user timeline is.
+ * 
  * @author marcelpuyat
  *
  */
@@ -32,24 +38,10 @@ public class StatusesController {
      * statuses to retrieve (besides bound on Long type).
      */
     private static final Long DEFAULT_MAX_ID = Long.MAX_VALUE;
-    /**
-     * Parameter that holds the id of the user to perform a given action on
-     */
     private static final String PARAMS_MY_ID_KEY = "my_id";
-    /**
-     * Parameter that holds a new status body
-     */
     private static final String PARAMS_STATUS_KEY = "status";
-    /**
-     * Parameter that indicate the max number of statuses to retrieve
-     */
     private static final String PARAMS_COUNT_KEY = "count";
-    /**
-     * Parameter that indicates what the maximum id of any retrieved status
-     * should be
-     */
     private static final String PARAMS_MAX_ID_KEY = "max_id";
-
     /**
      * Updates the status of a user.
      * 
@@ -91,14 +83,12 @@ public class StatusesController {
         Long count = req.getOptionalLongParam(PARAMS_COUNT_KEY, DEFAULT_TIMELINE_SIZE);
         Long maxId = req.getOptionalLongParam(PARAMS_MAX_ID_KEY, DEFAULT_MAX_ID);
         Logger.log("Returning JSON of home timeline of " + userId);
-
         Set<Long> friendIds = FriendshipData.getInstance().getUserFriends(userId);
         Set<Long> userIds = new HashSet<Long>();
         userIds.addAll(friendIds);
         userIds.add(userId);
         List<Status> statuses = StatusData.getInstance().getStatusesOnUserIds(userIds,
                 count, maxId);
-
         return generateJSONOfTweets(statuses);
     }
 
