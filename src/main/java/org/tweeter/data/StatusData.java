@@ -24,7 +24,7 @@ import org.general.util.Logger;
 public class StatusData {
 
     private static final String FILE_NAME = "status.db";
-    private static final int STATUS_CACHE_SIZE = 5;
+    private static final int STATUS_CACHE_SIZE = 1_000;
 
     // persistent storage
     private DataStorage<Status> storage;
