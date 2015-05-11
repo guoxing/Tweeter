@@ -1,0 +1,19 @@
+Major changes from Part 1 to Part 2:
+	Data module
+
+	Exception handling
+		Previously, exception handling was scattered everywhere. We now
+		handle nearly all exceptions in Tweeter.java.
+		Number of exceptions dropped from 23 to 13
+
+	JSON module
+		Consolidated into a single class. 
+			- Lines of code reduced from 300+ to 168.
+			- Changed from mutable to immutable.
+			- Cleaning up of escape method
+	Router
+		Changed to use method references instead of a big switch statement
+			- This made the Router class so small that we combined it with our
+			main Tweeter class.
+
+	Number of lines dropped from 2790 to < 2000
