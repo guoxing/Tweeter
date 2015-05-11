@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.security.InvalidKeyException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -27,6 +26,7 @@ public class HTTPRequest {
         private Method(String str) {
             this.str = str;
         }
+        @Override
         public String toString() {
             return str;
         }
@@ -82,8 +82,13 @@ public class HTTPRequest {
         headers = new HashMap<String, String>();
         String line = inReader.readLine();
         while (line != null && !line.isEmpty()) {
-            String key = line.split(":")[0].trim();
-            String value = line.split(":")[1].trim();
+            String[] lineSplit = line.split(":");
+            if (lineSplit.length != 2) {
+                throw new InvalidHttpFormattingException(
+                        "Header is malformatted. Line: " + line);
+            }
+            String key = lineSplit[0].trim();
+            String value = lineSplit[1].trim();
             headers.put(key, value);
             line = inReader.readLine();
         }
@@ -109,9 +114,15 @@ public class HTTPRequest {
         }
     }
     
-    private void addQueryParams(String queryString) throws IOException {
+    private void addQueryParams(String queryString)
+            throws InvalidHttpFormattingException {
         String[] queries = queryString.split("&");
         for (String query : queries) {
+            String[] querySplit = query.split("=");
+            if (querySplit.length != 2) {
+                throw new InvalidHttpFormattingException(
+                        "HTTP query params are malformatted. Line: " + query);
+            }
             String key = query.split("=")[0];
             String value = query.split("=")[1];
             queryParams.put(URLDecoder.decode(key), URLDecoder.decode(value));
@@ -119,12 +130,9 @@ public class HTTPRequest {
     }
     
     /**
-     * @throws InvalidKeyException if param with key given does not exist
+     * Get the header value given a key. If the key doesn't exist, returns null.
      */
-    public String getHeaderValue(String key) throws InvalidKeyException {
-        if (!headers.containsKey(key)) {
-            throw new InvalidKeyException("Header with key: " +key+ " does not exist.");
-        }
+    public String getHeaderValue(String key) {
         return headers.get(key);
     }
 
@@ -143,12 +151,9 @@ public class HTTPRequest {
     }
     
     /**
-     * @throws InvalidKeyException if param with key given does not exist
+     * Get the param value given a key. If the key doesn't exist, returns null.
      */
-    public String getParamValue(String key) throws InvalidKeyException {
-        if (!queryParams.containsKey(key)) {
-            throw new InvalidKeyException("Header with key: " +key+ " does not exist.");
-        }
+    public String getParamValue(String key) {
         return queryParams.get(key);
     }
     
@@ -211,7 +216,10 @@ public class HTTPRequest {
     public class InvalidHttpFormattingException extends Exception {
         private static final long serialVersionUID = 1L;
         public static final String INVALID_FIRST_LINE = "First line must have HTTP Method, URI, and Version.";
-        public InvalidHttpFormattingException(String msg) { super("Invalid HTTP Formatting: " + msg); }
+
+        public InvalidHttpFormattingException(String msg) {
+            super(msg);
+        }
     }
 
 }
