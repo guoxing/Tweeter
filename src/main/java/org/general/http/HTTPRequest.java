@@ -90,14 +90,13 @@ public class HTTPRequest {
 
         // process body
         if (line.isEmpty() && headers.get("Content-Length") != null) {
-            Long val;
+            int contentLength;
             try {
-                val = Long.parseLong(headers.get("Content-Length"));
+                contentLength = Integer.parseInt(headers.get("Content-Length"));
             } catch (NumberFormatException e) {
                 throw new InvalidHttpFormattingException("Content length must be a number. Was: "
                         +headers.get("Content-Length"));
             }
-            int contentLength = Integer.parseInt(headers.get("Content-Length"));
             if (contentLength <= 0)
                 return;
             char[] bodyBuffer = new char[contentLength];
@@ -193,7 +192,7 @@ public class HTTPRequest {
             throw new InvalidHttpParametersException(key
                     + " must be a 64-bit integer. Invalid value given: " + strForm);
         }
-        return Long.parseLong(strForm);
+        return val;
     }
     
     /**
