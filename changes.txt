@@ -24,4 +24,4 @@ Major changes from Part 1 to Part 2:
     Re-wrote complicated and non-intuitive code. Remove unnecessary methods. Added more comments.
     Overall, we now favor readability and robustness over performance.
 
-Number of lines dropped from 2790 to < 2000
+Number of lines dropped from 2790 to ~ 2000
