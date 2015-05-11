@@ -1,19 +1,27 @@
 Major changes from Part 1 to Part 2:
-	Data module
+  Data module
+    Rdesigned the data module. Instead of using an entry style storage
+    with arbitrary-length columns, we now use an entry storage with fixed-length
+    columns which enables random access. Now the clients just need to
+    subclass the DataEntry class to configure the entry format they want to
+    store to use DataStorage.
 
-	Exception handling
-		Previously, exception handling was scattered everywhere. We now
-		handle nearly all exceptions in Tweeter.java.
-		Number of exceptions dropped from 23 to 13
+  Exception handling
+    Previously, exception handling was scattered everywhere. We now
+    handle nearly all exceptions in Tweeter.java.
+    Number of catch statements dropped from 23 to 13
 
-	JSON module
-		Consolidated into a single class. 
-			- Lines of code reduced from 300+ to 168.
-			- Changed from mutable to immutable.
-			- Cleaning up of escape method
-	Router
-		Changed to use method references instead of a big switch statement
-			- This made the Router class so small that we combined it with our
-			main Tweeter class.
+  JSON module
+    Consolidated into a single class. 
+      - Lines of code reduced from 300+ to 168.
+      - Changed from mutable to immutable.
+      - Cleaning up of escape method
+  Router
+    Changed to use method references instead of a big switch statement
+      - This made the Router class so small that we combined it with our
+      main Tweeter class.
+  Miscellanea
+    Re-wrote complicated and non-intuitive code. Remove unnecessary methods. Added more comments.
+    Overall, we now favor readability and robustness over performance.
 
-	Number of lines dropped from 2790 to < 2000
+Number of lines dropped from 2790 to < 2000
