@@ -45,6 +45,14 @@ public class HTTPRequest {
     private Map<String, String> queryParams;
     private Map<String, String> headers;
 
+    /**
+     * Constructor for HTTPRequest.
+     * 
+     * @param in
+     *            The InputStream where the data of this HTTPRequest comes from.
+     * @throws IOException
+     * @throws InvalidHttpFormattingException
+     */
     public HTTPRequest(InputStream in) throws IOException, InvalidHttpFormattingException {
         BufferedReader inReader = new BufferedReader(new InputStreamReader(in));
         
