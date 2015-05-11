@@ -18,7 +18,6 @@ import org.general.http.HTTPServer.HttpServerException;
 import org.general.http.InvalidHttpParametersException;
 import org.general.json.JSONObject;
 import org.general.util.Logger;
-import org.general.util.NumberParser;
 import org.general.util.Pair;
 import org.tweeter.controllers.FriendshipsController;
 import org.tweeter.controllers.StatusesController;
@@ -65,15 +64,16 @@ public class Tweeter {
      */
     public static void main(String[] args) {
         // Parse arg options
-        int port = DEFAULT_PORT;
+        Integer port = DEFAULT_PORT;
         for (int i = 0; i < args.length; i += 2) {
             if (args[i].equals("-port") && i + 1 < args.length) {
                 String portAsStr = args[i + 1];
-                if (!NumberParser.isNumber(portAsStr)) {
-                    Logger.log("Port must be a number. Invalid value given: " + portAsStr);
+                try {
+                    port = Integer.parseInt(portAsStr);
+                } catch (NumberFormatException e) {
+                    System.out.println("Port must be a number. Invalid value given: " + portAsStr);
                     return;
                 }
-                port = Integer.parseInt(portAsStr); // Will not throw exception bec we checked if is number
             }
             if (args[i].equals("-workspace") && i + 1 < args.length) {
                 DataStorage.setPathToWorkspace(args[i + 1] + "/");

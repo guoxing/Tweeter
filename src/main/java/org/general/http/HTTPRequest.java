@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.general.util.NumberParser;
-
 /**
  * A class that represents an HTTP request.
  * 
@@ -92,7 +90,10 @@ public class HTTPRequest {
 
         // process body
         if (line.isEmpty() && headers.get("Content-Length") != null) {
-            if (!NumberParser.isNumber(headers.get("Content-Length"))) {
+            Long val;
+            try {
+                val = Long.parseLong(headers.get("Content-Length"));
+            } catch (NumberFormatException e) {
                 throw new InvalidHttpFormattingException("Content length must be a number. Was: "
                         +headers.get("Content-Length"));
             }
@@ -185,7 +186,10 @@ public class HTTPRequest {
             throw new InvalidHttpParametersException(key + " is a required parameter");
         }
         String strForm = queryParams.get(key);
-        if (!NumberParser.isNumber(strForm)) {
+        Long val;
+        try {
+            val = Long.parseLong(strForm);
+        } catch (NumberFormatException e) {
             throw new InvalidHttpParametersException(key
                     + " must be a 64-bit integer. Invalid value given: " + strForm);
         }
